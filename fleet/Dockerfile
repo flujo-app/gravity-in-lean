@@ -5,7 +5,7 @@
 # build files in `.lake` are not sent to Docker:
 #
 #   mkdir ctx && cp lean-toolchain lakefile.toml lake-manifest.json ctx/
-#   docker build -f fleet/Dockerfile -t gravity-worker:lean-4.36.0 ctx
+#   docker build -f fleet/Dockerfile -t gravity-worker:lean-4.36.0-r2 ctx
 FROM node:24.22.1-bookworm-slim
 
 RUN apt-get update \
@@ -26,7 +26,11 @@ COPY lean-toolchain lakefile.toml lake-manifest.json ./
 RUN lake exe cache get \
  && chmod -R a+rwX /opt/gravity /opt/elan
 
-ENV GRAVITY_PACKAGES=/opt/gravity/.lake/packages
-# All workers in one container queue their builds on this lock (see scripts/queued-build.sh).
-ENV GRAVITY_BUILD_LOCK=/data/gravity-build.lock
+# A FACTORY agent's commands get only a few settings from this image: the search path and the
+# home folder, nothing else. (Measured on 23 November 2026: ELAN_HOME did not arrive, and Lean's
+# launcher then downloaded Lean a second time into the agent's home.) So put Lean itself, not its
+# launcher, first on the search path, and do not rely on any other setting made here:
+# scripts/setup-worktree.sh looks for the library at the fixed place /opt/gravity/.lake/packages.
+ENV PATH=/opt/elan/toolchains/leanprover--lean4---v4.36.0/bin:$PATH
+RUN test -x /opt/elan/toolchains/leanprover--lean4---v4.36.0/bin/lake
 WORKDIR /data
