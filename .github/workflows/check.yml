@@ -1,0 +1,18 @@
+name: Check the proofs
+
+# Runs the same check as `lake build` on a clean machine:
+# every proof, plus the audit that fails on any hole or extra assumption.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: leanprover/lean-action@v1
