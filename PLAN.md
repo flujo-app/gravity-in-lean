@@ -23,8 +23,9 @@ is the first step whose statements have to be designed before anything can be pr
 
 ## The short answer
 
-- **Go, on a smaller target: "one mass, from the definitions"** (steps 1 and 2 below). It is cheap,
-  very likely to work, and as far as we could find nobody has done it by machine.
+- **Go, on a smaller target: "one mass, from the definitions"** (steps 1 and 2 below). It is cheap
+  and very likely to work. As far as we could find, nobody has done step 2 by machine. Step 1 had
+  been done in Lean before; this plan first missed that (see [SURVEY.md](SURVEY.md)).
 - **No-go on an exact formula for two masses circling each other.** Such a formula almost
   certainly does not exist. It is not the goal of this project and should not become it.
 - **Not now: deriving the two-body equations from Einstein's equations by machine** (step 4b).
@@ -273,8 +274,9 @@ time. **Not verified** on the provider's own page, and nothing was rented.
 - **The pace will drop.** Today's pieces were picked because they were easy.
 - **Right proof, wrong statement.** This is the real danger in all machine-checked work, and no
   tool removes it. Only reading does.
-- **"First" is not verified.** We searched and found no machine-checked one-mass proof. Before
-  saying so in public, ask in the Lean community chat.
+- **"First" is not verified, and for step 1 it is wrong.** Step 1 had been done in Lean before
+  (see [SURVEY.md](SURVEY.md), section 2). For Birkhoff's theorem, step 2, we found no earlier
+  machine-checked proof. Before saying so in public, ask in the Lean community chat.
 - **Coordinates have blind spots.** The poles are left out of every statement, and the rim of the
   black hole out of most. That is normal in textbooks too, but it must be said.
 - **Estimates are estimates.** Step 1 is well understood. From step 3 on, the ranges are wide on
