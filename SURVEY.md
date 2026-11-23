@@ -96,7 +96,7 @@ download or build any of it.
 | Schwarzschild's solution of 1916 describes space and time around one round mass that does not spin. | Worked out |
 | Its predictions hold: clocks lower down run slower, light bends, Mercury's orbit turns, black holes cast a shadow. | Measured (by experiments, not by us) |
 | Birkhoff's theorem of 1923: for a round, empty surrounding it is the *only* solution. | Worked out |
-| Either of the two, checked by machine from the definitions. | Not found (see the short version, point 3). Both are now done in this repository, in coordinates (steps 1 and 2, 23 November 2026). Birkhoff's theorem is proved there from "looks the same from every side", for any coordinates in which turning space moves only the two angles. |
+| Either of the two, checked by machine from the definitions. | Not found (see the short version, point 3). Both are now done in this repository, in coordinates (steps 1 and 2, 23 November 2026). Birkhoff's theorem is proved there from "looks the same from every side", for any coordinates in which turning space moves only the two angles. The coordinate formulas for curvature, free fall and symmetry are also proved there to give the same answer in any coordinates. Whether that had been checked by machine elsewhere before: not verified. |
 
 **Two masses**
 

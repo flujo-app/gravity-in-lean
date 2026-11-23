@@ -14,8 +14,12 @@ estimate of 20 to 60 agent-hours. See "What step 2 showed" below.
 
 **The starting shape of step 2 is no longer assumed** (also 23 November 2026). "Looks the same
 from every side" is now where the proof begins. That took about an hour and a half. See "What the
-starting shape showed" below. Step 3 is next, and it is the first step whose statements have to be
-designed before anything can be proved.
+starting shape showed" below.
+
+**The formulas no longer depend on the coordinates on trust** (also 23 November 2026). Curvature,
+free fall and "unchanged by a turn" are each proved to give the same answer in any coordinates.
+That took about an hour. See "What the coordinate question showed" below. Step 3 is next, and it
+is the first step whose statements have to be designed before anything can be proved.
 
 ## The short answer
 
@@ -91,6 +95,42 @@ tool removed that risk before any Lean was written. Lean then only had to confir
 What it means for the steps below: their hours are probably too high as well. But step 3 contains
 kinds of work steps 1 and 2 did not: limits ("to first order"), and statements that first have to
 be invented. Read the hours as upper limits until measured.
+
+## What the coordinate question showed
+
+Everything above computes with formulas in coordinates. The first item of "taken on trust" was
+that these formulas mean the same in any coordinates. That is now proved, for all three of them.
+It is a different kind of work from steps 1 and 2: a general statement about any length measure
+in any number of coordinates, not a computation for one space-time.
+
+| | | Mark |
+|---|---|---|
+| From the question to the curvature theorem | 28 minutes | Measured |
+| With the worked cases, free fall and symmetry as well | about an hour in all, about 30 builds | Measured |
+| Size now | 375 theorems, about 7,400 lines; all 749 declarations audited | Measured |
+| Estimate beforehand | none had been made | |
+| Tries needed | the curvature proof took most of the builds, again with small errors in the glue and none in the mathematics; the free-fall and the symmetry proof needed one small fix each, and their worked cases compiled on the first try | Measured |
+
+How it was done: no index was pushed around by hand where a table could do the work. The
+connections, their slopes and the full curvature were written as square tables, so that the
+cancellation at the heart of the proof became a few lines of table algebra. The standard library
+supplied the two facts from analysis: the chain rule, and "the order of two slopes does not
+matter".
+
+What it rests on, said plainly: the change of coordinates has to be smooth near the point and
+must lose no direction there. Nothing is assumed about the inverse of the length measure beyond
+its existence. That it is smooth is proved (`contDiffAt_of_inverse`).
+
+Each of the three theorems was then tested on a case whose answer was already known by another
+route: Eddington's way of writing the black hole. Its emptiness, its roundness and its
+free-falling orbit all follow from Schwarzschild's coordinates through the new theorems, and all
+three agree with what step 1 and step 2 had computed directly.
+
+What is still open here, and could be closed with the tools at hand: the two directions of
+Birkhoff's theorem ("empty and round, so Schwarzschild's in other coordinates" and
+"Schwarzschild's in other coordinates, so empty") are proved separately. Joining them into one
+"exactly when" needs the new time label to be shown three times differentiable, which asks for
+one more degree of smoothness in the setting, and a version of step 1 inside the rim.
 
 ## The steps
 
@@ -178,18 +218,20 @@ once its statements are fixed.
 | | | Mark |
 |---|---|---|
 | Checking one file | 1.2 to 1.3 GB of memory, 7 to 12 seconds | Measured |
-| Rebuilding the whole project (not the standard library) | 46 seconds; at the peak 3.1 GB for all Lean processes together, up to three at once | Measured |
+| Rebuilding the whole project (not the standard library) | 81 seconds; at the peak 4.3 GB for all Lean processes together, up to four at once. (Before the files about other coordinates: 46 seconds, 3.1 GB, three at once.) | Measured |
 | The ready-built standard library | about 3.4 GB on disk; workers can share one copy, because they only read it | Measured (size), Worked out (sharing) |
 
 So Lean is not the memory problem the first version of this plan assumed. A build is short, and
 Lean already checks independent files side by side. Several *builds* at the same time only happen
-when several workers each changed something and each want it checked. Even then, ten builds at
-once fit into about 30 GB, and a simple queue (one build at a time per machine) costs little,
-because each build takes seconds.
+when several workers each changed something and each want it checked. The usual build after a
+change re-checks one or two files and stays near 1.3 GB. A full rebuild is the expensive case: ten
+of those at once would now need about 43 GB, more than this PC has. A simple queue (one build at
+a time per machine) avoids the question and costs little, because each build takes seconds.
 
 **Decided for step 3 (23 November 2026): builds are queued, one at a time per machine.** No
 cloud machine and no extra memory are needed for that. A queue costs little, because a build
-takes seconds, and it keeps memory use at the level of a single build (about 3 GB at the peak).
+takes seconds, and it keeps memory use at the level of a single build (about 4 GB at the peak,
+as the project stands now).
 Several builds side by side stay possible later, if waiting for the queue ever becomes the slow
 part.
 
@@ -242,7 +284,7 @@ time. **Not verified** on the provider's own page, and nothing was rented.
 
 **Steps 1 and 2 are done.** Pieces B and C no longer carry a "taken on trust" note, and
 Schwarzschild's space-time is now proved to be the only round empty one, starting from the
-symmetry itself.
+symmetry itself. The formulas used on the way are proved not to depend on the coordinates.
 
 **Do step 3 next** (weak gravity gives Newton), but start with the statements, not the proofs.
 "To first order" has to be said precisely before anyone proves it, and each statement needs a
@@ -260,7 +302,6 @@ formula for two orbiting masses to find, so this project is not looking for one.
 2. Step 3: write down the statements of "weak gravity gives Newton" and have them read.
 3. Offer steps 1 and 2 to the community physics library.
 
-One thing that could be done before step 3, if the definitions are to rest on less trust: prove
-that the coordinate formula for curvature gives the same answer in any coordinates. It is a
-general statement, not about one space-time, so it is a different kind of work from steps 1
-and 2. Estimate: **not made yet**.
+One thing that was open before step 3 is done: the formulas for curvature, free fall and
+symmetry are proved to give the same answer in any coordinates (see "What the coordinate question
+showed").
