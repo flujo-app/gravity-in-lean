@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>Slow Clocks, Bent Light</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+/* One look only: deep space filling the page. A strip of clock rows on top, everything else stays out of the way. */
+:root {
+  color-scheme: dark;
+  --bg: #03050a;
+  --panel: rgba(7, 11, 20, 0.7);
+  --line: rgba(160, 190, 230, 0.26);
+  --ink: #e9eff8;
+  --soft: #a3b4cb;
+  --hot: #ffd27a;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; overflow: hidden; }
+.app { --row: 21px; --side-l: max(10px, env(safe-area-inset-left, 0px)); --side-r: max(10px, env(safe-area-inset-right, 0px)); position: relative; width: 100%; height: 100%; min-height: 420px; overflow: hidden; background: var(--bg); }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; cursor: grab; }
+#view:active { cursor: grabbing; }
+.app:not(.live) .tl, .app:not(.live) .tpane, .app:not(.live) .chips, .app:not(.live) .me, .app:not(.live) .keys, .app:not(.live) .pad, .app:not(.live) #tags { visibility: hidden; }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%); }
+#tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.tag { position: absolute; left: 0; top: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); white-space: nowrap; text-shadow: 0 1px 6px #000; will-change: transform; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+
+/* the clock rows */
+.tl { position: absolute; top: 8px; left: var(--side-l); right: var(--side-r); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: repeat(5, var(--row)); column-gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.tl canvas { grid-column: 2; grid-row: 1 / 6; width: 100%; height: 100%; display: block; min-width: 0; }
+.tl button { grid-column: 1; justify-self: start; height: calc(var(--row) - 3px); padding: 0 9px; border: 0; border-radius: 999px; background: transparent; color: var(--k); font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; white-space: nowrap; line-height: 1; }
+.tl button[aria-pressed="true"] { background: var(--k); color: #0b0f17; }
+.tl button .short { display: none; }
+.tl output { grid-column: 3; min-width: 13ch; text-align: right; font-family: var(--font-mono); font-size: 11.5px; color: var(--soft); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chips { position: absolute; top: calc(30px + 5 * var(--row)); right: var(--side-r); display: flex; gap: 6px; }
+.chips button { height: 30px; padding: 0 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--soft); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.chips button[aria-pressed="true"] { background: var(--hot); border-color: var(--hot); color: #1b1404; }
+.chips .round { width: 30px; padding: 0; }
+.me { position: absolute; top: calc(34px + 5 * var(--row)); left: calc(var(--side-l) + 4px); max-width: calc(100% - 300px); margin: 0; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); text-shadow: 0 1px 6px #000; pointer-events: none; font-variant-numeric: tabular-nums; }
+
+/* the details view: only for those who ask */
+.drawer { position: absolute; top: calc(70px + 5 * var(--row)); right: var(--side-r); width: min(318px, calc(100% - 20px)); max-height: calc(100% - 96px - 5 * var(--row)); overflow: auto; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 12px; background: rgba(7, 11, 20, 0.88); display: grid; gap: 7px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.drawer h2 { margin: 8px 0 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hot); }
+.drawer h2:first-child { margin-top: 0; }
+.drawer label { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.drawer label output { font-family: var(--font-mono); font-size: 12px; color: var(--soft); }
+.drawer input[type="range"] { width: 100%; margin: 0; accent-color: var(--hot); }
+.drawer .small { justify-self: start; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; font-size: 12.5px; color: var(--soft); }
+.calc { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; }
+.calc dt { color: var(--soft); }
+.calc dd { margin: 0; text-align: right; font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fx { margin: 0; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.6; color: var(--soft); }
+.note { margin: 0; font-size: 12px; line-height: 1.45; color: var(--soft); }
+.drawer canvas { width: 100%; height: auto; display: block; }
+
+.tpane { position: absolute; left: var(--side-l); bottom: 58px; width: min(44%, 560px); height: min(48%, 420px); border: 1px solid var(--line); border-radius: 10px; pointer-events: none; overflow: hidden; }
+.tpane span { position: absolute; left: 10px; top: 8px; right: 10px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--soft); text-shadow: 0 1px 6px #000; }
+.whisper { position: absolute; left: 50%; bottom: 13%; transform: translateX(-50%); margin: 0; width: min(92%, 700px); text-align: center; font-family: var(--font-display); font-stretch: 108%; font-weight: 600; font-size: clamp(17px, 2.5vw, 23px); line-height: 1.25; text-wrap: balance; color: #fff6e0; text-shadow: 0 2px 14px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9); opacity: 0; transition: opacity 1.4s ease; pointer-events: none; }
+.whisper.on { opacity: 1; }
+.keys { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 5px 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-family: var(--font-mono); font-size: 11.5px; color: var(--soft); white-space: nowrap; pointer-events: none; transition: opacity 1.2s ease; }
+.keys.off { opacity: 0; }
+.pad { position: absolute; right: var(--side-r); bottom: 14px; display: none; gap: 6px; }
+.pad button { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); font-family: var(--font-mono); font-size: 12px; font-weight: 700; touch-action: none; }
+@media (pointer: coarse) { .pad { display: flex; } .keys { display: none; } }
+@media (max-width: 720px) {
+  .app { --row: 19px; }
+  .keys { display: none; }
+  .tl { column-gap: 4px; padding: 6px; }
+  .tl button { padding: 0 6px; }
+  .tl button .full { display: none; }
+  .tl button .short { display: inline; }
+  .tl output { min-width: 11ch; font-size: 10.5px; }
+  .drawer { top: auto; bottom: 74px; left: var(--side-l); width: auto; max-height: 50%; }
+  .tpane { right: var(--side-r); width: auto; height: 31%; bottom: 74px; }
+  .me { top: calc(68px + 5 * var(--row)); max-width: calc(100% - 28px); }
+  .whisper { bottom: 21%; }
+}
+@media (prefers-reduced-motion: reduce) { .whisper, .keys { transition: none; } }
+
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); background: rgba(3, 5, 10, 0.5); overflow: auto; }
+#start { background: rgba(3, 5, 10, 0.25); }
+.sheet { width: min(580px, 100%); background: rgba(8, 12, 22, 0.92); border: 1px solid var(--line); border-radius: 12px; padding: 24px 26px; display: grid; gap: 11px; }
+.sheet h1 { margin: 0; font-family: var(--font-display); font-stretch: 122%; font-weight: 800; font-size: clamp(30px, 6.4vw, 46px); line-height: 1; letter-spacing: -0.01em; }
+.sheet h2 { margin: 6px 0 0; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hot); }
+.sheet p, .sheet li { margin: 0; color: #d3ddec; }
+.sheet ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.sheet .fine, .sheet .fine li { font-size: 13.5px; color: var(--soft); }
+.sheet .fine b { color: var(--ink); }
+.go { justify-self: start; padding: 11px 22px; border-radius: 999px; border: 0; background: var(--hot); color: #1b1404; font-weight: 800; font-size: 16px; }
+.go:disabled { opacity: 0.5; cursor: not-allowed; }
+[hidden] { display: none !important; }
+</style>
+
+<div class="app" id="app">
+  <canvas id="view" tabindex="0" aria-label="A heavy mass, a light mass, a far observer and you, in open space, with flashes of light passing through"></canvas>
+  <div class="vignette"></div>
+  <div id="tags"></div>
+
+  <div class="tl" id="tl" role="group" aria-label="One row per clock. Choose a row to see the world from there."><canvas id="tape" aria-hidden="true"></canvas></div>
+  <p class="me" id="me"></p>
+  <div class="chips">
+    <button type="button" id="b-time" aria-pressed="false">time as height</button>
+    <button type="button" id="b-details" aria-pressed="false">details</button>
+    <button type="button" class="round" id="b-help" aria-label="Controls and notes">?</button>
+  </div>
+
+  <aside class="drawer" id="drawer" hidden aria-label="Details">
+    <h2>What if</h2>
+    <label for="s-c">Speed of light <output id="o-c"></output></label>
+    <input type="range" id="s-c" min="-0.51" max="1.1" step="0.01" value="0">
+    <label for="s-m">Heavy mass <output id="o-m"></output></label>
+    <input type="range" id="s-m" min="-1.61" max="1.5" step="0.01" value="0">
+    <label for="s-l">Light mass <output id="o-l"></output></label>
+    <input type="range" id="s-l" min="0" max="10" step="0.1" value="1">
+    <label for="s-e">Your engine <output id="o-e"></output></label>
+    <input type="range" id="s-e" min="-1.39" max="2.08" step="0.01" value="0">
+    <button type="button" class="small" id="b-reset">Put all back</button>
+    <p class="note" id="d-real"></p>
+    <h2 id="d-who">This clock</h2>
+    <dl class="calc">
+      <dt>speed</dt><dd id="d-speed"></dd>
+      <dt>speed part</dt><dd id="d-sf"></dd>
+      <dt>distance</dt><dd id="d-dist"></dd>
+      <dt>depth part</dt><dd id="d-df"></dd>
+      <dt>together</dt><dd id="d-tot"></dd>
+    </dl>
+    <p class="fx">speed part = √(1 − v²/c²)<br>depth part = √(1 − r<sub>s</sub>/r), r<sub>s</sub> = 2GM/c²<br>together = speed part × depth part</p>
+    <p class="note">r is the distance you get from the length of a circle around the mass, divided by 2π. Close in it is larger than the distance on the map, because there is more room down there than a flat map can show.</p>
+    <h2>How each one's going is split</h2>
+    <canvas id="g-arc" width="560" height="300"></canvas>
+    <h2>Clock rate against distance</h2>
+    <canvas id="g-rate" width="560" height="260"></canvas>
+  </aside>
+
+  <div class="tpane" id="tpane" hidden><span>the same moment · up is each one's own time</span></div>
+  <p class="whisper" id="whisper" aria-live="polite"></p>
+  <p class="keys" id="keys">W A S D fly · Q E down, up · Space stop · G let go · 1 to 5 change view · T time as height · drag, wheel</p>
+  <div class="pad"><button type="button" id="b-down" aria-label="Down">▼</button><button type="button" id="b-up" aria-label="Up">▲</button><button type="button" id="b-out" aria-label="Pull back">−</button><button type="button" id="b-in" aria-label="Move in">+</button><button type="button" id="b-stop" aria-label="Stop">stop</button></div>
+
+  <div class="overlay" id="start">
+    <div class="sheet">
+      <h1>Slow Clocks, Bent Light</h1>
+      <p>A heavy mass, a light mass, a far observer, a distant light that flashes once a second, and you. Every one of them keeps its own time.</p>
+      <button type="button" class="go" id="b-start">Enter</button>
+      <p class="fine" id="start-note">W A S D to fly, drag to look, wheel to zoom. The rows on top are the clocks: choose one to see the world from there. On a phone: left thumb flies, right thumb looks.</p>
+    </div>
+  </div>
+
+  <div class="overlay" id="about" hidden>
+    <div class="sheet">
+      <h2>Getting around</h2>
+      <ul>
+        <li>Drag to look around, wheel to zoom. W A S D fly, Q and E go down and up.</li>
+        <li>Your engine gives one steady push. The pull of the masses never switches off, so close in you have to push against it.</li>
+        <li>Space turns the engine against your motion until you stand still, then holds you there if it is strong enough. G lets go, and you fall.</li>
+        <li>Choose a row on top, or press 1 to 5, to see the world from there and by that clock. On the light ray's row time stands still, and W and S move you along the ray.</li>
+        <li>F opens the details: sliders, the sums, two graphs. T opens a second picture of the same moment, with up and down replaced by each one's own time. P holds time still. R starts again.</li>
+      </ul>
+      <h2>How to read it</h2>
+      <p>Each row is one clock, and each tick is one of its own seconds. The rows line up moment by moment, so a row with fewer ticks is a clock that runs slower. A dot is a flash from the light source reaching that clock. The glowing sheets are those flashes on their way. The lines on the floor are paths that light would take. The row you chose always ticks evenly, because its clock sets the pace: your own seconds always feel normal to you. To watch your own clock slow down, choose the far observer's row. Whenever you fall freely, a ball of loose dust is let go around you: watch its shape.</p>
+      <h2>In real numbers</h2>
+      <p class="fine">Read one map unit as a kilometre. The heavy mass is then a neutron star of 1.35 suns, 11.5 km in radius, like ones that have been weighed and measured. A clock on its surface runs at about 82% of a far one. Everything is shown about 7,500 times slower than it would really happen, and your engine pushes with about 200 billion times the pull you feel on Earth.</p>
+      <h2>How sure is this</h2>
+      <ul class="fine">
+        <li><b>Measured:</b> clocks lower down near a mass run slow, and so do moving clocks. Light bends near a mass and arrives late. Neutron stars of this mass and size exist; the heaviest found weigh about 2.1 suns.</li>
+        <li><b>Worked out:</b> paths, clock rates, bent flashes and the bent sky follow Einstein's equations for one mass that does not spin, and were checked against the textbook sums (light bending to about one part in a hundred, the rest to five digits). The engine follows the real law for a rocket: a steady push as felt on board, added to the pull. The ball of dust is the real tide: every grain falls on its own.</li>
+        <li><b>Nobody has it exactly:</b> two masses circling each other. There is no formula for that, only step-by-step sums on very large computers. This page adds the light mass's pull to the heavy one's, which is right to about a thousandth here. Set the light mass to "no pull" and every sum on the page is exact.</li>
+        <li><b>Open:</b> exactly how heavy a neutron star can get before it collapses. The page uses 2.2 suns.</li>
+        <li><b>Picture:</b> everything is drawn on the far observer's map, moment by moment. Someone moving fast would cut the moments differently, so only clocks compared at the same place are beyond argument. It is not what your eyes would see. Light has no clock and no point of view of its own: the ray's row shows the limit of riding ever faster.</li>
+        <li><b>Invented:</b> how strong your engine is, that you and your ship survive any of this, and the light mass (nothing that small and dense is known). Nobody can change the speed of light; that slider keeps everyday speeds and pulls the same and changes only what light does. The world never plays more than fifty times faster, even when the clock you chose would call for more.</li>
+      </ul>
+      <button type="button" class="go" id="b-close">Back</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+// Lengths are map units, times are seconds. Read a map unit as a kilometre and the heavy mass is a neutron star of 1.35 suns, 11.5 km in radius,
+// shown about 7,500 times slower than it would really happen. C0: how far light goes in a second on screen. M_FALL: heavier than this (2.2 suns) it collapses.
+const C0 = 40, M1_0 = 2, M2_0 = 0.06, M1_MAX = 9, M_FALL = 3.25, R_STAR = 9.4, R_ORB = 70, R_PL = 2.6, PUSH = 35, L_MAX = 500, KM_SUN = 1.4766;
+const G = 33, GV = G * G, MID = (G - 1) / 2, TH = 0.5, NS = 26;
+const app = document.getElementById('app'), canvas = document.getElementById('view');
+const $ = id => document.getElementById(id);
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sstep = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const SRC = new THREE.Vector3(-250, 24, -60), FARP = new THREE.Vector3(150, 40, 126), HDIR = new THREE.Vector3(-0.5, 0.5, 0.7).normalize(), UP = new THREE.Vector3(0, 1, 0);
+
+/* ---------- what you can change, and what follows from it ---------- */
+const P = { cMul: 1, mMul: 1, lMul: 1, eMul: 1, c: C0, M1: M1_0, M2: M2_0, push: PUSH / (C0 * C0), nSurf: 0.82, bh: false, bCrit: 10.4, bDisc: 14.2, clockR: R_STAR + 0.5, cap: R_STAR, hoverR: 0 };
+// the push an engine needs to hold something still at map distance rho from the heavy mass (per unit of mass, counting light speed as 1)
+function holdPush(rho) { const s = P.M1 / (2 * rho), q = 1 + s; return s >= 1 ? Infinity : P.M1 / (rho * rho * q * q * q * (1 - s)); }
+function derive() {
+  P.c = C0 * P.cMul; P.M1 = Math.min(M1_MAX, M1_0 * P.mMul / (P.cMul * P.cMul)); P.M2 = M2_0 * P.lMul / (P.cMul * P.cMul); P.push = PUSH * P.eMul / (P.c * P.c);
+  const s = P.M1 / (2 * R_STAR), RA = R_STAR * (1 + s) * (1 + s);
+  P.nSurf = (1 - s) / (1 + s);
+  P.bh = P.M1 > M_FALL;                                 // heavier than about 2.2 suns, no neutron star can hold itself up
+  P.bCrit = 5.196152 * P.M1;                            // light passing closer than this is caught
+  P.bDisc = P.bh ? P.bCrit : RA / Math.sqrt(1 - 2 * P.M1 / RA);   // how big the heavy thing looks from far away
+  P.cap = P.bh ? 0.53 * P.M1 : R_STAR;                  // where light ends: the surface, or the rim of the black hole
+  // inside this distance the engine can no longer hold you still (0 when it can hold you anywhere you can get to)
+  const low = P.bh ? 0.56 * P.M1 : P.clockR;
+  if (holdPush(low) <= P.push) P.hoverR = 0;
+  else { let a = low, b = 3000; for (let i = 0; i < 60; i++) { const m = 0.5 * (a + b); if (holdPush(m) > P.push) a = m; else b = m; } P.hoverR = b; }
+}
+
+/* ---------- the shape of space and time around the two masses ---------- */
+// s measures how deep a spot is. Clocks there tick at (1 - s) / (1 + s) of a far clock's rate, and lengths are stretched by (1 + s) squared.
+const F = { s: 0, gx: 0, gy: 0, gz: 0 };
+const pl = { x: R_ORB, z: 0, phi: 0.9, om: 0, rate: 1, beta: 0, vx: 0, vz: 0 };
+function sAt(x, y, z) {
+  const r2 = x * x + y * y + z * z, i1 = 1 / Math.sqrt(Math.max(r2, 0.01)), k1 = -0.5 * P.M1 * i1 * i1 * i1;
+  let s = 0.5 * P.M1 * i1; F.gx = k1 * x; F.gy = k1 * y; F.gz = k1 * z;
+  const dx = x - pl.x, dz = z - pl.z, q2 = dx * dx + y * y + dz * dz;
+  if (q2 < 3600) {
+    if (q2 > R_PL * R_PL) { const i2 = 1 / Math.sqrt(q2), k2 = -0.5 * P.M2 * i2 * i2 * i2; s += 0.5 * P.M2 * i2; F.gx += k2 * dx; F.gy += k2 * y; F.gz += k2 * dz; }
+    else s += 0.5 * P.M2 / R_PL;
+  }
+  return (F.s = Math.min(s, 0.96));
+}
+const lapseAt = (x, y, z) => { const s = sAt(x, y, z); return (1 - s) / (1 + s); };
+// the light mass goes round the heavy one on a circle; its clock loses to both its speed and its depth
+function stepPlanet(dt) {
+  const s = P.M1 / (2 * R_ORB), r = R_ORB * (1 + s) * (1 + s), s2 = P.M2 / (2 * R_PL);
+  pl.om = Math.sqrt(P.M1 / (r * r * r)) * P.c; pl.phi += pl.om * dt;
+  pl.x = R_ORB * Math.cos(pl.phi); pl.z = R_ORB * Math.sin(pl.phi); pl.vx = -pl.om * pl.z; pl.vz = pl.om * pl.x;
+  pl.beta = Math.sqrt(P.M1 / (r - 2 * P.M1));
+  pl.rate = Math.sqrt(Math.max(1 - 3 * P.M1 / r, 0.01)) * (1 - s2) / (1 + s2);
+}
+
+/* ---------- you: place, push (per unit of mass) and own time ---------- */
+const ship = { st: new Float64Array(7), kind: 'static', thrust: null, off: new THREE.Vector3(), head: new THREE.Vector3(-0.3, 0, -0.95).normalize(), rate: 1, beta: 0, N: 1, need: 0, fell: 0, vel: new THREE.Vector3() };
+const thrust = [0, 0, 0];
+const k1 = new Float64Array(7), k2 = new Float64Array(7), k3 = new Float64Array(7), k4 = new Float64Array(7), tmp = new Float64Array(7);
+// How a thing with mass changes from one moment to the next. Its place moves with its push. Its push changes by the pull of the masses
+// (toward slower clocks, and more so the faster it goes), plus the engine if one is running. Its own clock runs at the local rate, slowed again by its speed.
+function deriv(s, f, o) {
+  const sv = sAt(s[0], s[1], s[2]), q = 1 + sv, N = (1 - sv) / q, C = q * q * q * q;
+  const pp = s[3] * s[3] + s[4] * s[4] + s[5] * s[5], p2 = pp / C, E = Math.sqrt(1 + p2), a = N / (C * E), k = 2 * E / (q * q) + N * p2 * 2 / (q * E);
+  o[0] = a * s[3]; o[1] = a * s[4]; o[2] = a * s[5]; o[6] = N / (E * P.c);
+  o[3] = k * F.gx; o[4] = k * F.gy; o[5] = k * F.gz;
+  if (f) {
+    // The engine: a steady push as felt on board, which is the real law for a rocket. Counted by someone standing still,
+    // the part of the push across the direction of motion comes out weaker the faster you go.
+    const ff = f[0] * f[0] + f[1] * f[1] + f[2] * f[2]; let w = 1;
+    if (pp > 1e-14 && ff > 0) { const par = (f[0] * s[3] + f[1] * s[4] + f[2] * s[5]) / Math.sqrt(ff * pp); w = 1 / Math.sqrt(par * par + E * E * (1 - par * par)); }
+    const g = q * q * N * w; o[3] += f[0] * g; o[4] += f[1] * g; o[5] += f[2] * g;
+  }
+}
+function stepState(s, d, f) {
+  deriv(s, f, k1);
+  for (let i = 0; i < 7; i++) tmp[i] = s[i] + k1[i] * d / 2; deriv(tmp, f, k2);
+  for (let i = 0; i < 7; i++) tmp[i] = s[i] + k2[i] * d / 2; deriv(tmp, f, k3);
+  for (let i = 0; i < 7; i++) tmp[i] = s[i] + k3[i] * d; deriv(tmp, f, k4);
+  for (let i = 0; i < 7; i++) s[i] += d * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6;
+}
+// give something an everyday velocity (map units a second)
+function setVel(s, vx, vy, vz) {
+  const v = Math.hypot(vx, vy, vz);
+  if (v < 1e-9) { s[3] = s[4] = s[5] = 0; return; }
+  const sv = sAt(s[0], s[1], s[2]), q = 1 + sv, N = (1 - sv) / q, b = Math.min(0.985, v * q * q / (N * P.c)), g = b / Math.sqrt(1 - b * b) * q * q / v;
+  s[3] = vx * g; s[4] = vy * g; s[5] = vz * g;
+}
+function measureShip(dt) {
+  const s = ship.st, sv = sAt(s[0], s[1], s[2]), q = 1 + sv, N = (1 - sv) / q;
+  ship.N = N; ship.need = holdPush(Math.max(Math.hypot(s[0], s[1], s[2]), 0.501 * P.M1));
+  if (ship.kind === 'free') {
+    const C = q * q * q * q, p2 = (s[3] * s[3] + s[4] * s[4] + s[5] * s[5]) / C, E = Math.sqrt(1 + p2), a = N / (C * E) * P.c;
+    ship.rate = N / E; ship.beta = Math.sqrt(p2) / E; ship.vel.set(a * s[3], a * s[4], a * s[5]);
+  } else {
+    if (ship.kind === 'planet') { ship.beta = pl.beta; ship.rate = pl.rate; ship.N = pl.rate / Math.sqrt(1 - pl.beta * pl.beta); ship.vel.set(pl.vx, 0, pl.vz); }   // standing on the light mass, you keep its time
+    else if (ship.kind === 'gone') { ship.beta = 0; ship.rate = 0; ship.vel.set(0, 0, 0); }      // at the rim, the far observer's map has you stopped for good
+    else { ship.beta = 0; ship.rate = N; ship.vel.set(0, 0, 0); }
+    s[6] += ship.rate * dt;
+  }
+  if (ship.vel.lengthSq() > 0.36) ship.head.copy(ship.vel).normalize();
+}
+// A ball of loose dust, let go around you whenever you fall freely. Every grain falls on its own path, so what happens to the ball's shape is the real tide.
+const DUST_N = 36, dustB = { on: false, age: 0, st: [], off: [] };
+for (let r = 0; r < 3; r++) for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, c = 1.5 * Math.cos(a), sn = 1.5 * Math.sin(a); dustB.off.push(r === 0 ? [c, sn, 0] : r === 1 ? [0, c, sn] : [sn, 0, c]); dustB.st.push(new Float64Array(7)); }
+function dustOut() {
+  const s = ship.st, v = ship.vel;
+  dustB.st.forEach((g, i) => { g[0] = s[0] + dustB.off[i][0]; g[1] = s[1] + dustB.off[i][1]; g[2] = s[2] + dustB.off[i][2]; g[6] = 0; setVel(g, v.x, v.y, v.z); });
+  dustB.on = true; dustB.age = 0;
+}
+// how much longer than wide the ball has become
+function dustStretch() { const s = ship.st; let lo = 1e9, hi = 0; for (const g of dustB.st) { if (g[6] < 0) continue; const d = Math.hypot(g[0] - s[0], g[1] - s[1], g[2] - s[2]); lo = Math.min(lo, d); hi = Math.max(hi, d); } return hi > 0 && lo < 1e9 ? hi / Math.max(lo, 0.05) : 1; }
+
+/* ---------- the five rows: who keeps which clock ---------- */
+const A = [
+  { id: 'you', name: 'you', short: 'you', col: 0xffd27a, css: '#ffd27a' },
+  { id: 'far', name: 'far observer', short: 'far', col: 0xdfe9f7, css: '#dfe9f7' },
+  { id: 'heavy', name: 'heavy mass', short: 'heavy', col: 0xff8a5c, css: '#ff8a5c' },
+  { id: 'light', name: 'light mass', short: 'light', col: 0x7ee0b2, css: '#7ee0b2' },
+  { id: 'ray', name: 'light ray', short: 'ray', col: 0xfff3c0, css: '#fff3c0' }
+];
+for (const a of A) Object.assign(a, { pos: new THREE.Vector3(), tau: 0, tick: 0, rate: 1, N: 1, beta: 0, flare: 0 });
+const sim = { t: 0, t0: 0, quiet: true, trailAt: 0, histAt: 0 }, src = { tau: 0, ref: 0, next: 0.5, flash: 0 };
+const state = { started: false, braking: false, paused: false, pace: 1, pushed: 0, since: 0, hud: 0, flashes: 0, touched: '', sliders: 0, rayFor: 0 };
+let persp = 0;
+// marks on the rows: a tick of a clock, or a flash arriving. Each remembers what every clock read at that moment.
+const MK = 700, mk = { n: 0, type: new Uint8Array(MK), row: new Uint8Array(MK), num: new Uint16Array(MK), tau: [0, 1, 2, 3].map(() => new Float64Array(MK)) };
+function mark(type, row) { const i = mk.n++ % MK; mk.type[i] = type; mk.row[i] = row; mk.num[i] = A[row].tick; for (let k = 0; k < 4; k++) mk.tau[k][i] = A[k].tau; }
+
+/* ---------- drawing: setup ---------- */
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
+if (renderer) { renderer.setClearColor(0x03050a, 1); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75)); }
+const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(58, 1, 0.3, 6000);
+const lineMats = [];
+const GLOW = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.22, 'rgba(255,255,255,0.6)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const sprite = color => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); scene.add(s); return s; };
+const glowLine = o => { const m = new LineMaterial(Object.assign({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }, o)); lineMats.push(m); return m; };
+
+// the sky: stars, the heavy thing's disc, and starlight bent around it
+// Where starlight really comes from. For the eye's present distance this fills a table from "the angle you look at" to
+// "the angle the star truly lies at", using the textbook sum for light passing one mass that does not spin.
+// So the bent sky is exact for the heavy mass alone (checked against rays followed step by step: equal to a hundredth of a degree).
+const LUT_N = 256, lutData = new Uint8Array(LUT_N * 4), lutTex = new THREE.DataTexture(lutData, LUT_N, 1, THREE.RGBAFormat, THREE.UnsignedByteType), lutKey = { M: -1, r: -1, e: -1 };
+lutTex.minFilter = lutTex.magFilter = THREE.NearestFilter; lutTex.generateMipmaps = false;
+// the angle light sweeps around the mass on its way in from far off to the eye. b: how close its straight path would have passed; uo: one over the eye's distance
+function sweep(b, uo, M, inbound) {
+  const ib2 = 1 / (b * b), fq = u => ib2 - u * u + 2 * M * u * u * u;
+  if (b > 5.196153 * M) {                                 // this light turns round at a nearest point and can get away again
+    let lo = 0, hi = 1 / (3 * M); for (let i = 0; i < 46; i++) { const mid = 0.5 * (lo + hi); if (fq(mid) > 0) lo = mid; else hi = mid; }
+    const up = 0.5 * (lo + hi), tip = 2 * up / Math.sqrt(Math.max((2 * up - 6 * M * up * up) * up, 1e-30)), n = b < 6.3 * M ? 240 : 48;
+    const part = s0 => { const h = (1 - s0) / n; let sum = 0; for (let i = 0; i <= n; i++) { const q = s0 + i * h, w = i === 0 || i === n ? 1 : i & 1 ? 4 : 2; sum += w * (q < 1e-7 ? tip : 2 * up * q / Math.sqrt(Math.max(fq(up * (1 - q * q)), 1e-30))); } return sum * h / 3; };
+    const toEye = part(Math.sqrt(Math.max(0, 1 - uo / up)));
+    return inbound ? toEye : 2 * part(0) - toEye;
+  }
+  const n = 96, h = uo / n; let sum = 0;                  // this light would be caught if it went on: it only ever comes inward
+  for (let i = 0; i <= n; i++) { const w = i === 0 || i === n ? 1 : i & 1 ? 4 : 2; sum += w / Math.sqrt(Math.max(fq(i * h), 1e-30)); }
+  return sum * h / 3;
+}
+function skyTable(M, rA, ff, edge) {
+  if (M === lutKey.M && Math.abs(rA - lutKey.r) < 2e-4 * rA && Math.abs(edge - lutKey.e) < 1e-5) return;
+  lutKey.M = M; lutKey.r = rA; lutKey.e = edge;
+  for (let i = 0; i < LUT_N; i++) {
+    const t = Math.max(i, 0.5) / (LUT_N - 1), th = edge + (Math.PI - edge) * t * t, b = rA * Math.sin(th) / ff;   // more entries near the disc's edge, where it changes fastest
+    const be = Math.max(b < 1e-5 ? th : Math.PI - sweep(b, 1 / rA, M, th > Math.PI / 2), -4 * Math.PI), v = Math.round((be + 4 * Math.PI) / (5 * Math.PI) * 65535);
+    lutData[i * 4] = v >> 8; lutData[i * 4 + 1] = v & 255; lutData[i * 4 + 3] = 255;
+  }
+  lutTex.needsUpdate = true;
+}
+const skyU = { uRot: { value: new THREE.Matrix3() }, uTan: { value: 0.55 }, uAsp: { value: 1 }, uLens: { value: new THREE.Vector3(0, 0, -100) }, uEdge: { value: 0.1 }, uLut: { value: lutTex }, uBH: { value: 0 }, uNs: { value: 0.5 } };
+const sky = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+  uniforms: skyU, depthTest: false, depthWrite: false,
+  vertexShader: `varying vec2 vP; void main() { vP = position.xy; gl_Position = vec4(position.xy, 1.0, 1.0); }`,
+  fragmentShader: `varying vec2 vP;
+    uniform mat3 uRot; uniform float uTan; uniform float uAsp; uniform vec3 uLens; uniform float uEdge; uniform sampler2D uLut; uniform float uBH; uniform float uNs;
+    float lut(float i) { vec4 v = texture2D(uLut, vec2((i + 0.5) / 256.0, 0.5)); return (floor(v.r * 255.0 + 0.5) * 256.0 + floor(v.g * 255.0 + 0.5)) / 65535.0 * 15.7079633 - 12.5663706; }
+    float h1(vec3 p) { p = fract(p * 0.3183099 + vec3(0.1, 0.2, 0.3)); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+    vec3 stars(vec3 d) {
+      vec3 col = vec3(0.0);
+      for (int k = 0; k < 2; k++) {
+        float sc = k == 0 ? 34.0 : 82.0; float cut = k == 0 ? 0.9 : 0.93;
+        vec3 c = floor(d * sc);
+        float h = h1(c + float(k) * 19.0);
+        if (h > cut) {
+          vec3 sp = normalize(c + 0.3 + 0.4 * vec3(h1(c + 1.3), h1(c + 2.7), h1(c + 4.1)));
+          vec3 dd = d - sp; float w = (h - cut) / (1.0 - cut); float size = (k == 0 ? 0.0017 : 0.0011) * (0.7 + 0.8 * w * w);
+          col += mix(vec3(1.0, 0.8, 0.6), vec3(0.7, 0.83, 1.0), h1(c + 9.1)) * exp(-dot(dd, dd) / (size * size)) * (k == 0 ? 0.35 + 1.1 * w * w : 0.22 + 0.4 * w);
+        }
+      }
+      float band = exp(-pow(dot(d, vec3(0.33, 0.86, 0.39)) * 3.2, 2.0));
+      return col + band * vec3(0.03, 0.04, 0.07);
+    }
+    void main() {
+      vec3 d = normalize(uRot * vec3(vP.x * uTan * uAsp, vP.y * uTan, -1.0));
+      vec3 l = normalize(uLens);
+      float ct = dot(d, l); float st = sqrt(max(1.0 - ct * ct, 0.0)); float th = acos(clamp(ct, -1.0, 1.0));   // th: how far this line of sight points away from the heavy thing
+      vec3 hot = mix(vec3(1.0, 0.9, 0.72), vec3(1.0, 0.3, 0.08), clamp((1.0 - uNs) * 1.35, 0.0, 1.0)) * (0.25 + 0.75 * uNs);   // light climbing out arrives redder and dimmer
+      vec3 col;
+      if (th <= uEdge) {                                   // inside the disc: light from here never reaches you (or it is the star itself)
+        float u = clamp(th / uEdge, 0.0, 1.0);
+        col = uBH > 0.5 ? vec3(0.0) : hot * (0.3 + 0.7 * sqrt(1.0 - u * u));
+      } else {
+        float x = sqrt((th - uEdge) / (3.14159265 - uEdge)) * 255.0; float i0 = min(floor(x), 254.0);
+        float be = mix(lut(i0), lut(i0 + 1.0), x - i0);       // the angle the star truly lies at
+        vec3 e = st > 0.00001 ? (d - l * ct) / st : vec3(0.0, 1.0, 0.0);
+        col = stars(l * cos(be) + e * sin(be));
+        float edge = (th - uEdge) / max(uEdge, 0.05);
+        col += uBH > 0.5 ? vec3(1.0, 0.85, 0.6) * 0.22 * exp(-edge * 28.0) : hot * 0.5 * exp(-edge * 5.0);
+      }
+      gl_FragColor = vec4(col, 1.0);
+      #include <colorspace_fragment>
+    }`
+}));
+sky.frustumCulled = false; sky.renderOrder = -100; scene.add(sky);
+// whatever is behind the heavy thing's disc stays hidden
+const occ = new THREE.Mesh(new THREE.CircleGeometry(1, 64), new THREE.MeshBasicMaterial({ colorWrite: false }));
+occ.renderOrder = -50; scene.add(occ);
+
+// the floor: lines that light would follow across the level plane
+const GRID_N = 14, GRID_SP = 16, GRID_R = 236, GRID_MAX = (GRID_N * 2 + 1) * 2 * 260;
+const gridPos = new Float32Array(GRID_MAX * 6), gridA = new Float32Array(GRID_MAX * 2), gridGeo = new THREE.BufferGeometry();
+gridGeo.setAttribute('position', new THREE.BufferAttribute(gridPos, 3)); gridGeo.setAttribute('aA', new THREE.BufferAttribute(gridA, 1));
+const grid = new THREE.LineSegments(gridGeo, new THREE.ShaderMaterial({
+  uniforms: { uCol: { value: new THREE.Color(0x1b7d89) } }, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  vertexShader: `attribute float aA; varying float vA; void main() { vA = aA; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform vec3 uCol; varying float vA; void main() { gl_FragColor = vec4(uCol * vA, 1.0); }`
+}));
+grid.frustumCulled = false; scene.add(grid);
+function buildGrid() {
+  let n = 0; const M = P.M1, cap2 = P.cap * P.cap, h = 2, out2 = GRID_R * GRID_R * 2.02;
+  for (let fam = 0; fam < 2; fam++) for (let k = -GRID_N; k <= GRID_N; k++) {
+    let x = fam ? k * GRID_SP : -GRID_R, z = fam ? -GRID_R : k * GRID_SP, ux = fam ? 0 : 1, uz = fam ? 1 : 0, a0 = 0;
+    const u0x = ux, u0z = uz;
+    for (let i = 0; i < 258 && n < GRID_MAX; i++) {
+      const r2 = x * x + z * z; if (r2 < cap2 || r2 > out2) break;
+      const i1 = 1 / Math.sqrt(r2), sv = 0.5 * M * i1, g = -0.5 * M * i1 * i1 * i1, q = 1 + sv, sp = (1 - sv) / (q * q * q), dn = -(4 - 2 * sv) / (q * q * q * q) / sp;
+      const hx = dn * g * x, hz = dn * g * z, dot = hx * ux + hz * uz;
+      let vx = ux - (hx - dot * ux) * h, vz = uz - (hz - dot * uz) * h; const il = 1 / Math.hypot(vx, vz); vx *= il; vz *= il;
+      const nx = x + vx * h, nz = z + vz * h;
+      const a1 = (1 - sstep(GRID_R * 0.62, GRID_R, Math.hypot(nx, nz))) * (1 - sstep(0.3, 0.75, Math.acos(clamp(vx * u0x + vz * u0z, -1, 1))));   // lines fade at the rim, and once they have been turned too far
+      gridPos.set([x, 0, z, nx, 0, nz], n * 6); gridA[n * 2] = a0; gridA[n * 2 + 1] = a1; n++;
+      x = nx; z = nz; ux = vx; uz = vz; a0 = a1;
+    }
+  }
+  gridGeo.setDrawRange(0, n * 2); gridGeo.attributes.position.needsUpdate = true; gridGeo.attributes.aA.needsUpdate = true;
+}
+
+// the light mass and its path
+const planet = new THREE.Mesh(new THREE.SphereGeometry(R_PL, 36, 22), new THREE.ShaderMaterial({
+  uniforms: { uSun: { value: new THREE.Vector3(1, 0, 0) }, uLum: { value: 1 } },
+  vertexShader: `varying vec3 vN; void main() { vN = normalize(mat3(modelMatrix) * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform vec3 uSun; uniform float uLum; varying vec3 vN;
+    void main() { float d = max(dot(normalize(vN), uSun), 0.0); gl_FragColor = vec4(vec3(0.16, 0.42, 0.36) * (0.1 + 0.95 * d * uLum) + vec3(0.02, 0.05, 0.06), 1.0);
+      #include <colorspace_fragment>
+    }`
+}));
+scene.add(planet);
+const orbit = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 180 }, (_, i) => new THREE.Vector3(R_ORB * Math.cos(i / 180 * Math.PI * 2), 0, R_ORB * Math.sin(i / 180 * Math.PI * 2)))),
+  new THREE.LineBasicMaterial({ color: 0x2f6f66, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
+scene.add(orbit);
+// small markers for the clocks, a glow on each, and a ring that goes out with every tick
+const gem = (size, color) => { const m = new THREE.Mesh(new THREE.OctahedronGeometry(size), new THREE.MeshBasicMaterial({ color })); scene.add(m); return m; };
+const gems = [null, gem(1.5, A[1].col), gem(0.6, A[2].col), gem(0.5, A[3].col), null];
+const glows = A.map(a => sprite(a.col)), lamp = sprite(0xfff3c0);
+const pings = A.slice(0, 4).map(a => {
+  const m = new THREE.Mesh(new THREE.RingGeometry(0.93, 1, 56), new THREE.MeshBasicMaterial({ color: a.col, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+  m.visible = false; scene.add(m); return { m, t: 9 };
+});
+// your craft: an arrow along the way you are going
+const craft = new THREE.Group();
+{
+  const a = new THREE.Mesh(new THREE.ConeGeometry(0.8, 2.2, 16), new THREE.MeshBasicMaterial({ color: 0xfff0cc })); a.position.y = 0.6;
+  const b = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.4, 10), new THREE.MeshBasicMaterial({ color: 0xffb347 })); b.position.y = -1.7;
+  craft.add(a, b); craft.matrixAutoUpdate = false; scene.add(craft);
+}
+const flame = sprite(0xff7a2a);
+// where you have been, and a line down to the floor so you can tell how high you are
+const TR = 260, trail = { n: 0, x: new Float32Array(TR), y: new Float32Array(TR), z: new Float32Array(TR) };
+const trailGeo = new LineGeometry(); trailGeo.setPositions(new Float32Array((TR + 1) * 3));
+{ const c = new Float32Array((TR + 1) * 3), col = new THREE.Color(0xffd27a); for (let i = 0; i <= TR; i++) { const f = 0.9 * Math.pow(i / TR, 1.8); c[i * 3] = col.r * f; c[i * 3 + 1] = col.g * f; c[i * 3 + 2] = col.b * f; } trailGeo.setColors(c); }
+const trailLine = new Line2(trailGeo, glowLine({ linewidth: 2.2, vertexColors: true })); trailLine.frustumCulled = false; scene.add(trailLine);
+const trailBuf = trailGeo.attributes.instanceStart.data;
+const plumbGeo = new THREE.BufferGeometry(); plumbGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+const plumb = new THREE.LineSegments(plumbGeo, new THREE.LineBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }));
+plumb.frustumCulled = false; scene.add(plumb);
+const foot = new THREE.Mesh(new THREE.RingGeometry(1.1, 1.3, 40), new THREE.MeshBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+foot.rotation.x = -Math.PI / 2; scene.add(foot);
+// a red ring on the floor: inside it your engine is too weak to hold you still
+const hoverRing = new THREE.Mesh(new THREE.RingGeometry(0.985, 1, 160), new THREE.MeshBasicMaterial({ color: 0xff5a3c, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+hoverRing.rotation.x = -Math.PI / 2; hoverRing.visible = false; scene.add(hoverRing);
+// the ball of loose dust: three hoops of grains
+const ballGeo = new THREE.BufferGeometry(); ballGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(36 * 6), 3));
+const ballLines = new THREE.LineSegments(ballGeo, new THREE.LineBasicMaterial({ color: 0xffe2a6, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
+ballLines.frustumCulled = false; ballLines.visible = false; scene.add(ballLines);
+const ballDotGeo = new THREE.BufferGeometry(); ballDotGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(36 * 3), 3));
+const ballDots = new THREE.Points(ballDotGeo, new THREE.PointsMaterial({ size: 0.7, map: GLOW, color: 0xfff0cc, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true }));
+ballDots.frustumCulled = false; ballDots.visible = false; scene.add(ballDots);
+// one whole ray of light, drawn all at once, with a dot for every second of the far map
+const RAY_MAX = 1400, ray = { n: 0, u: 0, len: 0, h: 0.45, p: new Float32Array(RAY_MAX * 3) };
+const rayGeo = new LineGeometry(); rayGeo.setPositions(new Float32Array(RAY_MAX * 3));
+const rayLine = new Line2(rayGeo, glowLine({ color: 0xfff3c0, linewidth: 3.2 })); rayLine.frustumCulled = false; rayLine.visible = false; scene.add(rayLine);
+const rayBuf = rayGeo.attributes.instanceStart.data;
+const rayDotGeo = new THREE.BufferGeometry(); rayDotGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(40 * 3), 3));
+const rayDots = new THREE.Points(rayDotGeo, new THREE.PointsMaterial({ size: 7, map: GLOW, color: 0x8fdcff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true }));
+rayDots.frustumCulled = false; rayDots.visible = false; scene.add(rayDots);
+
+/* ---------- flashes: sheets of light sent out by the far light source ---------- */
+const warp = u => 0.4 * u + 0.6 * u * u * u;             // more of the sheet's threads near its middle, where the bending happens
+const unwarp = w => { let u = w; for (let i = 0; i < 6; i++) u -= (0.4 * u + 0.6 * u * u * u - w) / (0.4 + 1.8 * u * u); return u; };
+const AX = SRC.clone().negate().normalize(), E1 = new THREE.Vector3().crossVectors(AX, UP).normalize(), E2 = new THREE.Vector3().crossVectors(E1, AX);
+const dir0 = new Float32Array(GV * 3), uvA = new Float32Array(GV * 2), edgeA = new Float32Array(GV), dAng = new Float32Array(G - 1), idx = [];
+for (let i = 0; i < G - 1; i++) dAng[i] = TH * (warp((i + 1) / MID - 1) - warp(i / MID - 1));
+for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) {
+  const u = i / MID - 1, v = j / MID - 1, ax = TH * warp(u), ay = TH * warp(v), tx = Math.tan(ax), ty = Math.tan(ay), k = j * G + i;
+  const dx = AX.x + tx * E1.x + ty * E2.x, dy = AX.y + tx * E1.y + ty * E2.y, dz = AX.z + tx * E1.z + ty * E2.z, il = 1 / Math.hypot(dx, dy, dz);
+  dir0[k * 3] = dx * il; dir0[k * 3 + 1] = dy * il; dir0[k * 3 + 2] = dz * il;
+  uvA[k * 2] = ax / (TH / 5); uvA[k * 2 + 1] = ay / (TH / 5);
+  edgeA[k] = 1 - sstep(0.78, 1, Math.hypot(u, v));
+  if (i < G - 1 && j < G - 1) idx.push(k, k + G, k + 1, k + 1, k + G, k + G + 1);
+}
+const uvAttr = new THREE.BufferAttribute(uvA, 2), edgeAttr = new THREE.BufferAttribute(edgeA, 1), idxAttr = new THREE.BufferAttribute(new Uint16Array(idx), 1);
+const sheets = [], eyeU = { value: new THREE.Vector3() };
+for (let n = 0; n < NS; n++) {
+  const geo = new THREE.BufferGeometry(), pos = new Float32Array(GV * 3), alpha = new Float32Array(GV);
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('aA', new THREE.BufferAttribute(alpha, 1));
+  geo.setAttribute('aUV', uvAttr); geo.setAttribute('aEdge', edgeAttr); geo.setIndex(idxAttr);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uCol: { value: new THREE.Color(0xffe9b0) }, uFade: { value: 0 }, uEye: eyeU },
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, extensions: { derivatives: true },
+    vertexShader: `attribute vec2 aUV; attribute float aA; attribute float aEdge; varying vec2 vUV; varying float vA; varying vec3 vW;
+      void main() { vUV = aUV; vA = aA * aEdge; vW = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `uniform vec3 uCol; uniform float uFade; uniform vec3 uEye; varying vec2 vUV; varying float vA; varying vec3 vW;
+      void main() {
+        vec3 n = normalize(cross(dFdx(vW), dFdy(vW)));
+        float rim = 1.0 - abs(dot(n, normalize(uEye - vW)));
+        float fl = 1.0 - smoothstep(0.0, fwidth(vW.y) * 1.7 + 0.02, abs(vW.y));
+        vec2 g = abs(fract(vUV) - 0.5); float line = smoothstep(0.47, 0.5, max(g.x, g.y));
+        gl_FragColor = vec4(uCol * vA * uFade * (0.012 + 0.15 * rim * rim * rim + 0.035 * line + 0.8 * fl), 1.0);
+      }`
+  });
+  const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false; mesh.visible = false; scene.add(mesh);
+  sheets.push({ alive: false, L: 0, pos, dir: new Float32Array(GV * 3), alpha, lost: new Uint8Array(GV), seen: new Uint8Array(4), geo, mat, mesh });
+}
+const ride = { sh: null, k: 0 };
+function emit() {
+  let sh = sheets.find(q => !q.alive);
+  if (!sh) sh = sheets.reduce((a, q) => (q.L > a.L ? q : a), sheets[0]);
+  if (ride.sh === sh) ride.sh = null;
+  sh.alive = true; sh.L = 0; sh.tauS = src.tau - src.ref; sh.lost.fill(0); sh.seen.fill(0); sh.dir.set(dir0);
+  for (let k = 0, o = 0; k < GV; k++, o += 3) { sh.pos[o] = SRC.x; sh.pos[o + 1] = SRC.y; sh.pos[o + 2] = SRC.z; }
+  src.flash = 1;
+}
+// one step for every thread of a sheet. Light turns toward where it goes slower, which is toward the masses.
+function stepSheet(sh, d) {
+  const p = sh.pos, u = sh.dir, lost = sh.lost, M1 = P.M1, M2 = P.M2, cap2 = P.cap * P.cap, px = pl.x, pz = pl.z, rp2 = R_PL * R_PL;
+  for (let k = 0, o = 0; k < GV; k++, o += 3) {
+    if (lost[k]) continue;
+    const x = p[o], y = p[o + 1], z = p[o + 2], r2 = x * x + y * y + z * z;
+    if (r2 < cap2) { lost[k] = 1; continue; }
+    const i1 = 1 / Math.sqrt(r2); let s = 0.5 * M1 * i1, g = -0.5 * M1 * i1 * i1 * i1, gx = g * x, gy = g * y, gz = g * z;
+    const dx = x - px, dz = z - pz, q2 = dx * dx + y * y + dz * dz;
+    if (q2 < 1600) {
+      if (q2 < rp2) { lost[k] = 1; continue; }
+      const i2 = 1 / Math.sqrt(q2), g2 = -0.5 * M2 * i2 * i2 * i2; s += 0.5 * M2 * i2; gx += g2 * dx; gy += g2 * y; gz += g2 * dz;
+    }
+    const q = 1 + s, qq = q * q, n = (1 - s) / (qq * q), dn = -(4 - 2 * s) / (qq * qq);
+    let ux = u[o], uy = u[o + 1], uz = u[o + 2];
+    const hx = dn * gx, hy = dn * gy, hz = dn * gz, dot = hx * ux + hy * uy + hz * uz;
+    ux -= (hx - dot * ux) * d; uy -= (hy - dot * uy) * d; uz -= (hz - dot * uz) * d;
+    const il = 1 / Math.sqrt(ux * ux + uy * uy + uz * uz); ux *= il; uy *= il; uz *= il;
+    u[o] = ux; u[o + 1] = uy; u[o + 2] = uz;
+    const st = n * d; p[o] = x + ux * st; p[o + 1] = y + uy * st; p[o + 2] = z + uz * st;
+  }
+}
+// a sheet shows nothing where it was swallowed or torn apart
+function skin(sh) {
+  const p = sh.pos, a = sh.alpha, lost = sh.lost, L = sh.L, hm = 0.5 * P.M1;
+  for (let k = 0, o = 0; k < GV; k++, o += 3) {
+    if (lost[k]) { a[k] = 0; continue; }
+    const sv = hm / Math.sqrt(p[o] * p[o] + p[o + 1] * p[o + 1] + p[o + 2] * p[o + 2]), q = 1 + sv;
+    a[k] = clamp(((1 - sv) / (q * q * q) - 0.3) / 0.3, 0, 1);
+  }
+  for (let j = 0; j < G; j++) for (let i = 0; i < G; i++) {
+    const k = j * G + i, o = k * 3;
+    if (i + 1 < G) { const m = k + 1, n = m * 3, lim = 4 * dAng[i] * L + 3, dx = p[o] - p[n], dy = p[o + 1] - p[n + 1], dz = p[o + 2] - p[n + 2]; if (lost[k] || lost[m] || dx * dx + dy * dy + dz * dz > lim * lim) { a[k] = 0; a[m] = 0; } }
+    if (j + 1 < G) { const m = k + G, n = m * 3, lim = 4 * dAng[j] * L + 3, dx = p[o] - p[n], dy = p[o + 1] - p[n + 1], dz = p[o + 2] - p[n + 2]; if (lost[k] || lost[m] || dx * dx + dy * dy + dz * dz > lim * lim) { a[k] = 0; a[m] = 0; } }
+  }
+  sh.geo.attributes.position.needsUpdate = true; sh.geo.attributes.aA.needsUpdate = true;
+  sh.mesh.visible = true; sh.mat.uniforms.uFade.value = sstep(0, 26, L) * (1 - sstep(L_MAX - 110, L_MAX, L));
+}
+// has this flash reached one of the clocks?
+function arrivals(sh) {
+  const p = sh.pos, u = sh.dir;
+  for (let a = 0; a < 4; a++) {
+    if (sh.seen[a] || (a === 2 && P.bh) || (a === 0 && ship.kind === 'gone')) continue;
+    const T = A[a].pos, far = Math.hypot(T.x - SRC.x, T.y - SRC.y, T.z - SRC.z);
+    if (sh.L < far - 40) continue;
+    if (sh.L > far + 260) { sh.seen[a] = 1; continue; }             // it went by out of reach, or was blocked
+    let best = -1, bd = 1e12;
+    for (let k = 0, o = 0; k < GV; k++, o += 3) { if (sh.lost[k]) continue; const dx = T.x - p[o], dy = T.y - p[o + 1], dz = T.z - p[o + 2], d2 = dx * dx + dy * dy + dz * dz; if (d2 < bd) { bd = d2; best = k; } }
+    if (best < 0 || bd > 400) continue;
+    const o = best * 3;
+    if ((T.x - p[o]) * u[o] + (T.y - p[o + 1]) * u[o + 1] + (T.z - p[o + 2]) * u[o + 2] > 0) continue;
+    sh.seen[a] = 1;
+    if (!sim.quiet) { mark(1, a); A[a].flare = 1; if (a === 0) state.flashes++; }
+  }
+}
+function pickRide() {
+  let best = null; for (const sh of sheets) if (sh.alive && (!best || sh.L < best.L)) best = sh;
+  if (!best) return;
+  const u = unwarp(clamp(Math.atan((1.5 * P.bDisc + 5) / SRC.length()) / TH, -1, 1));   // a thread that passes the heavy thing close, but gets away
+  ride.sh = best; ride.k = MID * G + clamp(Math.round(MID + u * MID), 0, G - 1);
+  if (persp === 4 && state.started) glide();
+}
+
+/* ---------- the other picture: the same moment, with up and down replaced by each one's own time ---------- */
+const tScene = new THREE.Scene(), tCam = new THREE.PerspectiveCamera(50, 1, 1, 12000), tMats = [], tPane = $('tpane'), SQ = 170, HIST = 520;
+const tLine = o => { const m = new LineMaterial(Object.assign({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }, o)); tMats.push(m); return m; };
+// a thread for each clock: where it has been, and how old it was there
+const threads = A.slice(0, 4).map(a => {
+  const g = new LineGeometry(); g.setPositions(new Float32Array((HIST + 1) * 3));
+  const c = new Float32Array((HIST + 1) * 3), col = new THREE.Color(a.col);
+  for (let i = 0; i <= HIST; i++) { const f = 0.08 + 0.92 * Math.pow(i / HIST, 1.5); c[i * 3] = col.r * f; c[i * 3 + 1] = col.g * f; c[i * 3 + 2] = col.b * f; }
+  g.setColors(c);
+  const line = new Line2(g, tLine({ linewidth: 2.4, vertexColors: true })); line.frustumCulled = false; tScene.add(line);
+  const tip = new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color: a.col, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false })); tScene.add(tip);
+  return { n: 0, x: new Float32Array(HIST), z: new Float32Array(HIST), tau: new Float32Array(HIST), buf: g.attributes.instanceStart.data, tip };
+});
+// each flash, lying flat at the age the light source had when it sent it: light itself does not age
+const flashes = sheets.map(() => {
+  const g = new LineGeometry(); g.setPositions(new Float32Array(G * 3));
+  const line = new Line2(g, tLine({ color: 0xffe9b0, linewidth: 1.5, opacity: 0.7 })); line.frustumCulled = false; line.visible = false; tScene.add(line);
+  return { buf: g.attributes.instanceStart.data, line };
+});
+// the net: how far everything that stands still has got since you entered. It sags where clocks run slow.
+const netU = { uM: { value: 2 }, uT: { value: 0 }, uH: { value: 40 }, uC: { value: 0 }, uSQ: { value: SQ }, uCap: { value: R_STAR } };
+{
+  const pts = [], rs = []; for (let r = 2.4; r < 262; r = r * 1.11 + 0.2) rs.push(r);
+  for (let i = 0; i < rs.length; i++) {
+    for (let q = 0; q < 96; q++) { const a0 = q / 96 * Math.PI * 2, a1 = (q + 1) / 96 * Math.PI * 2; pts.push(rs[i] * Math.cos(a0), 0, rs[i] * Math.sin(a0), rs[i] * Math.cos(a1), 0, rs[i] * Math.sin(a1)); }
+    if (i + 1 < rs.length) for (let q = 0; q < 96; q += rs[i] < 14 ? 6 : rs[i] < 50 ? 3 : 2) { const a = q / 96 * Math.PI * 2; pts.push(rs[i] * Math.cos(a), 0, rs[i] * Math.sin(a), rs[i + 1] * Math.cos(a), 0, rs[i + 1] * Math.sin(a)); }
+  }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  const net = new THREE.LineSegments(g, new THREE.ShaderMaterial({
+    uniforms: netU, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+    vertexShader: `uniform float uM; uniform float uT; uniform float uH; uniform float uC; uniform float uSQ; uniform float uCap; varying float vA;
+      void main() { float rho = length(position.xz); float s = uM / (2.0 * rho); float d = (max(1.0 - s, 0.0) / (1.0 + s) * uT * uH - uC) / uSQ;
+        vA = (1.0 - smoothstep(190.0, 258.0, rho)) * step(uCap, rho);
+        gl_Position = projectionMatrix * viewMatrix * vec4(position.x, uC + uSQ * sign(d) * log(abs(d) + sqrt(d * d + 1.0)), position.z, 1.0); }`,
+    fragmentShader: `varying float vA; void main() { gl_FragColor = vec4(vec3(0.1, 0.42, 0.46) * vA, 1.0); }`
+  }));
+  net.frustumCulled = false; tScene.add(net);
+}
+function drawTime() {
+  const r = tPane.getBoundingClientRect(), ar = app.getBoundingClientRect(), w = r.width, h = r.height;
+  if (!renderer || w < 8 || h < 8) return;
+  // true height near the row you chose; squeezed far above and below, so the past stays in sight
+  const H = P.c, hc = (persp === 4 ? (ride.sh ? ride.sh.tauS : 0) : A[persp].tau) * H, disp = v => hc + SQ * Math.asinh((v - hc) / SQ);
+  threads.forEach((th, k) => {
+    const a = th.buf.array, n = th.n, lead = HIST - n, tx = A[k].pos.x, tz = A[k].pos.z, ty = disp(A[k].tau * H);
+    for (let i = 0; i < lead; i++) { a[i * 6 + 1] = -1e7; a[i * 6 + 4] = -1e7; }
+    for (let i = 0; i < n; i++) { const o = (lead + i) * 6, last = i + 1 === n; a[o] = th.x[i]; a[o + 1] = disp(th.tau[i] * H); a[o + 2] = th.z[i]; a[o + 3] = last ? tx : th.x[i + 1]; a[o + 4] = last ? ty : disp(th.tau[i + 1] * H); a[o + 5] = last ? tz : th.z[i + 1]; }
+    th.buf.needsUpdate = true; th.tip.position.set(tx, ty, tz);
+  });
+  sheets.forEach((sh, i) => {
+    const f = flashes[i]; f.line.visible = sh.alive; if (!sh.alive) return;
+    const a = f.buf.array, y = disp(sh.tauS * H), p = sh.pos;
+    for (let q = 0; q < G - 1; q++) { const k0 = MID * G + q, k1 = k0 + 1, o = q * 6, yy = sh.alpha[k0] === 0 || sh.alpha[k1] === 0 ? -1e7 : y; a[o] = p[k0 * 3]; a[o + 1] = yy; a[o + 2] = p[k0 * 3 + 2]; a[o + 3] = p[k1 * 3]; a[o + 4] = yy; a[o + 5] = p[k1 * 3 + 2]; }
+    f.buf.needsUpdate = true; f.line.material.opacity = 0.7 * sh.mat.uniforms.uFade.value;
+  });
+  netU.uM.value = P.M1; netU.uT.value = sim.t - sim.t0; netU.uH.value = H; netU.uC.value = hc; netU.uCap.value = P.cap;
+  const dist = clamp(eye.dist * 5, 200, 1500);
+  tCam.aspect = w / h; tCam.updateProjectionMatrix();
+  target.set(view.x, hc, view.z); off.set(Math.cos(eye.pitch) * Math.sin(eye.yaw), Math.sin(eye.pitch), Math.cos(eye.pitch) * Math.cos(eye.yaw)).multiplyScalar(dist);
+  tCam.position.copy(target).add(off); tCam.lookAt(target);
+  for (const th of threads) th.tip.scale.setScalar(dist * 0.035);
+  for (const m of tMats) m.resolution.set(w, h);
+  const x = r.left - ar.left, y = ar.bottom - r.bottom;
+  renderer.setScissorTest(true); renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h); renderer.setClearColor(0x04070d, 1); renderer.clear(); renderer.render(tScene, tCam);
+  renderer.setScissorTest(false); renderer.setViewport(0, 0, app.clientWidth, app.clientHeight); renderer.setClearColor(0x03050a, 1);
+}
+function toggleTime(on) { tPane.hidden = on === undefined ? !tPane.hidden : !on; $('b-time').setAttribute('aria-pressed', String(!tPane.hidden)); if (!tPane.hidden) { if (narrow() && !$('drawer').hidden) toggleDetails(false); if (state.started) state.timeSeen = true; } }
+$('b-time').addEventListener('click', () => { toggleTime(); canvas.focus(); });
+
+/* ---------- time moves on ---------- */
+function hold() { const s = ship.st; s[3] = s[4] = s[5] = 0; ship.kind = 'static'; ship.thrust = null; state.braking = false; }
+function leave() { if (ship.kind === 'planet') { ship.kind = 'free'; setVel(ship.st, pl.vx, 0, pl.vz); } else ship.kind = 'free'; }
+// One whole thread of light from the light source, aimed to pass the heavy mass closely and get away again,
+// followed through the world as it stands at this moment. For the light itself the whole of it is a single moment.
+function buildRay() {
+  const th = Math.atan((1.5 * P.bDisc + 5) / SRC.length()), ct = Math.cos(th), st = Math.sin(th), h = ray.h, p = ray.p, dp = rayDotGeo.attributes.position.array, cap2 = P.cap * P.cap;
+  let x = SRC.x, y = SRC.y, z = SRC.z, ux = AX.x * ct + E1.x * st, uy = AX.y * ct + E1.y * st, uz = AX.z * ct + E1.z * st, t = 0, n = 0, nd = 0, best = 1e12, bi = 0;
+  while (n < RAY_MAX) {
+    p[n * 3] = x; p[n * 3 + 1] = y; p[n * 3 + 2] = z;
+    const r2 = x * x + y * y + z * z; if (r2 < best) { best = r2; bi = n; }
+    n++;
+    if (r2 < cap2 || (n > 60 && r2 > 340 * 340)) break;
+    const sv = sAt(x, y, z), q = 1 + sv, sp = (1 - sv) / (q * q * q), dn = -(4 - 2 * sv) / (q * q * q * q) / sp;
+    const hx = dn * F.gx, hy = dn * F.gy, hz = dn * F.gz, dot = hx * ux + hy * uy + hz * uz;
+    ux -= (hx - dot * ux) * h; uy -= (hy - dot * uy) * h; uz -= (hz - dot * uz) * h;
+    const il = 1 / Math.hypot(ux, uy, uz); ux *= il; uy *= il; uz *= il;
+    x += ux * h; y += uy * h; z += uz * h;
+    const t1 = t + h / (sp * P.c);                        // the far map's time for this step: longer where light is held up
+    if (Math.floor(t1) > Math.floor(t) && nd < 40) { dp[nd * 3] = x; dp[nd * 3 + 1] = y; dp[nd * 3 + 2] = z; nd++; }
+    t = t1;
+  }
+  ray.n = n; ray.len = (n - 1) * h; ray.u = bi * h;
+  const a = rayBuf.array;
+  for (let i = 0; i < RAY_MAX - 1; i++) { const j = Math.min(i, n - 1) * 3, k = Math.min(i + 1, n - 1) * 3, o = i * 6; a[o] = p[j]; a[o + 1] = p[j + 1]; a[o + 2] = p[j + 2]; a[o + 3] = p[k]; a[o + 4] = p[k + 1]; a[o + 5] = p[k + 2]; }
+  rayBuf.needsUpdate = true; rayDotGeo.attributes.position.needsUpdate = true; rayDotGeo.setDrawRange(0, nd);
+}
+function advance(dt) {
+  sim.t += dt;
+  stepPlanet(dt);
+  const s = ship.st, d = dt * P.c;
+  if (ship.kind === 'free') {
+    stepState(s, d, ship.thrust);
+    const rho = Math.hypot(s[0], s[1], s[2]);
+    if (P.bh) { if (rho < 0.56 * P.M1) { ship.kind = 'gone'; s[3] = s[4] = s[5] = 0; ship.thrust = null; state.braking = false; state.touched = 'rim'; } }   // the far observer's map ends here
+    else if (rho < P.clockR) { const k = P.clockR / rho; s[0] *= k; s[1] *= k; s[2] *= k; s[3] = s[4] = s[5] = 0; ship.kind = 'ground'; ship.thrust = null; state.braking = false; state.touched = 'heavy'; }   // landed
+    if (ship.kind === 'free') {
+      const dx = s[0] - pl.x, dz = s[2] - pl.z;
+      if (dx * dx + s[1] * s[1] + dz * dz < (R_PL + 0.9) * (R_PL + 0.9)) { ship.kind = 'planet'; ship.off.set(dx, s[1], dz).setLength(R_PL + 0.9); s[3] = s[4] = s[5] = 0; ship.thrust = null; state.braking = false; state.touched = 'light'; }
+    }
+  }
+  if (ship.kind === 'planet') { s[0] = pl.x + ship.off.x; s[1] = ship.off.y; s[2] = pl.z + ship.off.z; }
+  if (ship.kind === 'ground' && P.bh) ship.kind = 'free';                                                        // the ground has gone from under you
+  if (ship.kind === 'static' && holdPush(Math.hypot(s[0], s[1], s[2])) > P.push * 1.002) ship.kind = 'free';     // the engine can no longer hold this
+  measureShip(dt);
+  // the ball of dust: out while you fall freely, gathered in again the moment the engine runs
+  if (ship.kind === 'free' && !ship.thrust) { ship.fell += dt; if (!dustB.on && ship.fell > 0.3 && !sim.quiet) dustOut(); } else { ship.fell = 0; dustB.on = false; }
+  if (dustB.on) {
+    const lim = P.cap * P.cap; let far = 0;
+    for (const g of dustB.st) {
+      if (g[6] < 0) continue;
+      stepState(g, d, null);
+      if (g[0] * g[0] + g[1] * g[1] + g[2] * g[2] < lim) { g[6] = -1; continue; }                                 // this grain has landed, or is gone
+      far = Math.max(far, Math.hypot(g[0] - s[0], g[1] - s[1], g[2] - s[2]));
+    }
+    dustB.age += dt; if (far > 70 || dustB.age > 45) { dustB.on = false; ship.fell = -3; }
+  }
+  A[0].pos.set(s[0], s[1], s[2]); A[0].tau = s[6]; A[0].rate = ship.rate; A[0].N = ship.N; A[0].beta = ship.beta;
+  A[1].pos.copy(FARP); A[1].N = A[1].rate = lapseAt(FARP.x, FARP.y, FARP.z); A[1].tau += A[1].rate * dt;
+  if (P.bh) { A[2].pos.set(0, 0, 0); A[2].N = A[2].rate = 0; }                                                     // a black hole has no surface, so no clock of its own
+  else { A[2].pos.copy(HDIR).multiplyScalar(P.clockR); A[2].N = A[2].rate = lapseAt(A[2].pos.x, A[2].pos.y, A[2].pos.z); A[2].tau += A[2].rate * dt; }
+  A[3].pos.set(pl.x, R_PL + 0.4, pl.z); A[3].rate = pl.rate; A[3].beta = pl.beta; A[3].N = pl.rate / Math.sqrt(1 - pl.beta * pl.beta); A[3].tau += pl.rate * dt;
+  for (let k = 0; k < 4; k++) while (A[k].tau >= A[k].tick + 1) { A[k].tick++; if (!sim.quiet) { mark(0, k); pings[k].t = 0; } }
+  src.tau += lapseAt(SRC.x, SRC.y, SRC.z) * dt;
+  if (src.tau >= src.next) { src.next += 1; emit(); }
+  for (const sh of sheets) if (sh.alive) { stepSheet(sh, d); sh.L += d; if (sh.L > L_MAX) { sh.alive = false; sh.mesh.visible = false; } }
+  if (sim.t >= sim.histAt) {
+    sim.histAt = sim.t + 0.1;
+    threads.forEach((th, k) => { if (th.n === HIST) { th.x.copyWithin(0, 1); th.z.copyWithin(0, 1); th.tau.copyWithin(0, 1); th.n--; } th.x[th.n] = A[k].pos.x; th.z[th.n] = A[k].pos.z; th.tau[th.n] = A[k].tau; th.n++; });
+  }
+  if (sim.t >= sim.trailAt) { sim.trailAt = sim.t + 0.05; if (trail.n === TR) { trail.x.copyWithin(0, 1); trail.y.copyWithin(0, 1); trail.z.copyWithin(0, 1); trail.n--; } trail.x[trail.n] = s[0]; trail.y[trail.n] = s[1]; trail.z[trail.n] = s[2]; trail.n++; }
+}
+// once a frame: tidy the sheets, see who was reached, and find the point of light the eye follows
+function settle() {
+  for (const sh of sheets) if (sh.alive) { skin(sh); arrivals(sh); }
+  if (!ride.sh || !ride.sh.alive || ride.sh.lost[ride.k]) pickRide();
+  if (persp === 4 && state.started && ray.n > 1) { const f = clamp(ray.u / ray.h, 0, ray.n - 1.001), i = Math.floor(f) * 3, w = f - Math.floor(f), p = ray.p; A[4].pos.set(p[i] + (p[i + 3] - p[i]) * w, p[i + 1] + (p[i + 4] - p[i + 1]) * w, p[i + 2] + (p[i + 5] - p[i + 2]) * w); }
+  else if (ride.sh) { const o = ride.k * 3; A[4].pos.set(ride.sh.pos[o], ride.sh.pos[o + 1], ride.sh.pos[o + 2]); } else A[4].pos.copy(SRC);
+  A[4].N = lapseAt(A[4].pos.x, A[4].pos.y, A[4].pos.z); A[4].rate = 0; A[4].beta = 1;
+}
+function resetClocks() {
+  for (const a of A) { a.tau = 0; a.tick = 0; }
+  ship.st[6] = 0; mk.n = 0;
+  for (const sh of sheets) sh.tauS = (sh.tauS || 0) - (src.tau - src.ref);     // flashes already on their way were sent before you entered
+  sim.t0 = sim.t; src.ref = src.tau; for (const th of threads) th.n = 0;
+}
+function resetWorld() {
+  derive(); buildGrid();
+  const s = ship.st; s.fill(0); s[0] = 30; s[1] = 12; s[2] = 108; ship.kind = 'static'; ship.thrust = null; ship.fell = 0; ship.head.set(-0.27, 0, -0.96).normalize();
+  trail.n = 0; dustB.on = false; state.braking = false; state.touched = '';
+  resetClocks();
+}
+
+/* ---------- the eye ---------- */
+// one way of looking for each row; dragging and the wheel change the one you are using
+const cams = [{ yaw: 0.27, pitch: 0.26, dist: 44 }, { yaw: 1.14, pitch: 0.4, dist: 58 }, { yaw: -1.83, pitch: 0.36, dist: 34 }, { yaw: 0.6, pitch: 0.34, dist: 22 }, { yaw: -1.8, pitch: 0.3, dist: 70 }];
+const eye = { yaw: 1.1, pitch: 0.44, dist: 290, ease: 7 };
+const view = { blend: 1, dur: 0.9, fx: 0, fy: 0, fz: 0, x: 0, y: 0, z: 0 };
+const glide = (dur = 0.9) => { view.fx = view.x; view.fy = view.y; view.fz = view.z; view.blend = 0; view.dur = dur; };
+const keys = new Set(), stick = { id: null, x0: 0, y0: 0, dx: 0, dy: 0 }, look = { id: null, x: 0, y: 0 }, pad = { stop: 0, in: 0, out: 0, up: 0, down: 0 };
+let drag = false;
+const target = new THREE.Vector3(), off = new THREE.Vector3(), tv = new THREE.Vector3(), qd = new THREE.Quaternion(), mR = new THREE.Matrix4(), mS = new THREE.Matrix4(), mT = new THREE.Matrix4();
+function turn(dx, dy, k) { const c = cams[persp]; c.yaw -= dx * k; eye.yaw -= dx * k; const p = clamp(c.pitch + dy * k, -1.45, 1.45); eye.pitch += p - c.pitch; c.pitch = p; }
+function zoom(f) { const c = cams[persp], d = clamp(c.dist * f, 6, 900); eye.dist *= d / c.dist; c.dist = d; }
+
+/* ---------- the rows on top ---------- */
+const tl = $('tl'), tape = $('tape'), tctx = tape.getContext('2d'), btns = [], outs = [];
+let tapeDpr = 1;
+A.forEach((a, k) => {
+  const b = document.createElement('button'), full = document.createElement('span'), short = document.createElement('span'), o = document.createElement('output');
+  b.type = 'button'; b.style.setProperty('--k', a.css); b.style.gridRow = String(k + 1); b.title = 'See the world from here, by this clock';
+  full.className = 'full'; full.textContent = a.name; short.className = 'short'; short.textContent = a.short; b.append(full, short);
+  b.setAttribute('aria-pressed', String(k === 0)); b.addEventListener('click', () => { setPersp(k); canvas.focus(); });
+  o.style.gridRow = String(k + 1);
+  tl.append(b, o); btns.push(b); outs.push(o);
+});
+function setPersp(k) {
+  if (k !== persp) glide();
+  persp = k; btns.forEach((b, j) => b.setAttribute('aria-pressed', String(j === k)));
+  if (k === 4) { buildRay(); state.rayFor = 0; }
+  if (state.started) state.seen[k] = true;
+}
+state.seen = [true, false, false, false, false];
+const paceRow = () => (persp === 4 || (persp === 2 && P.bh) || (persp === 0 && ship.kind === 'gone') ? 1 : persp);   // whoever has no running clock borrows the far observer's
+function drawTape() {
+  const w = tape.clientWidth, h = tape.clientHeight; if (!w || !h) return;
+  tctx.setTransform(tapeDpr, 0, 0, tapeDpr, 0, 0); tctx.clearRect(0, 0, w, h);
+  const rh = h / 5, xNow = w - 8, PX = clamp(w / 9.5, 18, 60), pi = paceRow(), now = A[pi].tau;
+  tctx.lineWidth = 1; tctx.strokeStyle = 'rgba(160,190,230,0.15)';
+  for (let r = 0; r < 5; r++) { tctx.beginPath(); tctx.moveTo(0, Math.round((r + 0.5) * rh) + 0.5); tctx.lineTo(xNow, Math.round((r + 0.5) * rh) + 0.5); tctx.stroke(); }
+  const n = Math.min(mk.n, MK);
+  for (let q = 0; q < n; q++) {
+    const i = (mk.n - 1 - q) % MK, x = xNow - (now - mk.tau[pi][i]) * PX;
+    if (x < -6) break;
+    const r = mk.row[i], y = (r + 0.5) * rh;
+    if (mk.type[i] === 0) { const big = mk.num[i] % 5 === 0, hh = big ? rh * 0.46 : rh * 0.32; tctx.strokeStyle = A[r].css; tctx.lineWidth = big ? 2.6 : 1.8; tctx.beginPath(); tctx.moveTo(x, y - hh); tctx.lineTo(x, y + hh); tctx.stroke(); }
+    else { tctx.fillStyle = 'rgba(255,243,192,0.95)'; tctx.beginPath(); tctx.arc(x, y, 2.2, 0, 6.2832); tctx.fill(); }
+  }
+  tctx.strokeStyle = 'rgba(233,239,248,0.55)'; tctx.lineWidth = 1; tctx.beginPath(); tctx.moveTo(xNow + 0.5, 1); tctx.lineTo(xNow + 0.5, h - 1); tctx.stroke();
+  tctx.fillStyle = 'rgba(255,243,192,0.6)'; tctx.font = '10.5px "Atkinson Hyperlegible Mono", ui-monospace, monospace'; tctx.textBaseline = 'middle';
+  tctx.fillText(w > 300 ? 'no ticks: light does not age' : 'no ticks', 6, 4.5 * rh);
+  if (P.bh) { tctx.fillStyle = 'rgba(255,138,92,0.75)'; tctx.fillText(w > 300 ? 'a black hole now: no surface, no clock' : 'no clock', 6, 2.5 * rh); }
+}
+
+/* ---------- the details view ---------- */
+const gArc = $('g-arc').getContext('2d'), gRate = $('g-rate').getContext('2d');
+const pct = v => (v * 100).toFixed(1) + '%';
+// a speed is never rounded up to the speed of light: nothing with mass gets there, so the readout must not say it did
+const speedPct = b => { if (b >= 1) return '100%'; const d = b < 0.9 ? 0 : b < 0.99 ? 1 : b < 0.999 ? 2 : b < 0.9999 ? 3 : 4, k = Math.pow(10, d); return (Math.floor(b * 100 * k) / k).toFixed(d) + '%'; };
+function drawDetails() {
+  const a = A[persp], far = A[1].rate, rho = a.pos.length(), none = (persp === 2 && P.bh) || (persp === 0 && ship.kind === 'gone');
+  $('d-who').textContent = 'This clock: ' + a.name;
+  if (none) { for (const id of ['d-speed', 'd-sf', 'd-dist', 'd-df']) $(id).textContent = '–'; $('d-tot').textContent = persp === 2 ? 'no clock: nothing can stand there' : 'the far map ends here'; }
+  else {
+    const r = rho * Math.pow(1 + P.M1 / (2 * rho), 2), sf = Math.sqrt(Math.max(0, 1 - a.beta * a.beta));
+    $('d-speed').textContent = speedPct(a.beta) + ' of light'; $('d-sf').textContent = '× ' + sf.toFixed(3);
+    $('d-dist').textContent = 'r = ' + r.toFixed(0) + ', rₛ = ' + (2 * P.M1).toFixed(1); $('d-df').textContent = '× ' + a.N.toFixed(3);
+    $('d-tot').textContent = pct(sf * a.N) + ' of a far clock';
+  }
+  // how the going is split: up is through time, across is through space, as the far observer counts it
+  let g = gArc, W = 560, H = 300, ox = 70, oy = H - 44, R = 220;
+  g.clearRect(0, 0, W, H); g.lineWidth = 2; g.strokeStyle = 'rgba(160,190,230,0.35)';
+  g.beginPath(); g.arc(ox, oy, R, -Math.PI / 2, 0); g.stroke();
+  g.strokeStyle = 'rgba(160,190,230,0.16)'; g.beginPath(); g.arc(ox, oy, R / 2, -Math.PI / 2, 0); g.moveTo(ox, oy - R - 12); g.lineTo(ox, oy); g.lineTo(ox + R + 12, oy); g.stroke();
+  g.fillStyle = '#a3b4cb'; g.font = '20px "Atkinson Hyperlegible Mono", ui-monospace, monospace'; g.fillText('through time', ox + 12, oy - R - 2); g.fillText('through space', ox + R - 130, oy + 30);
+  for (let k = 4; k >= 0; k--) {
+    if (k === 2 && P.bh) continue;
+    const b = A[k], x = ox + R * b.N * b.beta / far, y = oy - R * b.rate / far; g.fillStyle = b.css; g.beginPath(); g.arc(x, y, k === persp ? 11 : 7, 0, 6.2832); g.fill();
+    if (k === persp) { g.strokeStyle = b.css; g.lineWidth = 2; g.beginPath(); g.moveTo(ox, oy); g.lineTo(x, y); g.stroke(); }
+  }
+  // clock rate against distance from the heavy mass (each step to the right doubles the distance)
+  g = gRate; H = 260; g.font = '20px "Atkinson Hyperlegible Mono", ui-monospace, monospace';
+  const x0 = 60, x1 = W - 16, y0 = H - 40, y1 = 16, lo = Math.log(2), hi = Math.log(300), X = d => x0 + (x1 - x0) * (Math.log(Math.max(d, 2)) - lo) / (hi - lo), Y = v => y0 + (y1 - y0) * v;
+  g.clearRect(0, 0, W, H); g.strokeStyle = 'rgba(160,190,230,0.16)'; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, y1); g.lineTo(x0, y0); g.lineTo(x1, y0); g.moveTo(x0, Y(1)); g.lineTo(x1, Y(1)); g.stroke();
+  g.fillStyle = '#a3b4cb'; g.fillText('1', x0 - 22, Y(1) + 7); g.fillText('0', x0 - 22, y0 + 6); g.fillText('distance', x1 - 100, y0 + 30);
+  g.strokeStyle = 'rgba(255,138,92,0.9)'; g.lineWidth = 3; g.beginPath();
+  for (let i = 0; i <= 80; i++) { const from = Math.log(Math.max(P.cap, 2)), d = Math.exp(from + (hi - from) * i / 80), sv = P.M1 / (2 * d), v = Math.max(0, (1 - sv) / (1 + sv)) / far; if (i) g.lineTo(X(d), Y(v)); else g.moveTo(X(d), Y(v)); }
+  g.stroke();
+  for (let k = 4; k >= 0; k--) { if (k === 2 && P.bh) continue; const b = A[k]; g.fillStyle = b.css; g.beginPath(); g.arc(X(b.pos.length()), Y(b.rate / far), k === persp ? 11 : 7, 0, 6.2832); g.fill(); }
+}
+const sC = $('s-c'), sM = $('s-m'), sL = $('s-l'), sE = $('s-e');
+function applySliders(which) {
+  let c = Math.exp(Number(sC.value)), m = Math.exp(Number(sM.value)); const l = Number(sL.value), e = Math.exp(Number(sE.value));
+  if (m / (c * c) > M1_MAX / M1_0) { if (which === 'c') c = Math.sqrt(m * M1_0 / M1_MAX); else m = c * c * M1_MAX / M1_0; }   // far enough: any heavier and it would swallow the light mass's path
+  const was = P.bh, v = ship.vel.clone();
+  P.cMul = c; P.mMul = m; P.lMul = l; P.eMul = e; derive(); buildGrid();
+  if (ship.kind === 'free') setVel(ship.st, v.x, v.y, v.z);          // you keep your everyday speed; what changes is how close that is to light
+  sC.value = String(Math.log(c)); sM.value = String(Math.log(m));
+  const suns = (m * M1_0 / KM_SUN).toFixed(2), sr = P.M1 / (2 * R_STAR), RA = R_STAR * (1 + sr) * (1 + sr);
+  $('o-c').textContent = '× ' + c.toFixed(2); $('o-m').textContent = suns + ' suns'; $('o-l').textContent = l === 0 ? 'no pull' : '× ' + l.toFixed(1); $('o-e').textContent = '× ' + e.toFixed(2);
+  // the same numbers in everyday units: a map unit read as a kilometre
+  $('d-real').textContent = 'Read one map unit as a kilometre: the heavy mass is ' + suns + ' suns, ' + (P.bh ? 'a black hole ' + (2 * P.M1).toFixed(1) : 'a neutron star ' + RA.toFixed(1)) + ' km in radius. Your engine pushes with about ' + Math.round(PUSH * e * 1000 * Math.pow(299792.458 / C0, 2) / 9.81 / 1e9) + ' billion g. '
+    + (Math.abs(c - 1) < 0.005 ? 'Everything is shown about 7,500 times slower than it would really happen.' : 'With the speed of light changed, this is no longer our world.') + (l === 0 ? ' With no pull from the light mass, every sum here is exact.' : '');
+  if (state.started) { state.sliders++; if (P.bh && !was) state.collapsed = true; if (persp === 4) buildRay(); }
+}
+for (const [el, w] of [[sC, 'c'], [sM, 'm'], [sL, 'l'], [sE, 'e']]) el.addEventListener('input', () => applySliders(w));
+$('b-reset').addEventListener('click', () => { sC.value = '0'; sM.value = '0'; sL.value = '1'; sE.value = '0'; applySliders('c'); });
+const narrow = () => app.clientWidth <= 720;
+function toggleDetails(on) { const d = $('drawer'); d.hidden = on === undefined ? !d.hidden : !on; $('b-details').setAttribute('aria-pressed', String(!d.hidden)); if (!d.hidden) { if (narrow() && !tPane.hidden) toggleTime(false); drawDetails(); } }
+$('b-details').addEventListener('click', () => toggleDetails());
+
+/* ---------- names floating in space ---------- */
+const tagsEl = $('tags');
+const tags = [[A[0].pos, 'you'], [A[1].pos, 'far observer'], [A[2].pos, 'heavy mass'], [A[3].pos, 'light mass'], [SRC, 'light source']].map(([pos, text], k) => {
+  const el = document.createElement('div'); el.className = 'tag'; el.textContent = text; tagsEl.appendChild(el); return { pos, el, k: k < 4 ? k : -1 };
+});
+
+function fit() {
+  const w = app.clientWidth, h = app.clientHeight; if (!w || !h) return;
+  if (renderer) { renderer.setSize(w, h, false); for (const m of lineMats) m.resolution.set(w, h); }
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  skyU.uAsp.value = w / h; skyU.uTan.value = Math.tan(camera.fov * Math.PI / 360);
+  tapeDpr = Math.min(window.devicePixelRatio || 1, 2);
+  const tw = Math.round(tape.clientWidth * tapeDpr), th = Math.round(tape.clientHeight * tapeDpr);
+  if (tw && th && (tape.width !== tw || tape.height !== th)) { tape.width = tw; tape.height = th; }
+}
+new ResizeObserver(fit).observe(app);
+
+/* ---------- your hands ---------- */
+function control(dt) {
+  const s = ship.st, on = c => (keys.has(c) ? 1 : 0), fwd = Math.max(on('KeyW'), on('ArrowUp')) - Math.max(on('KeyS'), on('ArrowDown')) - stick.dy;
+  if (state.started && persp === 4) { ray.u = clamp(ray.u + fwd * 95 * dt, 0, ray.len); state.rayFor += dt; }    // no time passes for light, so you can be anywhere along the ray
+  const mine = state.started && persp === 0 && ship.kind !== 'gone';
+  let f = 0, r = 0, u = 0;
+  if (mine) { f = fwd; r = Math.max(on('KeyD'), on('ArrowRight')) - Math.max(on('KeyA'), on('ArrowLeft')) + stick.dx; u = on('KeyE') - on('KeyQ') + pad.up - pad.down; }
+  const len = Math.hypot(f, r, u), rho = Math.hypot(s[0], s[1], s[2]);
+  if (mine && (keys.has('Space') || pad.stop)) state.braking = true;
+  if (len > 0.1) {
+    state.braking = false;
+    // the engine's full push across the level, relative to where you are looking from; Q and E push straight down and up
+    const fx = -Math.sin(eye.yaw), fz = -Math.cos(eye.yaw), k = P.push / len;
+    thrust[0] = (fx * f - fz * r) * k; thrust[1] = u * k; thrust[2] = (fz * f + fx * r) * k;
+    if (ship.kind !== 'free') leave();
+    ship.thrust = thrust; state.pushed += dt;
+  } else if (state.braking && ship.kind === 'free') {
+    // stopping: the engine turns against your motion and against the pull, as far as its strength goes
+    if (ship.beta < 0.003 && ship.need <= P.push) hold();
+    else {
+      const v = ship.vel.length();
+      let tx = s[0] / rho * ship.need, ty = s[1] / rho * ship.need, tz = s[2] / rho * ship.need;
+      if (v > 1e-6) { const m = Math.min(P.push, ship.beta / (0.18 * P.c)) / v; tx -= ship.vel.x * m; ty -= ship.vel.y * m; tz -= ship.vel.z * m; }
+      const t = Math.hypot(tx, ty, tz); if (t > P.push) { const m = P.push / t; tx *= m; ty *= m; tz *= m; }
+      thrust[0] = tx; thrust[1] = ty; thrust[2] = tz; ship.thrust = thrust;
+    }
+  } else { ship.thrust = null; state.braking = false; }
+  if (pad.in) zoom(Math.exp(-dt * 1.4)); if (pad.out) zoom(Math.exp(dt * 1.4));
+}
+
+/* ---------- small words that surface once ---------- */
+const lines = [
+  ['rows', () => state.since > 5.5, 'Every row up there is one clock. Each tick is one of its own seconds.'],
+  ['heavy', () => state.since > 15 && !P.bh, 'The heavy mass has fewer ticks. Its seconds are not shorter. There are simply fewer of them.'],
+  ['flash', () => state.flashes > 0 && state.since > 26, 'A flash from the light source just passed you. Watch the next one bend around the heavy mass.'],
+  ['fast', () => persp === 0 && ship.kind === 'free' && ship.beta > 0.5, "At this speed you get fewer ticks than the far observer, as the far observer's map counts it."],
+  ['near', () => persp === 0 && ship.beta > 0.985, 'However long you push, you only get closer to the speed of light, never there. Your clock slows, but it never stops.'],
+  ['deep', () => persp === 0 && ship.kind === 'static' && ship.N < 0.9, 'Hovering this deep, you get fewer ticks than the far observer. No speed needed.'],
+  ['tide', () => dustB.on && dustStretch() > 1.7, 'The ball of dust you let go is being pulled long toward the heavy mass and squeezed sideways. That is the tide, and it is real.'],
+  ['fall', () => persp === 0 && ship.kind === 'free' && !ship.thrust && ship.beta > 0.12 && A[0].pos.length() < 90, 'No engine now. The heavy mass bends your path and speeds you up.'],
+  ['weak', () => persp === 0 && ship.kind === 'free' && state.braking && ship.beta < 0.02 && ship.need > P.push, 'Your engine is at full push, and it is not enough to hold you here.'],
+  ['ring', () => P.hoverR > 0 && state.since > 3, 'Inside the red ring your engine cannot hold you still. It can only slow your fall.'],
+  ['stood', () => state.touched === 'heavy', 'You are standing on the heavy mass. Your row and its row now tick together.'],
+  ['rim', () => state.touched === 'rim', "On the far observer's map you never quite arrive: you hang at the rim, slower and slower. By your own clock you fell through in a moment. This map cannot follow you there. R starts again."],
+  ['landed', () => state.touched === 'light', 'You are on the light mass. Its own pull costs its clock very little. Most of its small lag comes from circling the heavy mass.'],
+  ['there', () => state.seen[2] && persp === 2 && !P.bh, 'Seen from the heavy mass, its own seconds are perfectly normal. It is everyone else who is in a hurry.'],
+  ['other', () => !!state.timeSeen, 'The same moment, drawn another way. Sideways is still where things are. Up is now how much time each one has lived through.'],
+  ['ray', () => persp === 4, 'For light, no time passes between leaving and arriving. So its whole path is a single moment, and here it is, all at once. W and S move you along it.'],
+  ['dots', () => persp === 4 && state.rayFor > 10, 'Each dot on the ray is one second of the far observer. Close to the heavy mass they crowd together: there the light is held up.'],
+  ['collapse', () => !!state.collapsed, 'Past about 2.2 suns nothing holds a neutron star up. It has become a black hole, and it no longer has a clock of its own.'],
+  ['quick', () => P.cMul > 1.9, 'With faster light the rows fall back into step. In our world light is so fast that nobody notices any of this.'],
+  ['slow', () => P.cMul < 0.9 && !P.bh, 'Slow the light and the clocks drift further apart, and light bends more.'],
+  ['exact', () => P.lMul === 0 && state.sliders > 0, 'With no pull from the light mass, every sum on this page is exact.']
+];
+const said = new Set(), whisperEl = $('whisper');
+let quiet = 1.2, showing = 0;
+function whispers(dt) {
+  state.since += dt;
+  if (showing > 0) { showing -= dt; if (showing <= 0) { whisperEl.classList.remove('on'); quiet = 3.5; } return; }
+  quiet -= dt; if (quiet > 0) return;
+  for (const [id, test, text] of lines) if (!said.has(id) && test()) { said.add(id); whisperEl.textContent = text; whisperEl.classList.add('on'); showing = 4 + text.length * 0.04; return; }
+}
+function hud() {
+  const pi = paceRow(), k = ship.kind;
+  for (let i = 0; i < 4; i++) outs[i].textContent = i === 2 && P.bh ? 'no clock' : A[i].tau.toFixed(1) + ' s  ×' + (A[i].rate / A[pi].rate).toFixed(2);
+  outs[4].textContent = '0.0 s  ×0.00';
+  const cp = 100 * ship.rate / A[1].rate;                // your clock next to the far observer's, whichever row sets the pace
+  let t = 'speed ' + speedPct(ship.beta) + ' of light · clock at ' + (cp >= 10 ? Math.round(cp) : cp.toFixed(1)) + "% of the far observer's · "
+    + (k === 'planet' ? 'standing on the light mass' : k === 'ground' ? 'standing on the heavy mass (push away from it to lift off)' : k === 'static' ? 'engine holding you with ' + Math.max(1, Math.round(100 * ship.need / P.push)) + '% of its push'
+      : !ship.thrust ? 'falling freely' : !state.braking ? 'engine pushing' : ship.need > P.push && ship.beta < 0.02 ? 'engine at full, cannot hold you here' : 'stopping');
+  if (k === 'gone') t = 'at the rim · the far map cannot follow you further · R starts again';
+  if (persp === 4) t = 'time is standing still · W and S move you along the ray';
+  else if (Math.abs(state.pace - 1) > 0.05 && state.pace > 0.05) t += ' · world playing ×' + state.pace.toFixed(1);
+  $('me').textContent = t;
+  if (!$('drawer').hidden) drawDetails();
+}
+
+/* ---------- one moment, drawn ---------- */
+function draw(dt) {
+  const s = ship.st, rho = Math.hypot(s[0], s[1], s[2]), rx = s[0] / rho, ry = s[1] / rho, rz = s[2] / rho;
+  planet.position.set(pl.x, 0, pl.z);
+  planet.material.uniforms.uSun.value.set(-pl.x, 0, -pl.z).normalize(); planet.material.uniforms.uLum.value = P.bh ? 0.12 : 0.3 + 0.7 * P.nSurf;
+  // you: an arrow along your motion, shorter along that motion the faster you go, as the far observer maps it. Nothing else about it is bent.
+  qd.setFromUnitVectors(UP, ship.head); mR.makeRotationFromQuaternion(qd); mT.makeScale(1, Math.max(0.15, Math.sqrt(1 - ship.beta * ship.beta)), 1); mR.multiply(mT);
+  craft.matrix.makeTranslation(s[0], s[1], s[2]).multiply(mR); craft.matrixWorldNeedsUpdate = true;
+  const pushing = !!ship.thrust, holding = ship.kind === 'static';
+  flame.visible = pushing || holding;
+  if (pushing) { const t = Math.hypot(thrust[0], thrust[1], thrust[2]) || 1; flame.position.set(s[0] - thrust[0] / t * 2.4, s[1] - thrust[1] / t * 2.4, s[2] - thrust[2] / t * 2.4); flame.scale.setScalar(1 + 2.8 * Math.min(1, t / P.push)); }
+  else if (holding) { flame.position.set(s[0] - rx * 1.6, s[1] - ry * 1.6, s[2] - rz * 1.6); flame.scale.setScalar(0.6 + 3 * Math.min(1, ship.need / P.push)); }
+  // your trail
+  { const t = trailBuf.array, n = trail.n, lead = TR - n;
+    for (let i = 0; i < lead; i++) { t[i * 6 + 1] = -1e7; t[i * 6 + 4] = -1e7; }
+    for (let i = 0; i < n; i++) { const o = (lead + i) * 6, last = i + 1 === n; t[o] = trail.x[i]; t[o + 1] = trail.y[i]; t[o + 2] = trail.z[i]; t[o + 3] = last ? s[0] : trail.x[i + 1]; t[o + 4] = last ? s[1] : trail.y[i + 1]; t[o + 5] = last ? s[2] : trail.z[i + 1]; }
+    trailBuf.needsUpdate = true; }
+  { const p = plumbGeo.attributes.position.array; p[0] = s[0]; p[1] = s[1]; p[2] = s[2]; p[3] = s[0]; p[4] = 0; p[5] = s[2]; plumbGeo.attributes.position.needsUpdate = true; foot.position.set(s[0], 0, s[2]); }
+  // the ball of dust, the red ring, and the whole ray
+  ballLines.visible = ballDots.visible = dustB.on;
+  if (dustB.on) {
+    const a = ballGeo.attributes.position.array, b = ballDotGeo.attributes.position.array, g = dustB.st;
+    for (let i = 0; i < DUST_N; i++) {
+      const j = Math.floor(i / 12) * 12 + (i + 1) % 12, u = g[i], v = g[j], o = i * 6;
+      a[o] = u[0]; a[o + 1] = u[1]; a[o + 2] = u[2]; a[o + 3] = v[0]; a[o + 4] = v[1]; a[o + 5] = v[2]; b[i * 3] = u[0]; b[i * 3 + 1] = u[1]; b[i * 3 + 2] = u[2];
+    }
+    ballGeo.attributes.position.needsUpdate = true; ballDotGeo.attributes.position.needsUpdate = true;
+  }
+  hoverRing.visible = P.hoverR > 0; if (P.hoverR > 0) hoverRing.scale.setScalar(P.hoverR);
+  rayLine.visible = rayDots.visible = persp === 4 && state.started;
+  // the eye: it circles whoever's row you chose
+  const c = cams[persp], e = 1 - Math.exp(-dt * eye.ease);
+  if (!state.started) { if (!reduceMotion) eye.yaw += dt * 0.03; }
+  else { eye.yaw += Math.atan2(Math.sin(c.yaw - eye.yaw), Math.cos(c.yaw - eye.yaw)) * e; eye.pitch += (c.pitch - eye.pitch) * e; eye.dist *= Math.pow(c.dist / eye.dist, e); }
+  let cx = A[persp].pos.x, cy = A[persp].pos.y, cz = A[persp].pos.z;
+  if (!state.started) { cx = 10; cy = -6; cz = 14; }
+  else if (view.blend < 1) { const q = view.blend * view.blend * (3 - 2 * view.blend); cx = view.fx + (cx - view.fx) * q; cy = view.fy + (cy - view.fy) * q; cz = view.fz + (cz - view.fz) * q; }
+  view.x = cx; view.y = cy; view.z = cz;
+  if (state.started && view.blend >= 1) eye.ease = 7;
+  target.set(cx, cy, cz);
+  off.set(Math.cos(eye.pitch) * Math.sin(eye.yaw), Math.sin(eye.pitch), Math.cos(eye.pitch) * Math.cos(eye.yaw)).multiplyScalar(eye.dist);
+  camera.position.copy(target).add(off);
+  const minR = P.bh ? 0.78 * P.M1 : R_STAR + 1.4; if (camera.position.length() < minR) camera.position.setLength(minR);
+  camera.lookAt(target); camera.updateMatrixWorld(); eyeU.value.copy(camera.position);
+  // glows, markers, tick rings
+  for (let k2 = 0; k2 < 5; k2++) {
+    const v = A[k2], g = glows[k2]; g.position.copy(v.pos);
+    g.scale.setScalar(Math.max(k2 === 0 ? 1.6 : 2.4, g.position.distanceTo(camera.position) * 0.02) * (1 + 1.3 * v.flare)); v.flare *= Math.exp(-dt / 0.3);
+    if (gems[k2]) { gems[k2].position.copy(v.pos); gems[k2].rotation.y += dt * 0.6; }
+  }
+  glows[2].visible = gems[2].visible = !P.bh;
+  glows[4].visible = persp === 4 || !!ride.sh;
+  lamp.position.copy(SRC); lamp.scale.setScalar(Math.max(9, SRC.distanceTo(camera.position) * 0.035) * (1 + 1.6 * src.flash)); src.flash *= Math.exp(-dt / 0.25);
+  for (let k2 = 0; k2 < 4; k2++) {
+    const p = pings[k2]; p.t += dt;
+    if (p.t < 0.9) { const q = p.t / 0.9; p.m.visible = true; p.m.position.copy(A[k2].pos); p.m.quaternion.copy(camera.quaternion); p.m.scale.setScalar((1 + 5.5 * (1 - (1 - q) * (1 - q))) * Math.max(1, p.m.position.distanceTo(camera.position) / 70)); p.m.material.opacity = 0.6 * (1 - q) * (1 - q); }
+    else p.m.visible = false;
+  }
+  // the sky and the heavy thing's disc, as they look from where the eye is
+  const D = camera.position.length(), sc = P.M1 / (2 * D), rA = D * (1 + sc) * (1 + sc), ff = Math.sqrt(Math.max(1 - 2 * P.M1 / rA, 1e-4));
+  skyU.uRot.value.setFromMatrix4(camera.matrixWorld); skyU.uLens.value.copy(camera.position).negate();
+  skyU.uBH.value = P.bh ? 1 : 0; skyU.uNs.value = P.nSurf;
+  let th = Math.asin(Math.min(1, P.bDisc / rA * ff)); if (rA < 3 * P.M1) th = Math.PI - th;      // how wide the heavy thing's disc looks from here
+  skyU.uEdge.value = th; skyTable(P.M1, rA, ff, th);
+  occ.position.set(0, 0, 0); occ.lookAt(camera.position); occ.scale.setScalar(D * Math.tan(Math.min(th, 1.45)));
+  if (renderer) renderer.render(scene, camera);
+  if (!tPane.hidden && state.started) drawTime();
+  // names
+  const w = app.clientWidth, h = app.clientHeight;
+  for (const t of tags) {
+    let show = t.k !== persp || view.blend < 1;
+    if (show) { tv.copy(t.pos).project(camera); show = tv.z < 1 && Math.abs(tv.x) < 1.05 && Math.abs(tv.y) < 1.05; }
+    t.el.style.display = show ? '' : 'none';
+    if (show) t.el.style.transform = 'translate(' + ((tv.x * 0.5 + 0.5) * w + 10).toFixed(1) + 'px,' + ((-tv.y * 0.5 + 0.5) * h - 18).toFixed(1) + 'px)';
+  }
+}
+function frame(dt) {
+  control(dt);
+  // Whose second counts: the clock of the row you chose sets the pace of everything. Light has no clock, so on its row time stands still.
+  const want = state.paused || (persp === 4 && state.started) ? 0 : Math.min(50, 1 / Math.max(A[paceRow()].rate, 0.001));
+  state.pace += (want - state.pace) * Math.min(1, dt * 4);
+  const left = dt * state.pace;
+  if (left > 1e-7) { const n = Math.max(1, Math.ceil(left * P.c / (state.pace > 8 ? 3 : 1.5))), h = left / n; for (let i = 0; i < n; i++) advance(h); }
+  settle();
+  view.blend = Math.min(1, view.blend + dt / view.dur);
+  draw(dt);
+  if (state.started) {
+    drawTape();
+    state.hud += dt; if (state.hud > 0.12) { state.hud = 0; hud(); }
+    whispers(dt); if (state.pushed > 2.5) $('keys').classList.add('off');
+  }
+}
+
+/* ---------- controls ---------- */
+window.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+  if (!state.started) { if (e.code === 'Enter') start(); return; }
+  keys.add(e.code);
+  if (/^Digit[1-5]$/.test(e.code)) setPersp(Number(e.code.slice(5)) - 1);
+  else if (e.code === 'KeyG') { if (persp === 0 && (ship.kind === 'static' || ship.kind === 'planet')) leave(); }
+  else if (e.code === 'KeyF') toggleDetails();
+  else if (e.code === 'KeyT') toggleTime();
+  else if (e.code === 'KeyP') state.paused = !state.paused;
+  else if (e.code === 'KeyR') { resetWorld(); setPersp(0); view.blend = 1; }
+  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+});
+window.addEventListener('keyup', e => keys.delete(e.code));
+window.addEventListener('blur', () => keys.clear());
+canvas.addEventListener('wheel', e => { e.preventDefault(); if (!state.started) return; eye.ease = 7; zoom(Math.exp(e.deltaY * 0.0012)); }, { passive: false });
+canvas.addEventListener('pointerdown', e => {
+  if (!state.started) return;
+  canvas.focus(); eye.ease = 7;
+  if (e.pointerType === 'touch') {
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientX - rect.left < rect.width * 0.4 && stick.id === null) { stick.id = e.pointerId; stick.x0 = e.clientX; stick.y0 = e.clientY; stick.dx = stick.dy = 0; }
+    else if (look.id === null) { look.id = e.pointerId; look.x = e.clientX; look.y = e.clientY; }
+  } else if (e.button === 0) { drag = true; look.x = e.clientX; look.y = e.clientY; }
+  try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* fine */ }
+});
+canvas.addEventListener('pointermove', e => {
+  if (e.pointerType === 'touch') {
+    if (e.pointerId === stick.id) { stick.dx = clamp((e.clientX - stick.x0) / 55, -1, 1); stick.dy = clamp((e.clientY - stick.y0) / 55, -1, 1); }
+    else if (e.pointerId === look.id) { turn(e.clientX - look.x, e.clientY - look.y, 0.006); look.x = e.clientX; look.y = e.clientY; }
+    return;
+  }
+  if (drag) { turn(e.clientX - look.x, e.clientY - look.y, 0.0045); look.x = e.clientX; look.y = e.clientY; }
+});
+const release = e => {
+  if (e.pointerId === stick.id) { stick.id = null; stick.dx = stick.dy = 0; }
+  if (e.pointerId === look.id) look.id = null;
+  if (e.pointerType !== 'touch') drag = false;
+};
+canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+for (const [id, key] of [['b-stop', 'stop'], ['b-in', 'in'], ['b-out', 'out'], ['b-up', 'up'], ['b-down', 'down']]) {
+  const b = $(id);
+  b.addEventListener('pointerdown', e => { e.preventDefault(); pad[key] = 1; });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, () => { pad[key] = 0; });
+}
+$('b-help').addEventListener('click', () => { $('about').hidden = false; });
+$('b-close').addEventListener('click', () => { $('about').hidden = true; canvas.focus(); });
+function start() {
+  state.started = true; $('start').hidden = true; app.classList.add('live'); canvas.focus();
+  resetClocks(); sim.quiet = false; fit();
+  if (reduceMotion) { Object.assign(eye, cams[0], { ease: 7 }); view.blend = 1; return; }
+  eye.ease = 1.15; glide(3.6);                           // the way in: from far off, down to your shoulder
+}
+$('b-start').addEventListener('click', start);
+if (!renderer) { $('start-note').textContent = 'This browser could not start 3D graphics (WebGL), so this place cannot be drawn here.'; $('b-start').disabled = true; }
+
+resetWorld(); applySliders('c'); fit();
+for (let i = 0; i < 520; i++) advance(0.025);            // let the flashes get under way before anyone looks
+settle();
+const timer = new THREE.Clock();
+let slowFor = 0, slowFrames = 0, tried = null, settled = false;
+function loop() {
+  requestAnimationFrame(loop);
+  const raw = timer.getDelta(), dt = Math.min(raw, 0.05);
+  if (document.hidden) return;
+  frame(reduceMotion && !state.started ? 0 : dt);
+  // if the picture is slow to draw, try drawing it a little coarser; if that does not help, put it back and leave it alone
+  slowFor += raw; slowFrames++;
+  if (slowFor > 2) {
+    const fps = slowFrames / slowFor;
+    if (renderer && state.started && !settled && fps > 8) {
+      const pr = renderer.getPixelRatio();
+      if (tried) { if (fps < tried.fps * 1.12) { renderer.setPixelRatio(tried.pr); fit(); settled = true; } tried = null; }
+      else if (fps < 24 && pr > 0.75) { tried = { fps, pr }; renderer.setPixelRatio(Math.max(0.75, pr * 0.8)); fit(); }
+    }
+    slowFor = 0; slowFrames = 0;
+  }
+}
+loop();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>

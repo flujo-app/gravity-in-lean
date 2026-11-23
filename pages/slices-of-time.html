@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>Slices of Time</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+/* Layout: lab-notebook series (graph paper by day, blueprint by night). One block of spacetime, told in four steps: step buttons, a note, then the 3D stage with its controls and live numbers beside it; stacked on phones. */
+:root {
+  --paper: #f3f6f8;
+  --paper-raised: #ffffff;
+  --grid-faint: #e6edf2;
+  --grid-strong: #9db2c3;
+  --rule: #c8d5df;
+  --ink: #132331;
+  --ink-soft: #4a5d6e;
+  --photon: #d99100;
+  --you: #12805a;
+  --crest: #1c5ed4;
+  --trough: #b4500f;
+  --mark: #ffe066;
+  --mark-ink: #1c1a0c;
+  --measured: #12805a;
+  --theory: #1c5ed4;
+  --picture: #b4500f;
+  --open: #6a3fc0;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d2136; --paper-raised: #122a44; --grid-faint: #112c48; --grid-strong: #44709a; --rule: #2a4d71;
+    --ink: #e9f1f8; --ink-soft: #a2b9cd; --photon: #ffd85a; --you: #6fdcaa; --crest: #8cc3ff; --trough: #ffab6e;
+    --mark: #ffd85a; --measured: #6fdcaa; --theory: #8cc3ff; --picture: #ffab6e; --open: #c3a6ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d2136; --paper-raised: #122a44; --grid-faint: #112c48; --grid-strong: #44709a; --rule: #2a4d71;
+  --ink: #e9f1f8; --ink-soft: #a2b9cd; --photon: #ffd85a; --you: #6fdcaa; --crest: #8cc3ff; --trough: #ffab6e;
+  --mark: #ffd85a; --measured: #6fdcaa; --theory: #8cc3ff; --picture: #ffab6e; --open: #c3a6ff;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid-faint) 1px, transparent 1px), linear-gradient(90deg, var(--grid-faint) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.masthead { display: grid; gap: 12px; }
+.eyebrow, .kicker { margin: 0; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+h1 { margin: 0; font-family: var(--font-display); font-stretch: 125%; font-weight: 800; font-size: clamp(2.1rem, 1.4rem + 3vw, 3.4rem); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+.intro { margin: 0; max-width: 64ch; font-size: 1.06rem; color: var(--ink-soft); }
+.legend { margin: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 0.92rem; color: var(--ink-soft); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1.5px solid currentColor; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 2px; white-space: nowrap; }
+.tag.measured { color: var(--measured); }
+.tag.theory { color: var(--theory); }
+.tag.picture { color: var(--picture); }
+.tag.open { color: var(--open); }
+
+.chapter { margin-top: 28px; padding-top: 28px; border-top: 1.5px solid var(--rule); display: grid; gap: 18px; }
+.text { min-width: 0; display: grid; gap: 14px; align-content: start; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 14px 40px; }
+.text p { margin: 0; max-width: 64ch; }
+h2 { margin: 0; font-family: var(--font-display); font-stretch: 110%; font-weight: 760; font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.05rem); line-height: 1.1; text-wrap: balance; }
+h3 { margin: 0; font-family: var(--font-display); font-stretch: 105%; font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
+mark { background: var(--mark); color: var(--mark-ink); padding: 0 0.2em; border-radius: 2px; }
+
+.steps { display: flex; flex-wrap: wrap; gap: 8px; }
+.note { margin: 0; padding: 12px 16px; border-left: 4px solid var(--crest); background: var(--paper-raised); border-radius: 0 6px 6px 0; min-height: 5.2em; }
+.note p { margin: 0; max-width: 82ch; }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 901px) { .stage > .figure { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); } }
+.figure { margin: 0; min-width: 0; background: var(--paper-raised); border: 1.5px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.figure figcaption { padding: 8px 12px; border-top: 1.5px solid var(--rule); font-size: 0.85rem; line-height: 1.45; color: var(--ink-soft); }
+.scene { position: relative; width: 100%; aspect-ratio: 1.12 / 1; background: var(--paper-raised); }
+@media (max-width: 900px) { .scene { aspect-ratio: 1 / 1.04; } }
+.scene canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.scene canvas:active { cursor: grabbing; }
+.scene-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.scene-label {
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; line-height: 1.2; white-space: nowrap;
+  color: var(--ink); background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 6px; opacity: 0.94;
+}
+.scene-label.soft { color: var(--ink-soft); font-weight: 400; }
+.scene-label.you { border-color: var(--you); border-width: 2px; }
+.scene-label.light { border-color: var(--photon); }
+@media (max-width: 560px) { .scene-label { font-size: 10.5px; padding: 0 4px; } }
+.fallback { margin: 0; padding: 24px; color: var(--ink-soft); }
+
+.panel { min-width: 0; display: grid; gap: 14px; align-content: start; }
+.control { display: grid; gap: 4px; min-width: 0; }
+.control > label { font-weight: 700; }
+.control output { font-family: var(--font-mono); font-weight: 700; }
+.hint { margin: 0; font-size: 0.9rem; font-weight: 400; color: var(--ink-soft); }
+input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--ink); cursor: pointer; }
+.check { display: flex; align-items: flex-start; gap: 10px; font-weight: 700; cursor: pointer; }
+.check input { flex: none; width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--ink); }
+.check input:disabled + span { opacity: 0.5; }
+button { font: inherit; }
+.btn { padding: 9px 12px; border-radius: 6px; border: 1.5px solid var(--ink); background: var(--paper-raised); color: var(--ink); font-family: var(--font-body); font-size: 0.9rem; font-weight: 700; line-height: 1.1; cursor: pointer; }
+.btn:hover { background: var(--paper); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn.solid, .btn[aria-current="step"] { background: var(--ink); color: var(--paper-raised); }
+.btn[aria-pressed="true"] { background: var(--mark); color: var(--mark-ink); border-color: var(--mark-ink); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+:focus-visible { outline: 3px solid var(--crest); outline-offset: 2px; }
+
+.readout { min-width: 0; display: grid; gap: 6px; align-content: start; padding: 12px 14px; background: var(--paper-raised); border: 1.5px solid var(--rule); border-radius: 6px; font-variant-numeric: tabular-nums; }
+.row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; min-width: 0; }
+.row .lab { color: var(--ink-soft); min-width: 13ch; }
+.row .val { font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
+.row .say { color: var(--ink-soft); font-size: 0.88rem; }
+.step { margin: 0; color: var(--ink-soft); font-size: 0.92rem; }
+
+.facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.fact { padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--paper-raised); display: grid; gap: 6px; align-content: start; }
+.fact p { margin: 0; font-size: 0.95rem; }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Maths for quantum physics · 3D workshop 3</p>
+    <h1>Slices of Time</h1>
+    <p class="intro">Every bit of matter is also a wave. This room shows where that wave comes from: it is what a stack of time-slices looks like when you cut through it at an angle.</p>
+    <p class="legend"><span><span class="tag measured">Measured</span> checked by experiment</span><span><span class="tag theory">Worked out</span> follows from measured facts</span><span><span class="tag picture">Picture</span> a way of drawing it</span><span><span class="tag open">Open</span> nobody knows yet</span></p>
+  </header>
+
+  <main>
+    <section class="chapter" aria-labelledby="h-block">
+      <div class="text">
+        <p class="kicker">The block</p>
+        <h2 id="h-block">A wave is a stack of moments, cut at an angle</h2>
+        <div class="cols">
+          <div class="text">
+            <p>Across and up is space: a side view of a room. Into the screen is time. The glass pane is one moment, our “now”, and it slides steadily into the future. This is the usual physics picture of space and time together, with one direction of space left out so it fits.</p>
+          </div>
+          <div class="text">
+            <p>In quantum theory a particle carries a turning arrow, like the arrows from Lesson 1. For a particle at rest it turns at a steady rate set by its mass, about 10²⁰ turns a second for an electron <span class="tag theory">Worked out</span>. Think of it as an inner clock <span class="tag picture">Picture</span>. Each disc marks one tick: a single moment of the particle's own time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="steps" role="group" aria-label="Steps">
+        <button class="btn" type="button" data-step="0">1 · At rest</button>
+        <button class="btn" type="button" data-step="1">2 · Moving</button>
+        <button class="btn" type="button" data-step="2">3 · Falling</button>
+        <button class="btn" type="button" data-step="3">4 · Fall along</button>
+      </div>
+      <div class="note" id="step-note" aria-live="polite"></div>
+
+      <div class="stage">
+        <figure class="figure">
+          <div class="scene" id="scene" role="img" aria-label="A corridor of time seen at an angle. A stack of discs follows a particle's path through time. A glass pane, our now, cuts through them."></div>
+          <figcaption>The thread is the particle's path through time. Blue discs: ticks still to come. Grey discs: ticks already passed. Green dot: the particle now. <span class="tag picture">Picture</span> Hugely thinned out and exaggerated: a real electron ticks about 10²⁰ times a second, and Earth's gravity tips the discs by one part in 10¹⁶ for each metre of height.</figcaption>
+        </figure>
+        <div class="panel">
+          <div class="btn-row" role="group" aria-label="View">
+            <button class="btn" type="button" id="view-our">Our world (face on)</button>
+            <button class="btn" type="button" id="view-out">Step out and see time</button>
+          </div>
+          <div class="control">
+            <label for="now">The moment “now”</label>
+            <input type="range" id="now" min="0" max="1000" step="1" value="350">
+            <div class="btn-row"><button class="btn" type="button" id="play">Pause</button></div>
+          </div>
+          <div class="control">
+            <label for="speed">Speed across: <output id="speed-out" for="speed">0%</output> of light speed</label>
+            <input type="range" id="speed" min="0" max="0.8" step="0.01" value="0">
+          </div>
+          <div class="control">
+            <label for="grav">Gravity (exaggerated): <output id="grav-out" for="grav">0.00</output></label>
+            <input type="range" id="grav" min="0" max="1" step="0.05" value="0">
+          </div>
+          <div class="btn-row" role="group" aria-label="Who is slicing">
+            <button class="btn" type="button" id="frame-room" aria-pressed="true">Stand in the room</button>
+            <button class="btn" type="button" id="frame-fall" aria-pressed="false">Fall along</button>
+          </div>
+          <label class="check"><input type="checkbox" id="flash"><span>Flash test: why a moving “now” is tilted <span class="hint">(needs gravity at 0)</span></span></label>
+          <label class="check"><input type="checkbox" id="wide"><span>Show the wave across the whole pane</span></label>
+          <div class="readout" id="out" aria-live="off"></div>
+        </div>
+      </div>
+
+      <div class="facts">
+        <div class="fact">
+          <h3>The flash test</h3>
+          <p>A lamp flashes in the middle of a carriage that travels along with the particle. Light goes at the same speed both ways, for everyone <span class="tag measured">Measured</span>. For the rider both end walls are equally far, so they light up at the same moment. For us the back wall runs into the light and the front wall runs away from it, so the back lights up first. The yellow band joins the two hits: one moment for the rider, a tilted slice for us <span class="tag theory">Worked out</span>. Every disc is parallel to it.</p>
+        </div>
+        <div class="fact">
+          <h3>It matches the measurement</h3>
+          <p>Tilt times tick rate gives the spacing of the crests: Planck's constant ÷ (mass × speed), with the slow-clock factor from your budget rule <span class="tag theory">Worked out</span>. That is exactly the wavelength found for electrons in 1927, and since then for neutrons, atoms and molecules of 2,000 atoms <span class="tag measured">Measured</span>.</p>
+        </div>
+        <div class="fact">
+          <h3>Crests faster than light?</h3>
+          <p>Yes, and that's allowed. A crest isn't a thing. It's only the line where our pane happens to cut a disc, like the point where two scissor blades cross: it can race along faster than either blade. The particle itself, the bright blob, never beats light <span class="tag theory">Worked out</span>.</p>
+        </div>
+        <div class="fact">
+          <h3>Is there really a clock inside?</h3>
+          <p><span class="tag open">Open</span> What's solid is the pattern of crests, and only differences between arrows are ever measured. De Broglie believed in a real inner clock. A 2008 experiment with electrons in a crystal saw a hint of one, and a 2013 “clock from one atom's mass” claimed to use it. Both are disputed, and most physicists treat the tick as bookkeeping.</p>
+        </div>
+        <div class="fact">
+          <h3>For pilot-wave fans</h3>
+          <p>In de Broglie's and Bohm's theory the particle is a real dot riding this wave. Its rule: move at right angles to the crests, faster where they sit closer. That is what the green dot does here. The standard theory predicts the same measurements without saying the dot is there, and no experiment has told the two apart <span class="tag open">Open</span>.</p>
+        </div>
+        <div class="fact">
+          <h3>What de Broglie actually did</h3>
+          <p>In 1924 he demanded that a particle's inner clock stay in step with a wave travelling along with it, and out came the wavelength. Drawing it as tilted slices of “now” is a later way of showing the same maths <span class="tag picture">Picture</span>. Notice the discs don't sit square on the thread: both lean towards the path of light. That's the minus sign in spacetime's geometry.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const f1 = x => (Math.round(x * 10) / 10).toFixed(1);
+function pct(f) { const p = f * 100; if (p > 99 && p < 100) return p.toFixed(1) + '%'; return Math.round(p) + '%'; }
+const sig3 = x => Number(x.toPrecision(3)).toLocaleString('en-GB', { maximumFractionDigits: 6 });
+const row = (lab, val, say) => '<div class="row"><span class="lab">' + lab + '</span><span class="val">' + val + '</span>' + (say ? '<span class="say">' + say + '</span>' : '') + '</div>';
+const lerp = (a, b, u) => a + (b - a) * u;
+const ease = u => u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+
+/* ---------- colours follow the page theme ---------- */
+const themedList = [];
+function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888888'; }
+function apply1(target, token, prop) { const o = target[prop]; if (o && o.isColor) o.set(tok(token)); }
+function themed(target, token, prop = 'color') { themedList.push([target, token, prop]); apply1(target, token, prop); return target; }
+function applyTheme() { themedList.forEach(([t, k, p]) => apply1(t, k, p)); }
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
+
+/* ---------- stage: a flat-projection camera, so a face-on view is an exact picture ---------- */
+function makeStage(box, o) {
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
+  catch (e) { box.innerHTML = '<p class="fallback">This browser could not start 3D graphics (WebGL), so the scene cannot be shown here.</p>'; return null; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  box.appendChild(renderer.domElement);
+  const labels = new CSS2DRenderer();
+  labels.domElement.className = 'scene-labels';
+  box.appendChild(labels.domElement);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color();
+  themed(scene, '--paper-raised', 'background');
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.3); sun.position.set(-6, 12, 10); scene.add(sun);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 600);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minPolarAngle = 0.25; controls.maxPolarAngle = Math.PI / 2 + 0.12;
+  renderer.domElement.style.touchAction = 'pan-y';
+  const S = { box, renderer, labels, scene, camera, controls, lineMats: [], visible: true, update: () => {}, tween: null, dist: 90, half: o.half, aspect: 1, home: { polar: o.polar, az: o.az } };
+  const sph = new THREE.Spherical(), off = new THREE.Vector3();
+  S.place = (polar, az) => {
+    sph.set(S.dist, polar, az);
+    camera.position.setFromSpherical(sph).add(controls.target);
+    camera.up.set(0, 1, 0);
+    camera.lookAt(controls.target);
+    controls.update();
+  };
+  S.angles = () => { off.copy(camera.position).sub(controls.target); sph.setFromVector3(off); return { polar: sph.phi, az: sph.theta }; };
+  S.goView = (polar, az, ms = 950) => {
+    const a = S.angles();
+    if (reduceMotion || !ms) { S.tween = null; controls.enabled = true; S.place(polar, az); return; }
+    let d = az - a.az; d = Math.atan2(Math.sin(d), Math.cos(d));
+    S.tween = { t: 0, dur: ms / 1000, p0: a.polar, p1: polar, a0: a.az, a1: a.az + d };
+    controls.enabled = false;
+  };
+  S.frustum = () => {
+    let hh = S.half, hw = hh * S.aspect;
+    if (hw < S.half) { hw = S.half; hh = hw / S.aspect; }
+    camera.left = -hw; camera.right = hw; camera.top = hh; camera.bottom = -hh;
+    camera.updateProjectionMatrix();
+  };
+  // move what the camera looks at, and how much it shows, without changing the viewing direction
+  S.frame = (half, x, y, z) => {
+    const a = S.angles();
+    S.half = half; controls.target.set(x, y, z); S.frustum();
+    if (!S.tween) S.place(a.polar, a.az);
+  };
+  let first = true;
+  S.fit = () => {
+    const w = box.clientWidth, h = box.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false); labels.setSize(w, h);
+    S.lineMats.forEach(m => m.resolution.set(w, h));
+    S.aspect = w / h;
+    const a = first ? S.home : S.angles();
+    S.frustum();
+    if (!S.tween) S.place(a.polar, a.az);
+    first = false;
+  };
+  new ResizeObserver(() => S.fit()).observe(box);
+  new IntersectionObserver(es => { S.visible = es.some(e => e.isIntersecting); }, { rootMargin: '120px' }).observe(box);
+  S.fit();
+  return S;
+}
+function makeLine(S, parent, token, width, opts = {}) {
+  const m = new LineMaterial({ linewidth: width, dashed: !!opts.dashed, dashSize: opts.dash || 0.3, gapSize: opts.gap || 0.22, transparent: true, opacity: 1 });
+  themed(m, token);
+  m.resolution.set(S.box.clientWidth || 800, S.box.clientHeight || 700);
+  S.lineMats.push(m);
+  const g = new LineGeometry(); g.setPositions([0, 0, 0, 0, 0.001, 0]);
+  const l = new Line2(g, m); l.frustumCulled = false; l.visible = false; l.renderOrder = 5;
+  parent.add(l);
+  return l;
+}
+function setLine(l, pts) {
+  if (!pts || pts.length < 6) { l.visible = false; return; }
+  l.visible = true;
+  l.geometry.dispose();
+  const g = new LineGeometry(); g.setPositions(pts);
+  l.geometry = g;
+  if (l.material.dashed) l.computeLineDistances();
+}
+function label(text, cls, cx, cy) {
+  const d = document.createElement('div');
+  d.className = 'scene-label' + (cls ? ' ' + cls : '');
+  d.textContent = text;
+  const o = new CSS2DObject(d);
+  o.center.set(cx === undefined ? 0.5 : cx, cy === undefined ? 0.5 : cy);
+  return o;
+}
+
+/* ---------- the block ---------- */
+const VS = 'attribute vec2 aP; varying vec2 vP; void main(){ vP = aP; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
+const FS = [
+  'uniform float uT; uniform float uSh; uniform float uA; uniform float uFlat; uniform float uV; uniform float uX0; uniform float uT0;',
+  'uniform float uGamma; uniform float uSigma; uniform float uWide; uniform float uOpacity; uniform vec2 uC;',
+  'uniform vec3 uCrest; uniform vec3 uTrough; uniform vec3 uGlass; uniform vec3 uLine;',
+  'varying vec2 vP;',
+  'void main(){',
+  '  float Tev = mix((vP.y + uA) * uSh, uT, uFlat);',                  // the moment, in the freely falling view, of this point on the pane
+  '  float n = uGamma * (Tev - uV * (vP.x - uX0)) / uT0;',             // which tick of the particle that is; whole numbers are the discs
+  '  float w = cos(6.2831853 * n);',
+  '  float d = abs(fract(n + 0.5) - 0.5);',
+  '  float line = 1.0 - smoothstep(0.035, 0.10, d);',
+  '  vec2 q = vP - uC;',
+  '  float env = exp(-dot(q, q) / (2.0 * uSigma * uSigma));',
+  '  float amp = clamp(env + 0.2 * uWide, 0.0, 1.0);',
+  '  vec3 col = mix(uGlass, w > 0.0 ? uCrest : uTrough, abs(w) * amp);',
+  '  col = mix(col, uLine, line * amp * 0.8);',
+  '  float alpha = uOpacity * (0.2 + 0.75 * amp * max(abs(w), line));',
+  '  gl_FragColor = vec4(col, alpha);',
+  '  #include <colorspace_fragment>',
+  '}'
+].join('\n');
+
+function init() {
+  const box = document.getElementById('scene');
+  const S = makeStage(box, { half: 8.8, polar: 1.17, az: 0.8 });
+  if (!S) return;
+  const { scene } = S;
+  // One scale for space and time, so light travels at 45 degrees. W, H: the room. D: how much time the corridor shows.
+  // X0, H0: where the particle starts. T0: time between drawn ticks. R: disc radius. KMAX: strongest clock gradient.
+  const SC = 6, W = 2.2, H = 0.9, D = 1.5, X0 = 0.45, H0 = 0.45, T0 = 0.08, R = 0.36, KMAX = 0.5, RATE = 0.17;
+  const st = { v: 0, g: 0, k: 0, mLin: 0, m: 0, mTarget: 0, ourLin: 0, our: 0, ourTarget: 0, t: 0.52, playing: !reduceMotion, hold: 0, flash: false, wide: false, dirty: true, acc: 0, shown: 0, lastNow: -1 };
+  const P = { gamma: 1, tEnd: D, Tend: D, nMax: 0 };
+
+  // Two ways to label the same event: the room's (x, h, t) and the freely falling one (X, Y, T).
+  const E = { x: 0, h: 0, t: 0, X: 0, Y: 0, T: 0 }, V = new THREE.Vector3();
+  function fromRoom(x, h, t, o) {
+    const k = st.k;
+    if (k < 1e-6) { o.X = x; o.Y = h; o.T = t; }
+    else { const a = h + 1 / k; o.X = x; o.Y = a * Math.cosh(k * t) - 1 / k; o.T = a * Math.sinh(k * t); }
+    o.x = x; o.h = h; o.t = t; return o;
+  }
+  function fromInertial(X, Y, T, o) {
+    const k = st.k;
+    if (k < 1e-6) { o.x = X; o.h = Y; o.t = T; }
+    else { const a = Y + 1 / k, q = Math.max(1e-9, a * a - T * T); o.x = X; o.h = Math.sqrt(q) - 1 / k; o.t = Math.atanh(Math.max(-0.999999, Math.min(0.999999, T / a))) / k; }
+    o.X = X; o.Y = Y; o.T = T; return o;
+  }
+  function scenePos(e, out) { const m = st.m; return out.set(SC * lerp(e.x, e.X, m), SC * lerp(e.h, e.Y, m), -SC * lerp(e.t, e.T, m)); }
+  function putRoom(arr, i, x, h, t) { scenePos(fromRoom(x, h, t, E), V); arr[i] = V.x; arr[i + 1] = V.y; arr[i + 2] = V.z; }
+  function putIn(arr, i, X, Y, T) { scenePos(fromInertial(X, Y, T, E), V); arr[i] = V.x; arr[i + 1] = V.y; arr[i + 2] = V.z; }
+  const TofRoom = t => st.k > 1e-6 ? (H0 + 1 / st.k) * Math.tanh(st.k * t) : t;   // the particle's falling-view time when the room clock shows t
+
+  // things that belong to the block fade out in the face-on view
+  const block = new THREE.Group(); scene.add(block);
+  const fades = [], blockLabels = [];
+  const fade = (mat, base) => { mat.transparent = true; mat.opacity = base; fades.push([mat, base]); return mat; };
+  const bl = l => { blockLabels.push(l); scene.add(l); return l; };
+
+  // corridor: floor, long edges, and the room drawn again at six moments
+  const FT = 24, NF = 5;
+  const floorPos = new Float32Array((FT + 1) * 6), floorIdx = [];
+  for (let i = 0; i < FT; i++) { const a = i * 2; floorIdx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  const floorGeo = new THREE.BufferGeometry(); floorGeo.setAttribute('position', new THREE.BufferAttribute(floorPos, 3)); floorGeo.setIndex(floorIdx);
+  const floorMesh = new THREE.Mesh(floorGeo, fade(themed(new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthWrite: false }), '--paper'), 0.8));
+  floorMesh.frustumCulled = false; floorMesh.renderOrder = 0; block.add(floorMesh);
+  const corrPos = new Float32Array((4 * FT + (NF + 1) * 4) * 6);
+  const corrGeo = new THREE.BufferGeometry(); corrGeo.setAttribute('position', new THREE.BufferAttribute(corrPos, 3));
+  const corr = new THREE.LineSegments(corrGeo, fade(themed(new THREE.LineBasicMaterial(), '--grid-strong'), 0.95));
+  corr.frustumCulled = false; corr.renderOrder = 4; block.add(corr);
+
+  // discs: one per tick
+  const NC = 22, SEG = 40;
+  const coinPos = new Float32Array(NC * (SEG + 1) * 3), coinIdx = [];
+  for (let c = 0; c < NC; c++) { const b = c * (SEG + 1); for (let s = 0; s < SEG; s++) coinIdx.push(b, b + 1 + s, b + 1 + (s + 1) % SEG); }
+  const coinGeo = new THREE.BufferGeometry(); coinGeo.setAttribute('position', new THREE.BufferAttribute(coinPos, 3)); coinGeo.setIndex(coinIdx);
+  const coinPast = fade(themed(new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthWrite: false }), '--ink-soft'), 0.13);
+  const coinNext = fade(themed(new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthWrite: false }), '--crest'), 0.22);
+  const coins = new THREE.Mesh(coinGeo, [coinPast, coinNext]); coins.frustumCulled = false; coins.renderOrder = 1; block.add(coins);
+  const rimPos = new Float32Array(NC * SEG * 6);
+  const rimGeo = new THREE.BufferGeometry(); rimGeo.setAttribute('position', new THREE.BufferAttribute(rimPos, 3));
+  const rims = new THREE.LineSegments(rimGeo, fade(themed(new THREE.LineBasicMaterial(), '--crest'), 0.9));
+  rims.frustumCulled = false; rims.renderOrder = 4; block.add(rims);
+  const beadGeo = new THREE.SphereGeometry(0.075, 14, 10), beadMat = fade(themed(new THREE.MeshStandardMaterial({ roughness: 0.6 }), '--ink'), 1);
+  const beads = []; for (let c = 0; c < NC; c++) { const b = new THREE.Mesh(beadGeo, beadMat); b.renderOrder = 4; b.visible = false; block.add(b); beads.push(b); }
+  const world = makeLine(S, block, '--ink', 3.2); fades.push([world.material, 1]);
+
+  // the panes: the room's "now", and the faller's
+  function mkUniforms() {
+    const U = { uT: { value: 0 }, uSh: { value: 0 }, uA: { value: 0 }, uFlat: { value: 1 }, uV: { value: 0 }, uX0: { value: X0 }, uT0: { value: T0 }, uGamma: { value: 1 },
+      uSigma: { value: R / 2.1 }, uWide: { value: 0 }, uOpacity: { value: 1 }, uC: { value: new THREE.Vector2() },
+      uCrest: { value: new THREE.Color() }, uTrough: { value: new THREE.Color() }, uGlass: { value: new THREE.Color() }, uLine: { value: new THREE.Color() } };
+    themed(U.uCrest, '--crest', 'value'); themed(U.uTrough, '--trough', 'value'); themed(U.uGlass, '--paper', 'value'); themed(U.uLine, '--ink', 'value');
+    return U;
+  }
+  const paneMat = U => new THREE.ShaderMaterial({ uniforms: U, vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false, side: THREE.DoubleSide });
+  const UA = mkUniforms(), UB = mkUniforms();
+  const paPos = new Float32Array(12);
+  const paGeo = new THREE.BufferGeometry();
+  paGeo.setAttribute('position', new THREE.BufferAttribute(paPos, 3));
+  paGeo.setAttribute('aP', new THREE.BufferAttribute(new Float32Array([0, 0, W, 0, W, H, 0, H]), 2));
+  paGeo.setIndex([0, 1, 2, 0, 2, 3]);
+  const paneA = new THREE.Mesh(paGeo, paneMat(UA)); paneA.frustumCulled = false; paneA.renderOrder = 2; scene.add(paneA);
+  const outlineA = makeLine(S, scene, '--ink', 2.6);
+  const NB = 12, pbPos = new Float32Array((NB + 1) * 6), pbP = new Float32Array((NB + 1) * 4), pbIdx = [];
+  for (let j = 0; j < NB; j++) { const a = j * 2; pbIdx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  const pbGeo = new THREE.BufferGeometry();
+  pbGeo.setAttribute('position', new THREE.BufferAttribute(pbPos, 3)); pbGeo.setAttribute('aP', new THREE.BufferAttribute(pbP, 2)); pbGeo.setIndex(pbIdx);
+  const paneB = new THREE.Mesh(pbGeo, paneMat(UB)); paneB.frustumCulled = false; paneB.renderOrder = 3; paneB.visible = false; scene.add(paneB);
+  const outlineB = makeLine(S, scene, '--you', 2.6);
+  const dot = new THREE.Mesh(new THREE.SphereGeometry(0.17, 24, 16), themed(new THREE.MeshStandardMaterial({ roughness: 0.4, transparent: true }), '--you'));
+  dot.renderOrder = 7; scene.add(dot);
+
+  // flash test
+  const lampMat = fade(themed(new THREE.MeshBasicMaterial(), '--photon'), 1), dotGeo = new THREE.SphereGeometry(0.11, 16, 12);
+  const lamp = new THREE.Mesh(dotGeo, lampMat), hitBack = new THREE.Mesh(dotGeo, lampMat), hitFront = new THREE.Mesh(dotGeo, lampMat);
+  for (const o of [lamp, hitBack, hitFront]) { o.renderOrder = 6; o.visible = false; block.add(o); }
+  const rayBack = makeLine(S, block, '--photon', 3), rayFront = makeLine(S, block, '--photon', 3);
+  const wallBack = makeLine(S, block, '--ink-soft', 2, { dashed: true, dash: 0.25, gap: 0.14 }), wallFront = makeLine(S, block, '--ink-soft', 2, { dashed: true, dash: 0.25, gap: 0.14 });
+  for (const l of [rayBack, rayFront, wallBack, wallFront]) fades.push([l.material, 1]);
+  const bandPos = new Float32Array(12), bandGeo = new THREE.BufferGeometry();
+  bandGeo.setAttribute('position', new THREE.BufferAttribute(bandPos, 3)); bandGeo.setIndex([0, 1, 2, 0, 2, 3]);
+  const band = new THREE.Mesh(bandGeo, fade(themed(new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthWrite: false }), '--photon'), 0.42));
+  band.frustumCulled = false; band.renderOrder = 3; band.visible = false; block.add(band);
+
+  // labels
+  const nowLabel = label('our “now”', '', 0, 1.3); scene.add(nowLabel);
+  const fallLabel = label('the faller’s “now”', 'you', 1, 1.3); fallLabel.visible = false; scene.add(fallLabel);
+  const timeLabel = bl(label('time →', 'soft', 0.5, -0.5)), floorLabel = bl(label('floor', 'soft', 0.5, -0.4));
+  const tickLabel = bl(label('one tick', 'soft', 0.5, 1.4));
+  const backLabel = bl(label('', 'light', 0.92, -0.7)), frontLabel = bl(label('front wall: lit later', 'light', 0.08, -0.7)), bandLabel = bl(label('one moment for the rider', 'light', 0.5, 2.3));
+
+  function derive() {
+    const k = st.k;
+    P.gamma = 1 / Math.sqrt(1 - st.v * st.v);
+    P.tEnd = k > 1e-6 ? Math.min(D, Math.acosh(1 + k * H0) / k) : D;
+    P.Tend = TofRoom(P.tEnd);
+    P.nMax = Math.min(NC - 1, Math.floor(P.Tend / (T0 * P.gamma) + 1e-9));
+  }
+  function buildCorridor() {
+    let q = 0;
+    const seg = (x1, h1, t1, x2, h2, t2) => { putRoom(corrPos, q, x1, h1, t1); putRoom(corrPos, q + 3, x2, h2, t2); q += 6; };
+    for (const [x, h] of [[0, 0], [W, 0], [0, H], [W, H]]) for (let i = 0; i < FT; i++) seg(x, h, D * i / FT, x, h, D * (i + 1) / FT);
+    for (let j = 0; j <= NF; j++) { const t = D * j / NF; seg(0, 0, t, W, 0, t); seg(W, 0, t, W, H, t); seg(W, H, t, 0, H, t); seg(0, H, t, 0, 0, t); }
+    corrGeo.attributes.position.needsUpdate = true;
+    for (let i = 0; i <= FT; i++) { putRoom(floorPos, i * 6, 0, 0, D * i / FT); putRoom(floorPos, i * 6 + 3, W, 0, D * i / FT); }
+    floorGeo.attributes.position.needsUpdate = true;
+    scenePos(fromRoom(W, 0, D * 0.82, E), V); timeLabel.position.copy(V);
+    scenePos(fromRoom(W * 0.5, 0, 0, E), V); floorLabel.position.copy(V);
+  }
+  function buildCoins() {
+    const v = st.v, g = P.gamma, n = P.nMax + 1;
+    for (let c = 0; c < n; c++) {
+      const Tc = c * T0 * g, Xc = X0 + v * Tc, b = c * (SEG + 1) * 3;
+      putIn(coinPos, b, Xc, H0, Tc);
+      for (let s = 0; s < SEG; s++) { const a = s / SEG * Math.PI * 2, dx = R * Math.cos(a); putIn(coinPos, b + 3 + s * 3, Xc + dx, H0 + R * Math.sin(a), Tc + v * dx); }
+      for (let s = 0; s < SEG; s++) {
+        const p1 = b + 3 + s * 3, p2 = b + 3 + ((s + 1) % SEG) * 3, r = (c * SEG + s) * 6;
+        rimPos[r] = coinPos[p1]; rimPos[r + 1] = coinPos[p1 + 1]; rimPos[r + 2] = coinPos[p1 + 2];
+        rimPos[r + 3] = coinPos[p2]; rimPos[r + 4] = coinPos[p2 + 1]; rimPos[r + 5] = coinPos[p2 + 2];
+      }
+      beads[c].position.set(coinPos[b], coinPos[b + 1], coinPos[b + 2]); beads[c].visible = true;
+    }
+    for (let c = n; c < NC; c++) beads[c].visible = false;
+    coinGeo.attributes.position.needsUpdate = true; rimGeo.attributes.position.needsUpdate = true;
+    rimGeo.setDrawRange(0, n * SEG * 2);
+    st.shown = n; st.lastNow = -1;
+    // "one tick" points at the top of the second disc
+    const c1 = Math.min(1, n - 1), top = c1 * (SEG + 1) * 3 + 3 + (SEG / 4) * 3;
+    tickLabel.position.set(coinPos[top], coinPos[top + 1], coinPos[top + 2]);
+    const pts = [];
+    for (let i = 0; i <= 40; i++) { const T = P.Tend * i / 40; scenePos(fromInertial(X0 + v * T, H0, T, E), V); pts.push(V.x, V.y, V.z); }
+    setLine(world, pts);
+  }
+  function buildFlash() {
+    const on = st.flash && st.k < 1e-6;
+    st.flashOn = on;
+    lamp.visible = hitBack.visible = hitFront.visible = band.visible = on;
+    if (!on) { for (const l of [rayBack, rayFront, wallBack, wallFront]) l.visible = false; return; }
+    const v = st.v, Tf = 0.12, L = 0.24, Xf = X0 + v * Tf;
+    const Tr = Tf + L / (1 + v), Xr = X0 + v * Tr - L, Tq = Tf + L / (1 - v), Xq = X0 + v * Tq + L;
+    const at = (X, Y, T) => { scenePos(fromInertial(X, Y, T, E), V); return [V.x, V.y, V.z]; };
+    const a = at(Xf, H0, Tf), r = at(Xr, H0, Tr), f = at(Xq, H0, Tq);
+    setLine(rayBack, a.concat(r)); setLine(rayFront, a.concat(f));
+    const Ta = Math.max(0, Tf - 0.1), Tb = Math.min(D, Tq + 0.12);
+    setLine(wallBack, at(X0 + v * Ta - L, H0, Ta).concat(at(X0 + v * Tb - L, H0, Tb)));
+    setLine(wallFront, at(X0 + v * Ta + L, H0, Ta).concat(at(X0 + v * Tb + L, H0, Tb)));
+    lamp.position.fromArray(a); hitBack.position.fromArray(r); hitFront.position.fromArray(f);
+    putIn(bandPos, 0, Xr, H0 - 0.2, Tr); putIn(bandPos, 3, Xq, H0 - 0.2, Tq); putIn(bandPos, 6, Xq, H0 + 0.2, Tq); putIn(bandPos, 9, Xr, H0 + 0.2, Tr);
+    bandGeo.attributes.position.needsUpdate = true;
+    backLabel.position.fromArray(r); frontLabel.position.fromArray(f);
+    bandLabel.position.set((r[0] + f[0]) / 2, (r[1] + f[1]) / 2 + 0.2 * SC, (r[2] + f[2]) / 2);
+    backLabel.element.textContent = v < 0.02 ? 'both walls lit together' : 'back wall: lit first';
+    frontLabel.element.textContent = v < 0.02 ? '' : 'front wall: lit later';
+  }
+  function showLabels() {
+    const out = st.our < 0.5;
+    for (const l of blockLabels) l.visible = out;
+    tickLabel.visible = out && st.shown > 1;
+    backLabel.visible = bandLabel.visible = out && st.flashOn;
+    frontLabel.visible = out && st.flashOn && st.v >= 0.02;
+  }
+  function applyFade() {
+    const f = 1 - st.our;
+    for (const [m, base] of fades) m.opacity = base * f;
+    block.visible = st.our < 0.985;
+    showLabels();
+  }
+  function reframe() {
+    const m = st.m, u = st.our;
+    const stepY = lerp(H / 2, 0.80, m), stepZ = lerp(D / 2, 1.12, m), stepHalf = lerp(1.47, 2.0, m);
+    const ourY = lerp(H / 2, 0.78, m), ourHalf = lerp(1.27, 1.36, m);
+    S.frame(lerp(stepHalf, ourHalf, u) * SC, (W / 2) * SC, lerp(stepY, ourY, u) * SC, -stepZ * SC);
+  }
+  function placeNow() {
+    const t = st.t, k = st.k, v = st.v, grav = k > 1e-6;
+    const Tp = TofRoom(t), Xp = X0 + v * Tp, hp = grav ? (H0 + 1 / k) / Math.cosh(k * t) - 1 / k : H0;
+    // the room's "now"
+    putRoom(paPos, 0, 0, 0, t); putRoom(paPos, 3, W, 0, t); putRoom(paPos, 6, W, H, t); putRoom(paPos, 9, 0, H, t);
+    paGeo.attributes.position.needsUpdate = true;
+    const oa = 1 - st.m * st.our;
+    setLine(outlineA, oa > 0.02 ? [paPos[0], paPos[1], paPos[2], paPos[3], paPos[4], paPos[5], paPos[6], paPos[7], paPos[8], paPos[9], paPos[10], paPos[11], paPos[0], paPos[1], paPos[2]] : null);
+    outlineA.material.opacity = oa; paneA.visible = oa > 0.02;
+    UA.uT.value = t; UA.uSh.value = grav ? Math.sinh(k * t) : 0; UA.uA.value = grav ? 1 / k : 0; UA.uFlat.value = grav ? 0 : 1;
+    UA.uV.value = v; UA.uGamma.value = P.gamma; UA.uWide.value = st.wide ? 1 : 0; UA.uC.value.set(Xp, hp); UA.uOpacity.value = oa;
+    nowLabel.position.set(paPos[9], paPos[10], paPos[11]);
+    nowLabel.element.textContent = st.m > 0.5 ? 'the room’s “now”' : 'our “now”';
+    nowLabel.visible = oa > 0.5;
+    // the faller's "now": the part of it that lies inside the room
+    const showB = grav && st.m > 0.002;
+    paneB.visible = showB; fallLabel.visible = showB && st.m > 0.5;
+    if (showB) {
+      const Yf = Math.sqrt(1 / (k * k) + Tp * Tp) - 1 / k, Yc = Math.sqrt((H + 1 / k) * (H + 1 / k) + Tp * Tp) - 1 / k, left = [], right = [];
+      for (let j = 0; j <= NB; j++) {
+        const Y = lerp(Yf, Yc, j / NB);
+        putIn(pbPos, j * 6, 0, Y, Tp); putIn(pbPos, j * 6 + 3, W, Y, Tp);
+        pbP[j * 4] = 0; pbP[j * 4 + 1] = Y; pbP[j * 4 + 2] = W; pbP[j * 4 + 3] = Y;
+        left.push(pbPos[j * 6], pbPos[j * 6 + 1], pbPos[j * 6 + 2]); right.unshift(pbPos[j * 6 + 3], pbPos[j * 6 + 4], pbPos[j * 6 + 5]);
+      }
+      // left runs up the left edge, right runs back down the right edge
+      pbGeo.attributes.position.needsUpdate = true; pbGeo.attributes.aP.needsUpdate = true;
+      setLine(outlineB, left.concat(right, [left[0], left[1], left[2]]));
+      outlineB.material.opacity = st.m;
+      UB.uT.value = Tp; UB.uFlat.value = 1; UB.uV.value = v; UB.uGamma.value = P.gamma; UB.uWide.value = st.wide ? 1 : 0; UB.uC.value.set(Xp, H0); UB.uOpacity.value = st.m;
+      fallLabel.position.set(pbPos[NB * 6 + 3], pbPos[NB * 6 + 4], pbPos[NB * 6 + 5]);
+    } else outlineB.visible = false;
+    scenePos(fromInertial(Xp, H0, Tp, E), V); dot.position.copy(V);
+    // which discs are already behind us
+    const nNow = Math.min(st.shown, Math.floor(Tp / (T0 * P.gamma) + 1e-9) + 1);
+    if (nNow !== st.lastNow) {
+      coinGeo.clearGroups(); coinGeo.addGroup(0, nNow * SEG * 3, 0); coinGeo.addGroup(nNow * SEG * 3, (st.shown - nNow) * SEG * 3, 1);
+      st.lastNow = nNow;
+    }
+  }
+
+  const out = document.getElementById('out');
+  function write() {
+    const v = st.v, k = st.k, grav = k > 1e-6, t = st.t, g = P.gamma;
+    const sh = grav ? Math.sinh(k * t) : 0;
+    const perLen = g * Math.sqrt(v * v + sh * sh) / T0;              // crests per unit of length on the room's pane
+    const cut = Math.round(perLen * 2 * R);
+    // someone standing in the room measures the sideways speed a little lower once the particle is also falling fast
+    let h = '<h3>Right now</h3>' + row('Speed across', pct(grav ? v / Math.cosh(k * t) : v), grav && v > 0.005 ? 'of light speed, measured in the room (thrown at ' + pct(v) + ')' : 'of light speed');
+    if (grav) h += row('Speed downwards', pct(Math.tanh(k * t)), 'of light speed, in this exaggerated gravity');
+    h += row('Discs our pane cuts', cut <= 1 ? 'one at a time' : 'about ' + cut + ' at once', cut <= 1 ? 'no crests' : 'each cut is a crest');
+    if (st.m > 0.5) { const fc = Math.round(g * v / T0 * 2 * R); h += row('Discs the faller cuts', fc <= 1 ? 'one at a time' : 'about ' + fc + ' at once', 'for the faller it is not falling'); }
+    if (!grav) {
+      h += row('Its clock, seen by us', pct(1 / g), 'your budget rule') +
+        row('Its “now”, per metre ahead', v < 0.005 ? 'same as ours' : f1(v * 3.3356) + ' billionths of a second later') +
+        row('Crests for an electron', v < 0.005 ? 'none: it is not moving' : sig3(2.4263 / (g * v)) + ' trillionths of a metre apart') +
+        row('Crests run at', v < 0.005 ? '—' : pct(1 / v) + ' of light speed', v < 0.005 ? '' : 'the blob keeps to ' + pct(v));
+    } else {
+      h += '<p class="step">For real numbers: a neutron that has fallen for one second on Earth has crests 40 billionths of a metre apart, getting closer all the time.</p>';
+    }
+    out.innerHTML = h;
+  }
+
+  /* ---------- steps and controls ---------- */
+  const T = (cls, word) => '<span class="tag ' + cls + '">' + word + '</span>';
+  const STEPS = [
+    { v: 0, g: 0, fall: 0, note: '<p><b>1 · At rest.</b> Each disc is one tick of the particle’s inner clock: one moment of its own time, spread across space. The discs lie flat, parallel to our pane, because a thing at rest shares our “now”. The pane passes them one at a time, and the whole blob blinks together. Nothing waves.</p>' },
+    { v: 0.6, g: 0, fall: 0, note: '<p><b>2 · Moving.</b> The particle now drifts to the right, so its thread through time leans. Its discs lean too, because a moving thing’s “now” is tilted against ours ' + T('theory', 'Worked out') + ' (tick “Flash test” to see why). Our pane now cuts several discs at once, each along a line. <mark>Those lines are the crests of a wave.</mark> More speed, more tilt, closer crests.</p>' },
+    { v: 0, g: 1, fall: 0, note: '<p><b>3 · Falling.</b> Gravity on, particle let go. Higher up, clocks tick faster ' + T('measured', 'Measured') + ', so every tick is reached earlier at the top than at the bottom. The discs tip towards us a little more with each tick, like a book being fanned. Our pane cuts them in level lines that crowd closer and closer: a wave heading downwards, ever faster. The particle falls.</p>' },
+    { v: 0, g: 1, fall: 1, note: '<p><b>4 · Fall along.</b> Same particle, same discs, nothing touched. Only the slicing changed: this is how someone falling along with it carves up the block. For them the discs are flat again, because the particle is simply at rest. It is the room that is bent: its floor curves upwards and its “now” keeps tilting. <mark>The floor comes up and hits the particle.</mark></p>' }
+  ];
+  const stepBtns = [...document.querySelectorAll('[data-step]')], note = document.getElementById('step-note');
+  const speed = document.getElementById('speed'), speedOut = document.getElementById('speed-out');
+  const grav = document.getElementById('grav'), gravOut = document.getElementById('grav-out');
+  const nowS = document.getElementById('now'), playBtn = document.getElementById('play');
+  const roomBtn = document.getElementById('frame-room'), fallBtn = document.getElementById('frame-fall');
+  const flashBox = document.getElementById('flash'), wideBox = document.getElementById('wide');
+  function syncUI() {
+    speed.value = String(st.v); speedOut.textContent = pct(st.v);
+    grav.value = String(st.g); gravOut.textContent = st.g.toFixed(2);
+    const has = st.g > 0;
+    roomBtn.disabled = fallBtn.disabled = !has;
+    roomBtn.setAttribute('aria-pressed', String(st.mTarget === 0)); fallBtn.setAttribute('aria-pressed', String(st.mTarget === 1));
+    flashBox.disabled = has; if (has) { flashBox.checked = false; st.flash = false; }
+    playBtn.textContent = st.playing ? 'Pause' : 'Play';
+  }
+  function setParams(v, g, fall) {
+    st.v = v; st.g = g; st.k = g * KMAX;
+    st.mTarget = g > 0 ? fall : 0;
+    if (reduceMotion || g === 0) { st.mLin = st.mTarget; st.m = st.mTarget; }
+    st.dirty = true; syncUI();
+  }
+  function setStep(i) {
+    stepBtns.forEach((b, j) => { if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+    note.innerHTML = STEPS[i].note;
+    setParams(STEPS[i].v, STEPS[i].g, STEPS[i].fall);
+    st.t = Math.min(st.t, 0.35); st.hold = 0;
+  }
+  stepBtns.forEach((b, i) => b.addEventListener('click', () => setStep(i)));
+  speed.addEventListener('input', () => setParams(parseFloat(speed.value), st.g, st.mTarget));
+  grav.addEventListener('input', () => setParams(st.v, parseFloat(grav.value), st.mTarget));
+  roomBtn.addEventListener('click', () => { st.mTarget = 0; if (reduceMotion) { st.mLin = st.m = 0; st.dirty = true; } syncUI(); });
+  fallBtn.addEventListener('click', () => { st.mTarget = 1; if (reduceMotion) { st.mLin = st.m = 1; st.dirty = true; } syncUI(); });
+  flashBox.addEventListener('change', () => { st.flash = flashBox.checked; st.dirty = true; });
+  wideBox.addEventListener('change', () => { st.wide = wideBox.checked; });
+  nowS.addEventListener('input', () => { st.t = parseInt(nowS.value, 10) / 1000 * P.tEnd; st.playing = false; st.hold = 0; syncUI(); });
+  playBtn.addEventListener('click', () => { st.playing = !st.playing; syncUI(); });
+  const goOur = () => { st.ourTarget = 1; S.goView(Math.PI / 2, 0); if (reduceMotion) { st.ourLin = st.our = 1; applyFade(); reframe(); } };
+  const goOut = () => { st.ourTarget = 0; S.goView(S.home.polar, S.home.az); if (reduceMotion) { st.ourLin = st.our = 0; applyFade(); reframe(); } };
+  document.getElementById('view-our').addEventListener('click', goOur);
+  document.getElementById('view-out').addEventListener('click', goOut);
+  S.controls.addEventListener('start', () => { if (st.ourTarget === 1) st.ourTarget = 0; });   // dragging the face-on view steps you out of it
+
+  S.update = dt => {
+    let moved = false;
+    if (st.mLin !== st.mTarget) {
+      const d = dt / 1.4;
+      st.mLin = st.mTarget > st.mLin ? Math.min(st.mTarget, st.mLin + d) : Math.max(st.mTarget, st.mLin - d);
+      st.m = ease(st.mLin); st.dirty = true;
+    }
+    if (st.ourLin !== st.ourTarget) {
+      const d = dt / 0.95;
+      st.ourLin = st.ourTarget > st.ourLin ? Math.min(st.ourTarget, st.ourLin + d) : Math.max(st.ourTarget, st.ourLin - d);
+      st.our = ease(st.ourLin); applyFade(); moved = true;
+    }
+    if (st.dirty) {
+      derive();
+      st.t = Math.min(st.t, P.tEnd);
+      buildCorridor(); buildCoins(); buildFlash(); showLabels();
+      st.dirty = false; moved = true;
+    }
+    if (st.playing) {
+      if (st.hold > 0) { st.hold -= dt; if (st.hold <= 0) st.t = 0; }
+      else { st.t += dt * RATE; if (st.t >= P.tEnd) { st.t = P.tEnd; st.hold = 1.1; } }
+      nowS.value = String(Math.round(st.t / P.tEnd * 1000));
+    }
+    if (moved) reframe();
+    placeNow();
+    st.acc += dt;
+    if (st.acc > 0.12) { st.acc = 0; write(); }
+  };
+  setStep(0);
+  st.t = 0.52;
+  derive(); buildCorridor(); buildCoins(); buildFlash(); applyFade(); reframe(); placeNow(); write();
+  st.dirty = false;
+  return S;
+}
+
+const S = init();
+const clk = new THREE.Clock();
+function frame(dt) {
+  S.update(dt);            // keep the numbers live even when the scene is scrolled away
+  if (!S.visible) return;
+  if (S.tween) {
+    const tw = S.tween; tw.t += dt;
+    const u = Math.min(1, tw.t / tw.dur), e = ease(u);
+    S.place(tw.p0 + (tw.p1 - tw.p0) * e, tw.a0 + (tw.a1 - tw.a0) * e);
+    if (u >= 1) { S.tween = null; S.controls.enabled = true; }
+  } else S.controls.update();
+  S.renderer.render(S.scene, S.camera);
+  S.labels.render(S.scene, S.camera);
+}
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(clk.getDelta(), 0.05);
+  if (document.hidden || !S) return;
+  frame(dt);
+}
+loop();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>

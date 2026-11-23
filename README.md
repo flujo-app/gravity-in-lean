@@ -36,6 +36,11 @@ flowchart LR
 
 Solid arrows are steps worth taking. Dotted arrows are not for now.
 
+## The pages
+
+The interactive pages this project grew out of are kept in [pages/](pages/): 7 files, each of
+which opens in a browser by itself. Start with *Slow Clocks, Bent Light*.
+
 ## What is proved today
 
 | Piece | In plain words | File and main result |
@@ -130,7 +135,8 @@ GravityInLean/Curvature.lean        the general definitions: connection, curvatu
 GravityInLean/RoundSpacetime.lean   step 1: the curvature of the round space-time
 GravityInLean/FreeFall.lean         step 1: the round orbit as free fall
 GravityInLean/Probe/Sphere.lean     the probe
-Audit.lean                          the judge
+pages/                              the interactive pages
+
 SURVEY.md                           what already exists elsewhere
 PLAN.md                             where this could go, and what it would cost
 ```
