@@ -21,3 +21,10 @@ import GravityInLean.NewCoordinates
 import GravityInLean.SamePath
 import GravityInLean.SameSymmetry
 import GravityInLean.SameSpacetime
+import GravityInLean.Curved.Basic
+import GravityInLean.Curved.Flat
+import GravityInLean.Curved.Tables
+import GravityInLean.Curved.KnownAnswers
+import GravityInLean.Curved.Goal
+import GravityInLean.Goals.Turns
+import GravityInLean.Goals.Connection

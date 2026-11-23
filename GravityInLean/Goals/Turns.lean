@@ -76,7 +76,8 @@ theorem smoothFlow_const (E : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] (
       ContDiffOn ℝ ∞ (fun p : ℝ × E ↦ flow p.1 p.2) (Ioo (-ε) ε ×ˢ Metric.ball x₀ ε) ∧
       (∀ x ∈ Metric.ball x₀ ε, flow 0 x = x) ∧
       ∀ x ∈ Metric.ball x₀ ε, ∀ t ∈ Ioo (-ε) ε,
-        flow t x ∈ (Set.univ : Set E) ∧ HasDerivAt (fun r ↦ flow r x) ((fun _ ↦ v) (flow t x)) t := by
+        flow t x ∈ (Set.univ : Set E)
+          ∧ HasDerivAt (fun r ↦ flow r x) ((fun _ ↦ v) (flow t x)) t := by
   refine ⟨1, fun t x ↦ x + t • v, one_pos, ?_, fun x _ ↦ by simp, fun x _ t _ ↦ ⟨mem_univ _, ?_⟩⟩
   · exact (contDiff_snd.add (contDiff_fst.smul contDiff_const)).contDiffOn
   · simpa using ((hasDerivAt_id t).smul_const v).const_add x
@@ -150,5 +151,76 @@ def TurnsCoordinatesStatement : Prop :=
       R * R.transpose = 1 ∧ R.det = 1 ∧
       (∀ y ∈ W, sin (y 2) ≠ 0 ∧ (tab (jac Φ) y).det ≠ 0) ∧
       ∀ y ∈ W, ∀ i α, ∑ μ, jac Φ α μ y * stdTurn i μ y = ∑ j, R i j * ξ j α (Φ y)
+
+/-! ## The assumptions can be met, and the conclusion is formed the right way round -/
+
+theorem turns_eq_stdTurn (x : Coords 4) :
+    (fun i : Fin 3 ↦ (Curved.turns i x : Coords 4)) = fun i ↦ fun k ↦ stdTurn i k x :=
+  funext fun i ↦ by fin_cases i <;> rfl
+
+/-- **The assumptions of statement 2 can be met.** Schwarzschild's table with the three standard
+turns meets `TurnsOn` outside the rim. -/
+theorem schwarzschild_turnsOn (M : ℝ) :
+    TurnsOn (roundG (schwA M) (schwB M)) stdTurn (Curved.outside M) where
+  smooth := by
+    intro i k
+    fin_cases i
+    · exact fun x hx ↦ (Curved.smooth_rotY (z := x) hx.2.2 k).contDiffWithinAt
+    · exact fun x hx ↦ (Curved.smooth_rotX (z := x) hx.2.2 k).contDiffWithinAt
+    · exact fun x _ ↦ (Curved.smooth_rotZ x k).contDiffWithinAt
+  unchanged := by
+    intro i x hx
+    have hround := schwarzschild_isRound M hx.2.2
+    fin_cases i
+    · exact hround.2.1
+    · exact hround.1
+    · exact hround.2.2
+  likeTurns := fun x hx k ↦ by
+    have hs := hx.2.2
+    have hY := differentiableAt_rotY hs
+    have hX := differentiableAt_rotX hs
+    have hZ := differentiableAt_rotZ x
+    refine ⟨?_, ?_, ?_⟩
+    · have h := congrArg (fun v : Coords 4 ↦ v k) (Curved.bracket_rotY_rotX hs)
+      rwa [mlieBracket_fieldOf_eq hY hX k] at h
+    · have h := congrArg (fun v : Coords 4 ↦ v k) (Curved.bracket_rotX_rotZ hs)
+      rwa [mlieBracket_fieldOf_eq hX hZ k] at h
+    · have h := congrArg (fun v : Coords 4 ↦ v k) (Curved.bracket_rotZ_rotY hs)
+      rwa [mlieBracket_fieldOf_eq hZ hY k] at h
+  surfaces := fun x _ ↦ by
+    have h := Curved.finrank_span_angles
+    rw [← Curved.span_turns x, turns_eq_stdTurn] at h
+    exact h
+  positive := fun x hx v hv hne ↦ by
+    rw [← turns_eq_stdTurn, Curved.span_turns] at hv
+    have h := Curved.round_pos_on_angles (A := schwA M) (B := schwB M) hx.1.ne' hx.2.2 v hv hne
+    rwa [Curved.tableMeasure, Curved.formOf_apply] at h
+
+/-- The table of slopes of the change of coordinates that does nothing. -/
+theorem jac_id (y : Coords 4) (α μ : Fin 4) :
+    jac (fun z : Coords 4 ↦ z) α μ y = if α = μ then 1 else 0 := by
+  by_cases h : α = μ
+  · subst h
+    simpa [jac] using slope_along α (fun r : ℝ ↦ r) y
+  · simpa [jac, h] using slope_across (i := μ) (j := α) h (fun r : ℝ ↦ r) y
+
+/-- **The conclusion of statement 2 holds for Schwarzschild's own coordinates,** with the change
+of coordinates that does nothing and no rotation. So the conclusion is formed the right way
+round. -/
+theorem turnsCoordinates_schwarzschild (M : ℝ) {p : Coords 4} (hp : p ∈ Curved.outside M) :
+    ∃ (Φ : Coords 4 → Coords 4) (R : Matrix (Fin 3) (Fin 3) ℝ) (W : Set (Coords 4))
+      (y₀ : Coords 4),
+      IsOpen W ∧ y₀ ∈ W ∧ Φ y₀ = p ∧ (∀ y ∈ W, Φ y ∈ Curved.outside M) ∧ ContDiffOn ℝ ∞ Φ W ∧
+      R * R.transpose = 1 ∧ R.det = 1 ∧
+      (∀ y ∈ W, sin (y 2) ≠ 0 ∧ (tab (jac Φ) y).det ≠ 0) ∧
+      ∀ y ∈ W, ∀ i α, ∑ μ, jac Φ α μ y * stdTurn i μ y = ∑ j, R i j * stdTurn j α (Φ y) := by
+  refine ⟨fun z ↦ z, 1, Curved.outside M, p, Curved.isOpen_outside M, hp, rfl, fun y hy ↦ hy,
+    contDiffOn_id, by simp, by simp, fun y hy ↦ ⟨hy.2.2, ?_⟩, fun y _ i α ↦ ?_⟩
+  · have e : tab (jac fun z : Coords 4 ↦ z) y = 1 := by
+      ext a b
+      simp [tab, jac_id, Matrix.one_apply]
+    rw [e]
+    simp
+  · simp [jac_id, Matrix.one_apply]
 
 end GravityInLean
