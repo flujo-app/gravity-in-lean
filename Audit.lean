@@ -132,6 +132,33 @@ quietly go stale. -/
   GravityInLean.leavesUnchangedAt_inNewCoords GravityInLean.schwarzschild_isRound
   GravityInLean.eddington_isRound_from_schwarzschild
 
+-- Curved spaces: the definitions with no coordinates, tested on known answers
+#audit GravityInLean.Curved.HasOneTimeDirection.not_orthogonal
+  GravityInLean.Curved.isCovariantDerivativeOn_flatTransport
+  GravityInLean.Curved.curvatureOfFields_flat
+  GravityInLean.Curved.curvatureOfFields_flat_eq_curvatureAt
+  GravityInLean.Curved.leavesUnchangedAt_flat_iff GravityInLean.Curved.isSmoothOn_flat_iff
+  GravityInLean.Curved.isConnectionOf_table GravityInLean.Curved.ricciAt_table
+  GravityInLean.Curved.leavesUnchangedAt_table_iff GravityInLean.Curved.mlieBracket_fieldOf
+  GravityInLean.Curved.IsRegularTableOn.isEmptyOn
+  GravityInLean.Curved.flat_isSpaceTimeOn GravityInLean.Curved.flat_isEmptyOn
+  GravityInLean.Curved.sphere_noTime GravityInLean.Curved.sphere_curvature
+  GravityInLean.Curved.deSitter_isSpaceTimeOn GravityInLean.Curved.deSitter_curvature
+  GravityInLean.Curved.schwarzschild_isSpaceTimeOn_outside
+  GravityInLean.Curved.schwarzschild_isSpaceTimeOn_inside
+  GravityInLean.Curved.schwarzschild_isEmptyOn GravityInLean.Curved.schwarzschild_isRoundOn
+  GravityInLean.Curved.schwarzschild_sizeSq GravityInLean.Curved.schwarzschild_usable
+  GravityInLean.Curved.schwarzschild_meets_goal GravityInLean.Curved.schwarzschild_meets_conclusion
+  GravityInLean.Curved.IsConnectionOf.koszul GravityInLean.Curved.IsConnectionOf.unique
+  GravityInLean.Curved.connectionUnique GravityInLean.Curved.ricciAt_eq_of_isConnectionOf
+  GravityInLean.Curved.IsRegularTableOn.isEmptyOn_iff GravityInLean.Curved.deSitter_not_isEmptyOn
+
+-- Statements to prove (not proofs of them), and the checks that they are not about nothing
+#audit GravityInLean.Curved.BirkhoffNoCoordinates GravityInLean.SmoothFlowStatement
+  GravityInLean.TurnsCoordinatesStatement GravityInLean.Curved.ConnectionExistsStatement
+  GravityInLean.Curved.ConnectionUniqueStatement GravityInLean.smoothFlow_const
+  GravityInLean.schwarzschild_turnsOn GravityInLean.turnsCoordinates_schwarzschild
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean
