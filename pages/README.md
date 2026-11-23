@@ -15,11 +15,18 @@ the owner of the pages.
 | **The Dome and the Horn** | Two curved pictures of the motion budget: a dome without gravity, a horn with it. | [dome-and-horn.html](dome-and-horn.html) | [link](https://claude.ai/artifact/S2gKfWkXfZzuVRx5wYPt7N) |
 | **Light Clock &amp; Falling Wave** | A light clock that shows why moving clocks run slow, and a matter wave that falls. | [light-clock-falling-wave.html](light-clock-falling-wave.html) | [link](https://claude.ai/artifact/LkjgXTXey6h4KdqT2KJJoT) |
 | **Spacetime Speedometer** | The motion budget as a dial: what you spend on moving through space is missing from your moving through time. | [spacetime-speedometer.html](spacetime-speedometer.html) | [link](https://claude.ai/artifact/BQqHnP8uEtzvEeuhVgudz9) |
+| **Arrows to Amplitudes** | Five short chapters on the maths behind quantum physics: arrows, adding, stretching, matrices, and arrows that cancel to make the double-slit stripes. Each chapter asks questions you answer before you check. | [arrows-to-amplitudes.html](arrows-to-amplitudes.html) | [link](https://claude.ai/artifact/3f78qtBv2vFQXCV4V9PSv7) |
+| **Turns and a Mirror** | One picture of a quarter turn, a half turn and a mirror, with a letter F so you can see which way things face. | [turns-explainer.svg](turns-explainer.svg) | not published |
 
 ## Good to know
 
-- **Start with the first one.** The other six are the earlier tries that led to it, kept because
+- **Start with the first one.** The next six are the earlier tries that led to it, kept because
   each shows the same idea from a different side.
+- **The last two are a separate maths lesson.** Arrows to Amplitudes teaches vectors and
+  matrices from zero, as a first step towards quantum physics. The turns picture is a plain image
+  that goes with its matrices chapter, shown in a chat rather than published. Neither is part of
+  the gravity work. The lesson was tested in a browser (dragging, answer checks, phone layout);
+  its double-slit pattern is a simple model that shows the idea, not real measurements.
 - **How sure is this?** The first page was tested with numbers against the textbook formulas, and
   several of its formulas are now proved by machine in this repository (see the main README).
   The earlier pages are pictures: good for the idea, not tested the same way.

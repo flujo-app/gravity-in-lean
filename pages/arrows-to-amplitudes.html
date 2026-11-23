@@ -1,0 +1,1586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>Arrows to Amplitudes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: a lab-notebook page. Lesson text sits beside a graph-paper figure, with the live arithmetic right under the figure; one column on phones. Light theme is graph paper, dark theme is a blueprint. */
+:root {
+  --paper: #f3f6f8;
+  --paper-raised: #ffffff;
+  --grid-faint: #e6edf2;
+  --grid: #d6e0e8;
+  --grid-strong: #9db2c3;
+  --rule: #c8d5df;
+  --ink: #132331;
+  --ink-soft: #4a5d6e;
+  --a: #1c5ed4;
+  --b: #b4500f;
+  --i: #12805a;
+  --j: #b32f6b;
+  --mark: #ffe066;
+  --mark-ink: #1c1a0c;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d2136;
+    --paper-raised: #122a44;
+    --grid-faint: #112c48;
+    --grid: #1d3e60;
+    --grid-strong: #44709a;
+    --rule: #2a4d71;
+    --ink: #e9f1f8;
+    --ink-soft: #a2b9cd;
+    --a: #8cc3ff;
+    --b: #ffab6e;
+    --i: #6fdcaa;
+    --j: #ff8fc5;
+    --mark: #ffd85a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d2136;
+  --paper-raised: #122a44;
+  --grid-faint: #112c48;
+  --grid: #1d3e60;
+  --grid-strong: #44709a;
+  --rule: #2a4d71;
+  --ink: #e9f1f8;
+  --ink-soft: #a2b9cd;
+  --a: #8cc3ff;
+  --b: #ffab6e;
+  --i: #6fdcaa;
+  --j: #ff8fc5;
+  --mark: #ffd85a;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid-faint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-faint) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+
+/* Masthead */
+.masthead { display: grid; gap: 12px; }
+.eyebrow, .kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  font-size: clamp(2.1rem, 1.4rem + 3vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.intro { margin: 0; max-width: 60ch; font-size: 1.06rem; color: var(--ink-soft); }
+
+/* Chapter steps */
+nav.chapters { margin-top: 24px; scroll-margin-top: 12px; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.steps button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 7px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rule);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.steps button:hover { border-color: var(--ink-soft); }
+.steps .num {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rule);
+  background: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+.steps button[aria-current="step"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.steps button[aria-current="step"] .num { background: var(--ink); color: var(--paper-raised); border-color: var(--ink); }
+.steps button.solved .num { background: var(--mark); color: var(--mark-ink); border-color: var(--mark); }
+
+/* Chapters */
+.chapter {
+  margin-top: 24px;
+  padding-top: 28px;
+  border-top: 1.5px solid var(--rule);
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 28px 44px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .chapter { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
+.text { min-width: 0; display: grid; gap: 14px; align-content: start; }
+.text p { margin: 0; max-width: 60ch; }
+.text h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-weight: 760;
+  font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.05rem);
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+.text h3 {
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-stretch: 105%;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+.aside { font-size: 0.95rem; color: var(--ink-soft); }
+mark {
+  background: var(--mark);
+  color: var(--mark-ink);
+  padding: 0 0.2em;
+  border-radius: 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.t-a { color: var(--a); }
+.t-b { color: var(--b); }
+.t-i { color: var(--i); }
+.t-j { color: var(--j); }
+.sym { font-family: var(--font-body); font-weight: 700; font-size: 1.06em; }
+
+.stage { min-width: 0; display: grid; gap: 14px; }
+.figure {
+  margin: 0;
+  background: var(--paper-raised);
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.figure figcaption {
+  padding: 8px 12px;
+  border-top: 1.5px solid var(--rule);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* Live arithmetic */
+.readout {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--paper-raised);
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+.eq { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.words { font-family: var(--font-body); color: var(--ink-soft); }
+.note { font-family: var(--font-body); font-size: 0.9rem; color: var(--ink-soft); }
+.cv, .mx {
+  position: relative;
+  display: inline-grid;
+  padding: 2px 0.6em;
+  text-align: center;
+  line-height: 1.3;
+  vertical-align: middle;
+}
+.mx { grid-template-columns: auto auto; column-gap: 0.9em; }
+.cv::before, .cv::after, .mx::before, .mx::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.32em;
+  border: 1.6px solid currentColor;
+}
+.cv::before, .mx::before { left: 0; border-right: 0; }
+.cv::after, .mx::after { right: 0; border-left: 0; }
+.strong { font-weight: 700; }
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1.5px solid var(--rule);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.pill.lit { background: var(--mark); color: var(--mark-ink); border-color: var(--mark); }
+
+/* Challenges */
+.challenge {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1.5px dashed var(--ink-soft);
+  border-radius: 6px;
+  background: var(--paper-raised);
+}
+.challenge .tag {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.challenge p { margin: 0; }
+.challenge[data-state="done"] { background: var(--mark); color: var(--mark-ink); border: 1.5px solid var(--mark); }
+.challenge[data-state="done"] .tag { color: var(--mark-ink); }
+.challenge[data-state="wrong"] { border-style: solid; }
+
+/* Questions: type an answer, then check it */
+.questions { display: grid; gap: 12px; min-width: 0; }
+.answer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 4px 0 0; }
+.vec-in { position: relative; display: inline-grid; gap: 6px; padding: 5px 0.65em; }
+.vec-in::before, .vec-in::after { content: ""; position: absolute; top: 0; bottom: 0; width: 0.4em; border: 2px solid currentColor; }
+.vec-in::before { left: 0; border-right: 0; }
+.vec-in::after { right: 0; border-left: 0; }
+.num-row { display: inline-flex; align-items: center; gap: 6px; }
+.num-label { font-family: var(--font-mono); font-weight: 700; }
+.num {
+  width: 4.6ch;
+  padding: 7px 6px;
+  border: 1.5px solid var(--rule);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  text-align: center;
+}
+.num:focus { border-color: var(--a); }
+.pm {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  border: 1.5px solid var(--rule);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.pm:hover { border-color: var(--ink-soft); }
+.choices { display: grid; gap: 6px; flex: 1 1 100%; min-width: 0; }
+.choices label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  background: var(--paper);
+  line-height: 1.4;
+  cursor: pointer;
+}
+.choices input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ink); }
+.feedback, .error { margin: 0; }
+.error { color: var(--b); font-weight: 700; font-size: 0.92rem; }
+.challenge[data-state="done"] .num,
+.challenge[data-state="done"] .pm,
+.challenge[data-state="done"] .choices label,
+.challenge[data-state="done"] .show-me {
+  background: transparent;
+  border-color: var(--mark-ink);
+  color: var(--mark-ink);
+  -webkit-text-fill-color: var(--mark-ink);
+  opacity: 1;
+}
+.challenge[data-state="done"] .show-me:hover { background: rgba(0, 0, 0, 0.07); }
+
+/* Controls */
+button { font: inherit; }
+.btn {
+  padding: 11px 15px;
+  border-radius: 6px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.btn:hover { background: var(--paper); }
+.btn.solid { background: var(--ink); color: var(--paper-raised); }
+.btn.solid:hover { opacity: 0.88; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn.small { padding: 8px 11px; font-size: 0.88rem; }
+:focus-visible { outline: 3px solid var(--a); outline-offset: 2px; }
+
+.control { display: grid; gap: 6px; min-width: 0; }
+.control > label, .seg legend { font-weight: 700; }
+.control output { font-family: var(--font-mono); font-weight: 700; }
+input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--ink); cursor: pointer; }
+.range-ends { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-soft); }
+.check { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; cursor: pointer; justify-self: start; }
+.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+
+.seg { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 8px; }
+.seg legend { padding: 0; margin-bottom: 8px; }
+.seg .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg label { position: relative; display: inline-flex; }
+.seg input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.seg span {
+  display: inline-block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--rule);
+  background: var(--paper-raised);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.seg input:checked + span { background: var(--ink); color: var(--paper-raised); border-color: var(--ink); }
+.seg input:focus-visible + span { outline: 3px solid var(--a); outline-offset: 2px; }
+.mode-note { margin: 0; font-size: 0.95rem; }
+
+.vpick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.stepper { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); }
+.stepper .lab { font-family: var(--font-body); color: var(--ink-soft); font-size: 0.9rem; }
+.stepper output { min-width: 2.2ch; text-align: center; font-weight: 700; }
+.mini {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1.5px solid var(--ink);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+.mini:hover { background: var(--paper); }
+
+.pair { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; }
+.pair > .figure { flex: 1 1 210px; }
+.pair > .readout { flex: 1 1 230px; align-content: start; }
+
+.chapter-foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+/* Side notes sit under the lesson text on wide screens and after the figure on phones. */
+@media (min-width: 861px) {
+  .chapter.has-after { grid-template-rows: auto 1fr auto; }
+  .chapter.has-after > .text { grid-column: 1; grid-row: 1; }
+  .chapter.has-after > .text.after { grid-row: 2; }
+  .chapter.has-after > .stage { grid-column: 2; grid-row: 1 / span 2; }
+  .chapter.has-after > .chapter-foot { grid-row: 3; }
+}
+
+/* SVG: graph paper */
+.g-minor { stroke: var(--grid); stroke-width: 1.2; }
+.g-axis { stroke: var(--grid-strong); stroke-width: 2.4; }
+.faint-grid .g-minor { opacity: 0.55; }
+.faint-grid .g-axis { opacity: 0.5; }
+.tick { fill: var(--ink-soft); font-family: var(--font-mono); font-size: 17px; }
+.arr line { fill: none; stroke-linecap: round; }
+.arr polygon { stroke-linejoin: round; stroke-width: 2; }
+.arr.c-a line, .arr.c-a polygon { stroke: var(--a); }
+.arr.c-a polygon { fill: var(--a); }
+.arr.c-b line, .arr.c-b polygon { stroke: var(--b); }
+.arr.c-b polygon { fill: var(--b); }
+.arr.c-i line, .arr.c-i polygon { stroke: var(--i); }
+.arr.c-i polygon { fill: var(--i); }
+.arr.c-j line, .arr.c-j polygon { stroke: var(--j); }
+.arr.c-j polygon { fill: var(--j); }
+.arr.c-ink line, .arr.c-ink polygon { stroke: var(--ink); }
+.arr.c-ink polygon { fill: var(--ink); }
+.arr.c-soft line, .arr.c-soft polygon { stroke: var(--ink-soft); }
+.arr.c-soft polygon { fill: var(--ink-soft); }
+.arr.dashed line { stroke-dasharray: 9 9; opacity: 0.8; }
+.arr.dashed polygon { opacity: 0.8; }
+.arr-label {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 700;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--paper-raised);
+  stroke-width: 7px;
+  stroke-linejoin: round;
+}
+.arr-label.c-a { fill: var(--a); }
+.arr-label.c-b { fill: var(--b); }
+.arr-label.c-i { fill: var(--i); }
+.arr-label.c-j { fill: var(--j); }
+.arr-label.c-ink { fill: var(--ink); }
+.arr-label.c-soft { fill: var(--ink-soft); }
+.leg { stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 5 6; }
+.leg-label {
+  fill: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 700;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--paper-raised);
+  stroke-width: 6px;
+}
+.tgrid { stroke: var(--grid-strong); stroke-width: 1.5; }
+.tgrid.axis { stroke: var(--ink-soft); stroke-width: 2.6; }
+.cell { fill: var(--mark); opacity: 0.45; }
+.clockface { fill: none; stroke: var(--grid-strong); stroke-width: 2; stroke-dasharray: 4 6; }
+
+/* SVG: drag handles */
+.handle { cursor: grab; touch-action: none; outline: none; }
+.handle.dragging { cursor: grabbing; }
+.h-hit { fill: transparent; pointer-events: all; }
+.h-ring { fill: var(--paper-raised); stroke-width: 4; transition: stroke-width 120ms ease; }
+.handle:hover .h-ring, .handle.dragging .h-ring { stroke-width: 6; }
+.handle.c-a .h-ring { stroke: var(--a); }
+.handle.c-a .h-dot { fill: var(--a); }
+.handle.c-b .h-ring { stroke: var(--b); }
+.handle.c-b .h-dot { fill: var(--b); }
+.handle.c-i .h-ring { stroke: var(--i); }
+.handle.c-i .h-dot { fill: var(--i); }
+.handle.c-j .h-ring { stroke: var(--j); }
+.handle.c-j .h-dot { fill: var(--j); }
+.h-focus { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 4 4; opacity: 0; }
+.handle:focus-visible .h-focus { opacity: 1; }
+.h-pulse { fill: none; stroke: var(--ink-soft); stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; pointer-events: none; }
+.handle.hint .h-pulse { animation: pulse 1.7s ease-out infinite; }
+@keyframes pulse {
+  0% { opacity: 0.75; transform: scale(0.55); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* SVG: double-slit setup */
+.setup .baseline { stroke: var(--rule); stroke-width: 1.5; }
+.setup .curve { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.setup .curve-fill { fill: var(--a); opacity: 0.16; }
+.setup .guide { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.setup .spot { fill: var(--paper-raised); stroke: var(--ink); stroke-width: 3; }
+.setup .screen-band { fill: var(--paper); stroke: var(--ink-soft); stroke-width: 1.5; }
+.setup .hit { fill: var(--ink); opacity: 0.75; }
+.setup .path { fill: none; stroke-width: 2.5; }
+.setup .path.p1 { stroke: var(--a); }
+.setup .path.p2 { stroke: var(--b); }
+.setup .feed { stroke: var(--ink-soft); stroke-width: 1.5; stroke-dasharray: 4 5; }
+.setup .barrier { stroke: var(--ink); stroke-width: 7; }
+.setup .plug { fill: var(--ink); }
+.setup .source { fill: var(--ink); }
+.setup .sensor { fill: var(--mark); stroke: var(--ink); stroke-width: 1.5; }
+.setup .lbl { fill: var(--ink-soft); font-family: var(--font-mono); font-size: 17px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .handle.hint .h-pulse { animation: none; opacity: 0.45; transform: scale(1); }
+  .h-ring { transition: none; }
+}
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Maths for quantum physics · Lesson 1</p>
+    <h1>Arrows to Amplitudes</h1>
+    <p class="intro">Quantum mechanics is written in arrows. In five short chapters you'll drag arrows around, watch the numbers follow, and answer a question or two in each. Work out your answer first, then check it. No school maths needed.</p>
+  </header>
+
+  <nav class="chapters" id="chapters" aria-label="Chapters">
+    <ol class="steps">
+      <li><button type="button" data-go="arrows"><span class="num">1</span>Arrows</button></li>
+      <li><button type="button" data-go="adding"><span class="num">2</span>Adding</button></li>
+      <li><button type="button" data-go="stretching"><span class="num">3</span>Stretching</button></li>
+      <li><button type="button" data-go="matrices"><span class="num">4</span>Matrices</button></li>
+      <li><button type="button" data-go="interference"><span class="num">5</span>Interference</button></li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- Chapter 1 -->
+    <section class="chapter" id="ch-arrows" aria-labelledby="h-arrows">
+      <div class="text">
+        <p class="kicker">Chapter 1 of 5</p>
+        <h2 id="h-arrows">A vector is an arrow</h2>
+        <p>A vector is an arrow that starts at the centre of the grid. Two numbers describe it completely: how many steps it goes right, and how many steps it goes up. Negative numbers mean left or down.</p>
+        <p>Drag the dot at the tip of the blue arrow and watch the numbers change. Physicists write the two numbers stacked inside brackets, with the right-steps on top.</p>
+        <h3>How long is it?</h3>
+        <p>The arrow is the long side of a right-angled triangle, so its length comes from Pythagoras. Square both numbers, add them, then take the square root.</p>
+        <p><mark>Keep an eye on the squared length.</mark> In quantum mechanics, squared lengths turn into probabilities.</p>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <svg id="board-arrows" role="img" aria-label="Graph paper with one draggable arrow called v"></svg>
+          <figcaption>Drag the dot at the tip. You can also click it and use the arrow keys.</figcaption>
+        </figure>
+        <div class="readout" id="out-arrows"></div>
+        <div class="questions" id="q-arrows"></div>
+      </div>
+      <div class="chapter-foot">
+        <span></span>
+        <button class="btn solid" type="button" data-go="adding">Next: Adding arrows →</button>
+      </div>
+    </section>
+
+    <!-- Chapter 2 -->
+    <section class="chapter" id="ch-adding" aria-labelledby="h-adding" hidden>
+      <div class="text">
+        <p class="kicker">Chapter 2 of 5</p>
+        <h2 id="h-adding">Adding means walking one arrow, then the other</h2>
+        <p>To add two arrows, walk along the first one. Then, from wherever you ended up, walk along the second. The sum is the arrow from the start to where you finished.</p>
+        <p>In numbers, you add the matching parts. Right-steps go with right-steps, and up-steps go with up-steps.</p>
+        <p>Drag the tips of <b class="t-a">a</b> and <b class="t-b">b</b>. The dashed copy of <b class="t-b">b</b> shows the walk.</p>
+        <p>The order doesn't matter. Walking <b class="t-b">b</b> first and then <b class="t-a">a</b> ends in the same place.</p>
+        <label class="check"><input type="checkbox" id="show-other"> Show the other order too</label>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <svg id="board-adding" role="img" aria-label="Graph paper with two draggable arrows, a and b, and their sum"></svg>
+        </figure>
+        <div class="readout" id="out-adding"></div>
+        <div class="questions" id="q-adding"></div>
+      </div>
+      <div class="chapter-foot">
+        <button class="btn" type="button" data-go="arrows">← Arrows</button>
+        <button class="btn solid" type="button" data-go="stretching">Next: Stretching →</button>
+      </div>
+    </section>
+
+    <!-- Chapter 3 -->
+    <section class="chapter" id="ch-stretching" aria-labelledby="h-stretching" hidden>
+      <div class="text">
+        <p class="kicker">Chapter 3 of 5</p>
+        <h2 id="h-stretching">Multiplying by a number stretches the arrow</h2>
+        <p>Multiplying an arrow by a number multiplies both of its parts. Times 2 makes it twice as long. Times 0.5 makes it half as long.</p>
+        <p>A negative number flips the arrow around. That's also how subtraction works: a − b is the same as a + (−1) × b.</p>
+        <p>Drag the tip of <b class="t-a">v</b> and move the slider.</p>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <svg id="board-stretching" role="img" aria-label="Graph paper with a draggable arrow v and a stretched copy of it"></svg>
+        </figure>
+        <div class="control">
+          <label for="k">Multiply by <output id="k-out" for="k">2</output></label>
+          <input type="range" id="k" min="-2" max="2" step="0.5" value="2">
+          <div class="range-ends" aria-hidden="true"><span>−2</span><span>0</span><span>2</span></div>
+        </div>
+        <div class="readout" id="out-stretching"></div>
+        <div class="questions" id="q-stretching"></div>
+      </div>
+      <div class="chapter-foot">
+        <button class="btn" type="button" data-go="adding">← Adding</button>
+        <button class="btn solid" type="button" data-go="matrices">Next: Matrices →</button>
+      </div>
+    </section>
+
+    <!-- Chapter 4 -->
+    <section class="chapter has-after" id="ch-matrices" aria-labelledby="h-matrices" hidden>
+      <div class="text">
+        <p class="kicker">Chapter 4 of 5</p>
+        <h2 id="h-matrices">A matrix moves every arrow at once</h2>
+        <p>Two small arrows hold up the whole grid. <b class="t-i">î</b> (say “i-hat”) points one step right, and <b class="t-j">ĵ</b> (“j-hat”) points one step up. Every other arrow is built from them. The arrow v with numbers 2 and 1 means 2 × <b class="t-i">î</b> plus 1 × <b class="t-j">ĵ</b>.</p>
+        <p>Drag the tips of <b class="t-i">î</b> and <b class="t-j">ĵ</b>. The whole grid follows, and so does v, because it's still 2 × <b class="t-i">î</b> plus 1 × <b class="t-j">ĵ</b>.</p>
+        <p>A matrix is a note of where <b class="t-i">î</b> and <b class="t-j">ĵ</b> end up. Its first column is the new <b class="t-i">î</b> and its second column is the new <b class="t-j">ĵ</b>. To move any arrow, follow its old recipe with the new <b class="t-i">î</b> and <b class="t-j">ĵ</b>.</p>
+        <p>Turns are measured as parts of a full circle. A quarter turn is 90°. A half turn is 180°, like a clock hand going from 12 to 6, so afterwards everything points the opposite way.</p>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <svg id="board-matrices" role="img" aria-label="Graph paper that a matrix transforms, with draggable arrows i-hat and j-hat"></svg>
+          <figcaption>The faint grid is where everything started. The yellow square shows where the 1-by-1 square between î and ĵ ends up.</figcaption>
+        </figure>
+        <div class="btn-row" role="group" aria-label="Example matrices">
+          <button class="btn small" type="button" data-preset="turn">Quarter turn</button>
+          <button class="btn small" type="button" data-preset="mirror">Mirror</button>
+          <button class="btn small" type="button" data-preset="stretch">Stretch</button>
+          <button class="btn small" type="button" data-preset="shear">Shear</button>
+          <button class="btn small" type="button" data-preset="squash">Squash flat</button>
+          <button class="btn small" type="button" data-preset="reset">Reset</button>
+        </div>
+        <div class="vpick" role="group" aria-label="Choose the arrow v">
+          <b class="sym">v</b>
+          <span class="stepper"><span class="lab">right</span><button class="mini" type="button" data-dv="0,-1" aria-label="One step less to the right">−</button><output id="vx">2</output><button class="mini" type="button" data-dv="0,1" aria-label="One step more to the right">+</button></span>
+          <span class="stepper"><span class="lab">up</span><button class="mini" type="button" data-dv="1,-1" aria-label="One step less up">−</button><output id="vy">1</output><button class="mini" type="button" data-dv="1,1" aria-label="One step more up">+</button></span>
+        </div>
+        <div class="readout" id="out-matrices"></div>
+        <div class="questions" id="q-matrices"></div>
+      </div>
+      <div class="text after">
+        <p class="aside"><b>Adding two matrices</b> works like adding arrows. Add the numbers in matching spots:
+          <span class="mx"><span>1</span><span>2</span><span>3</span><span>4</span></span> +
+          <span class="mx"><span>0</span><span>1</span><span>1</span><span>0</span></span> =
+          <span class="mx"><span>1</span><span>3</span><span>4</span><span>4</span></span>
+        </p>
+      </div>
+      <div class="chapter-foot">
+        <button class="btn" type="button" data-go="stretching">← Stretching</button>
+        <button class="btn solid" type="button" data-go="interference">Next: Interference →</button>
+      </div>
+    </section>
+
+    <!-- Chapter 5 -->
+    <section class="chapter has-after" id="ch-interference" aria-labelledby="h-interference" hidden>
+      <div class="text">
+        <p class="kicker">Chapter 5 of 5</p>
+        <h2 id="h-interference">Arrows that cancel make the stripes</h2>
+        <p>Back to the double slit. Quantum mechanics gives each way a photon could travel its own arrow, called an <i>amplitude</i>.</p>
+        <p>As a path gets longer, its arrow turns, like the hand of a clock. The paths through the two slits have slightly different lengths, so by the time they reach the screen their arrows point in different directions.</p>
+        <p>To find how bright a spot on the screen is, add the two arrows and square the length of the sum. <mark>Where the arrows point opposite ways, they cancel</mark>, just like in chapter 2. Those are the dark stripes.</p>
+        <p>Move the spot along the screen, then change what happens at the slits.</p>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <svg id="setup" class="setup" role="img" aria-label="Double-slit setup with a brightness curve above the screen and photon hits on it"></svg>
+          <figcaption>The curve shows how bright each spot on the screen is. Every dot is one photon hit.</figcaption>
+        </figure>
+        <div class="control">
+          <label for="spot">Spot on the screen</label>
+          <input type="range" id="spot" min="-1" max="1" step="0.005" value="0.1">
+          <div class="range-ends" aria-hidden="true"><span>left edge</span><span>centre</span><span>right edge</span></div>
+        </div>
+        <fieldset class="seg">
+          <legend>At the slits</legend>
+          <div class="opts">
+            <label><input type="radio" name="mode" id="mode-both" value="both" checked><span>Both slits open</span></label>
+            <label><input type="radio" name="mode" id="mode-one" value="one"><span>Right slit closed</span></label>
+            <label><input type="radio" name="mode" id="mode-which" value="which"><span>Which-path detector</span></label>
+          </div>
+          <p class="mode-note" id="mode-note"></p>
+        </fieldset>
+        <div class="btn-row">
+          <button class="btn small solid" type="button" id="fire">Fire 300 photons</button>
+          <button class="btn small" type="button" id="clear">Clear screen</button>
+          <span class="note" id="count"></span>
+        </div>
+        <div class="pair">
+          <figure class="figure">
+            <svg id="amps" role="img" aria-label="The two amplitude arrows at the chosen spot and their sum"></svg>
+            <figcaption><b class="t-a">Arrow 1</b> comes from the left slit and <b class="t-b">arrow 2</b> from the right slit. The thick arrow is their sum, and the dashed circle is the clock face.</figcaption>
+          </figure>
+          <div class="readout" id="out-interference"></div>
+        </div>
+        <div class="questions" id="q-interference"></div>
+      </div>
+      <div class="text after">
+        <p class="aside">A which-path detector is one example of what physicists call decoherence. The arrows stop adding, so the stripes go away. Nothing in this maths decides which slit the photon really took, though. That missing piece is the measurement problem.</p>
+        <h3>Next lesson</h3>
+        <p>Complex numbers. Physicists write these clock-hand arrows as complex numbers, which are arrows with one extra rule for multiplying. That rule is what makes them turn.</p>
+      </div>
+      <div class="chapter-foot">
+        <button class="btn" type="button" data-go="matrices">← Matrices</button>
+        <button class="btn solid" type="button" data-go="arrows">Back to the start</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const NS = 'http://www.w3.org/2000/svg';
+  const MINUS = '−';
+  const ORDER = ['arrows', 'adding', 'stretching', 'matrices', 'interference'];
+  const STORE = 'arrows-to-amplitudes:v2';
+  const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  /* ---------- small helpers ---------- */
+  function s(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function setA(el, attrs) { for (const k in attrs) el.setAttribute(k, attrs[k]); }
+  function clean(n) { return Math.abs(n) < 1e-9 ? 0 : n; }
+  function fmt(n) { return String(clean(Math.round(n * 100) / 100)).replace('-', MINUS); }
+  function round2(n) { return clean(Math.round(n * 100) / 100); }
+  function f2(n) { return round2(n).toFixed(2).replace('-', MINUS); }
+  function term(n) { return n < 0 ? '(' + fmt(n) + ')' : fmt(n); }
+  function sq(n) { return term(n) + '²'; }
+  function cv(top, bottom, cls) { return '<span class="cv' + (cls ? ' ' + cls : '') + '"><span>' + top + '</span><span>' + bottom + '</span></span>'; }
+  function mx(a, b, c, d) { return '<span class="mx"><span>' + a + '</span><span>' + b + '</span><span>' + c + '</span><span>' + d + '</span></span>'; }
+  function words(p) {
+    return fmt(Math.abs(p[0])) + (p[0] < 0 ? ' left, ' : ' right, ') + fmt(Math.abs(p[1])) + (p[1] < 0 ? ' down' : ' up');
+  }
+  function near(p, q) { return Math.abs(p[0] - q[0]) < 1e-6 && Math.abs(p[1] - q[1]) < 1e-6; }
+
+  /* ---------- progress (per viewer, optional) ---------- */
+  let solved = {};
+  try { solved = JSON.parse(localStorage.getItem(STORE) || '{}') || {}; } catch (_) { solved = {}; }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(solved)); } catch (_) { /* storage unavailable */ } }
+  function markChapter(ch) {
+    const nb = document.querySelector('.steps [data-go="' + ch + '"]');
+    if (!nb || nb.classList.contains('solved')) return;
+    const name = Array.prototype.filter.call(nb.childNodes, n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+    nb.classList.add('solved');
+    nb.querySelector('.num').textContent = '✓';
+    nb.setAttribute('aria-label', name + ', all questions answered');
+  }
+
+  /* ---------- graph-paper board ---------- */
+  class Board {
+    constructor(svg, opt) {
+      opt = opt || {};
+      this.svg = svg;
+      this.range = opt.range || 6;
+      this.size = opt.size || 600;
+      this.unit = this.size / (2 * this.range);
+      this.c = this.size / 2;
+      svg.setAttribute('viewBox', '0 0 ' + this.size + ' ' + this.size);
+      const clipId = 'clip-' + svg.id;
+      const cp = s('clipPath', { id: clipId }, s('defs', null, svg));
+      s('rect', { x: 0, y: 0, width: this.size, height: this.size }, cp);
+      this.root = s('g', { 'clip-path': 'url(#' + clipId + ')' }, svg);
+      this.grid = s('g', null, this.root);
+      this.under = s('g', null, this.root);
+      this.layer = s('g', null, this.root);
+      this.labels = s('g', null, this.root);
+      this.handles = s('g', null, svg);
+      this.drawGrid(opt.labelEvery === undefined ? 2 : opt.labelEvery);
+    }
+    drawGrid(every) {
+      const c = this.c, u = this.unit, S = this.size;
+      const lo = Math.ceil(-this.range), hi = Math.floor(this.range);
+      for (let k = lo; k <= hi; k++) {
+        if (!k) continue;
+        const p = c + k * u;
+        s('line', { x1: p, y1: 0, x2: p, y2: S, class: 'g-minor' }, this.grid);
+        s('line', { x1: 0, y1: p, x2: S, y2: p, class: 'g-minor' }, this.grid);
+      }
+      s('line', { x1: c, y1: 0, x2: c, y2: S, class: 'g-axis' }, this.grid);
+      s('line', { x1: 0, y1: c, x2: S, y2: c, class: 'g-axis' }, this.grid);
+      if (!every) return;
+      for (let k = lo + 1; k < hi; k++) {
+        if (!k || k % every) continue;
+        const p = c + k * u;
+        s('text', { x: p, y: c + 23, class: 'tick', 'text-anchor': 'middle' }, this.grid).textContent = fmt(k);
+        s('text', { x: c - 9, y: c - k * u + 6, class: 'tick', 'text-anchor': 'end' }, this.grid).textContent = fmt(k);
+      }
+    }
+    px(p) { return [this.c + p[0] * this.unit, this.c - p[1] * this.unit]; }
+    toMath(e) {
+      const m = this.svg.getScreenCTM();
+      if (!m) return [0, 0];
+      const pt = this.svg.createSVGPoint();
+      pt.x = e.clientX; pt.y = e.clientY;
+      const q = pt.matrixTransform(m.inverse());
+      return [(q.x - this.c) / this.unit, (this.c - q.y) / this.unit];
+    }
+  }
+
+  class Arrow {
+    constructor(board, color, o) {
+      o = o || {};
+      this.b = board;
+      this.w = o.width || 5;
+      this.side = o.side || 'tip';
+      this.g = s('g', { class: 'arr c-' + color + (o.dashed ? ' dashed' : '') }, o.layer || board.layer);
+      this.line = s('line', { 'stroke-width': this.w }, this.g);
+      this.head = s('polygon', null, this.g);
+      this.lab = null;
+      if (o.label != null) {
+        this.lab = s('text', { class: 'arr-label c-' + color }, board.labels);
+        this.lab.textContent = o.label;
+      }
+    }
+    set(from, to, label) {
+      const p0 = this.b.px(from), p1 = this.b.px(to);
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1], len = Math.hypot(dx, dy);
+      const vis = len > 2;
+      this.g.style.display = vis ? '' : 'none';
+      if (this.lab) this.lab.style.display = vis ? '' : 'none';
+      if (!vis) return this;
+      const ux = dx / len, uy = dy / len;
+      const hl = Math.min(14 + this.w * 1.6, len * 0.55), hw = hl * 0.45;
+      const bx = p1[0] - ux * hl, by = p1[1] - uy * hl;
+      setA(this.line, { x1: p0[0], y1: p0[1], x2: bx + ux * 0.5, y2: by + uy * 0.5 });
+      this.head.setAttribute('points',
+        p1[0] + ',' + p1[1] + ' ' + (bx - uy * hw) + ',' + (by + ux * hw) + ' ' + (bx + uy * hw) + ',' + (by - ux * hw));
+      if (this.lab) {
+        if (label != null) this.lab.textContent = label;
+        let lx, ly;
+        if (this.side === 'perp') {
+          lx = p1[0] + uy * 28 - ux * 14;
+          ly = p1[1] - ux * 28 - uy * 14 + 8;
+        } else if (this.side === 'midL' || this.side === 'midR') {
+          const sg = this.side === 'midL' ? 1 : -1;
+          lx = (p0[0] + p1[0]) / 2 + uy * 24 * sg;
+          ly = (p0[1] + p1[1]) / 2 - ux * 24 * sg + 8;
+        } else {
+          const off = 36 + (this.lab.textContent.length > 2 ? 14 : 0);
+          lx = p1[0] + ux * off;
+          ly = p1[1] + uy * off + 8;
+        }
+        const S = this.b.size;
+        lx = Math.max(30, Math.min(S - 30, lx));
+        ly = Math.max(26, Math.min(S - 12, ly));
+        setA(this.lab, { x: lx, y: ly });
+      }
+      return this;
+    }
+    hide() {
+      this.g.style.display = 'none';
+      if (this.lab) this.lab.style.display = 'none';
+    }
+  }
+
+  class Handle {
+    constructor(board, color, o) {
+      this.b = board;
+      this.get = o.get;
+      this.put = o.set;
+      this.snap = o.snap || 1;
+      this.min = o.min;
+      this.max = o.max;
+      this.off = [0, 0];
+      const g = this.g = s('g', {
+        class: 'handle c-' + color, tabindex: '0', role: 'slider',
+        'aria-label': o.name, 'aria-valuemin': this.min, 'aria-valuemax': this.max
+      }, board.handles);
+      s('circle', { r: 26, class: 'h-pulse' }, g);
+      s('circle', { r: 40, class: 'h-hit' }, g);
+      s('circle', { r: 21, class: 'h-focus' }, g);
+      s('circle', { r: 11, class: 'h-ring' }, g);
+      s('circle', { r: 4, class: 'h-dot' }, g);
+      let dragging = false;
+      g.addEventListener('pointerdown', e => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        e.preventDefault();
+        dragging = true;
+        g.classList.add('dragging');
+        g.classList.remove('hint');
+        try { g.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
+        const p = board.toMath(e), cur = this.get();
+        this.off = [cur[0] - p[0], cur[1] - p[1]];
+      });
+      g.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        e.preventDefault();
+        const p = board.toMath(e);
+        this.moveTo([p[0] + this.off[0], p[1] + this.off[1]]);
+      });
+      const end = () => { dragging = false; g.classList.remove('dragging'); };
+      g.addEventListener('pointerup', end);
+      g.addEventListener('pointercancel', end);
+      g.addEventListener('lostpointercapture', end);
+      g.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false });
+      g.addEventListener('keydown', e => {
+        const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        g.classList.remove('hint');
+        const cur = this.get();
+        this.moveTo([cur[0] + d[0] * this.snap, cur[1] + d[1] * this.snap]);
+      });
+    }
+    moveTo(p) {
+      const q = v => clean(Math.min(this.max, Math.max(this.min, Math.round(v / this.snap) * this.snap)));
+      const nx = q(p[0]), ny = q(p[1]), cur = this.get();
+      if (nx === cur[0] && ny === cur[1]) return;
+      this.put([nx, ny]);
+    }
+    place() {
+      const p = this.get(), q = this.b.px(p);
+      this.g.setAttribute('transform', 'translate(' + q[0].toFixed(2) + ' ' + q[1].toFixed(2) + ')');
+      this.g.setAttribute('aria-valuenow', String(round2(p[0])));
+      this.g.setAttribute('aria-valuetext', words(p));
+    }
+  }
+
+  /* ---------- Chapter 1: arrows ---------- */
+  function initArrows() {
+    const B = new Board(document.getElementById('board-arrows'), { range: 6 });
+    const st = { v: [3, 2] };
+    const legX = s('line', { class: 'leg' }, B.under), legY = s('line', { class: 'leg' }, B.under);
+    const labX = s('text', { class: 'leg-label' }, B.under), labY = s('text', { class: 'leg-label' }, B.under);
+    const V = new Arrow(B, 'a', { label: 'v', width: 6 });
+    const h = new Handle(B, 'a', {
+      get: () => st.v, set: v => { st.v = v; render(); },
+      min: -5, max: 5, name: 'Tip of arrow v'
+    });
+    h.g.classList.add('hint');
+    const out = document.getElementById('out-arrows');
+    function render() {
+      const x = st.v[0], y = st.v[1], o = B.px([0, 0]), p = B.px(st.v);
+      V.set([0, 0], st.v);
+      const legs = x !== 0 && y !== 0;
+      [legX, legY, labX, labY].forEach(el => { el.style.display = legs ? '' : 'none'; });
+      setA(legX, { x1: o[0], y1: o[1], x2: p[0], y2: o[1] });
+      setA(legY, { x1: p[0], y1: o[1], x2: p[0], y2: p[1] });
+      labX.textContent = fmt(Math.abs(x));
+      labY.textContent = fmt(Math.abs(y));
+      setA(labX, { x: (o[0] + p[0]) / 2, y: o[1] + 7 });
+      setA(labY, { x: p[0], y: (o[1] + p[1]) / 2 + 7 });
+      h.place();
+      const L2 = x * x + y * y, L = Math.sqrt(L2);
+      out.innerHTML =
+        '<div class="eq"><b class="sym t-a">v</b><span>=</span>' + cv(fmt(x), fmt(y), 't-a') +
+          '<span class="words">' + words(st.v) + '</span></div>' +
+        '<div class="eq"><span>length²</span><span>=</span><span>' + sq(x) + ' + ' + sq(y) + '</span><span>=</span><span>' +
+          fmt(x * x) + ' + ' + fmt(y * y) + '</span><span>=</span><b>' + fmt(L2) + '</b></div>' +
+        '<div class="eq"><span>length</span><span>=</span><b>' +
+          (Number.isInteger(L) ? fmt(L) : '√' + fmt(L2) + ' ≈ ' + fmt(L)) + '</b></div>';
+    }
+    render();
+    return { setV: v => { st.v = v.slice(); render(); } };
+  }
+
+  /* ---------- Chapter 2: adding ---------- */
+  function initAdding() {
+    const B = new Board(document.getElementById('board-adding'), { range: 6 });
+    const st = { a: [3, 1], b: [-1, 2], other: false };
+    const aCopy = new Arrow(B, 'a', { dashed: true, width: 4, layer: B.under });
+    const bCopy = new Arrow(B, 'b', { dashed: true, width: 4, layer: B.under });
+    const sum = new Arrow(B, 'ink', { label: 'a + b', width: 7, layer: B.under });
+    const A = new Arrow(B, 'a', { label: 'a', width: 5 });
+    const Bv = new Arrow(B, 'b', { label: 'b', width: 5 });
+    const ha = new Handle(B, 'a', { get: () => st.a, set: v => { st.a = v; render(); }, min: -3, max: 3, name: 'Tip of arrow a' });
+    const hb = new Handle(B, 'b', { get: () => st.b, set: v => { st.b = v; render(); }, min: -3, max: 3, name: 'Tip of arrow b' });
+    const out = document.getElementById('out-adding');
+    document.getElementById('show-other').addEventListener('change', e => { st.other = e.target.checked; render(); });
+    function render() {
+      const a = st.a, b = st.b, S = [a[0] + b[0], a[1] + b[1]];
+      A.set([0, 0], a);
+      Bv.set([0, 0], b);
+      bCopy.set(a, S);
+      if (st.other) aCopy.set(b, S); else aCopy.hide();
+      sum.set([0, 0], S);
+      ha.place(); hb.place();
+      const mid = i => '<span class="t-a">' + fmt(a[i]) + '</span> + <span class="t-b">' + term(b[i]) + '</span>';
+      out.innerHTML =
+        '<div class="eq"><b class="sym t-a">a</b><span>+</span><b class="sym t-b">b</b><span>=</span>' +
+          cv(fmt(a[0]), fmt(a[1]), 't-a') + '<span>+</span>' + cv(fmt(b[0]), fmt(b[1]), 't-b') + '</div>' +
+        '<div class="eq"><span>=</span>' + cv(mid(0), mid(1)) + '<span>=</span>' + cv(fmt(S[0]), fmt(S[1]), 'strong') + '</div>';
+    }
+    render();
+    return { set: (a, b) => { st.a = a.slice(); st.b = b.slice(); render(); } };
+  }
+
+  /* ---------- Chapter 3: stretching ---------- */
+  function initStretching() {
+    const B = new Board(document.getElementById('board-stretching'), { range: 6 });
+    const st = { v: [2, 1], k: 2 };
+    const KV = new Arrow(B, 'ink', { label: '2 × v', width: 9, layer: B.under });
+    const V = new Arrow(B, 'a', { label: 'v', width: 4, side: 'perp' });
+    const h = new Handle(B, 'a', { get: () => st.v, set: v => { st.v = v; render(); }, min: -3, max: 3, name: 'Tip of arrow v' });
+    const slider = document.getElementById('k'), kOut = document.getElementById('k-out');
+    const out = document.getElementById('out-stretching');
+    slider.addEventListener('input', () => { st.k = parseFloat(slider.value); render(); });
+    function render() {
+      const x = st.v[0], y = st.v[1], k = st.k, R = [clean(k * x), clean(k * y)];
+      KV.set([0, 0], R, k > 0 && k <= 1 ? '' : fmt(k) + ' × v');
+      V.set([0, 0], st.v);
+      h.place();
+      kOut.textContent = fmt(k);
+      out.innerHTML =
+        '<div class="eq"><b>' + fmt(k) + '</b><span>×</span><b class="sym t-a">v</b><span>=</span><b>' + fmt(k) +
+          '</b><span>×</span>' + cv(fmt(x), fmt(y), 't-a') + '</div>' +
+        '<div class="eq"><span>=</span>' + cv(fmt(k) + ' × ' + term(x), fmt(k) + ' × ' + term(y)) +
+          '<span>=</span>' + cv(fmt(R[0]), fmt(R[1]), 'strong') + '</div>';
+    }
+    render();
+    return { set: (v, k) => { st.v = v.slice(); st.k = k; slider.value = String(k); render(); } };
+  }
+
+  /* ---------- Chapter 4: matrices ---------- */
+  function initMatrices() {
+    const svg = document.getElementById('board-matrices');
+    const B = new Board(svg, { range: 4, labelEvery: 0 });
+    svg.classList.add('faint-grid');
+    const st = { i: [1, 0], j: [0, 1], v: [2, 1] };
+    const tg = s('g', null, B.under);
+    const N = 14, lines = [];
+    for (let k = -N; k <= N; k++) {
+      lines.push({ k: k, x: true, el: s('line', { class: 'tgrid' + (k ? '' : ' axis') }, tg) });
+      lines.push({ k: k, x: false, el: s('line', { class: 'tgrid' + (k ? '' : ' axis') }, tg) });
+    }
+    const cell = s('polygon', { class: 'cell' }, B.under);
+    const before = new Arrow(B, 'soft', { dashed: true, width: 4, label: 'v', layer: B.under });
+    const MV = new Arrow(B, 'ink', { width: 7, label: 'M v' });
+    const I = new Arrow(B, 'i', { width: 6, label: 'î' });
+    const J = new Arrow(B, 'j', { width: 6, label: 'ĵ' });
+    let raf = 0;
+    const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0; };
+    const hi = new Handle(B, 'i', { get: () => st.i, set: v => { stop(); st.i = v; render(); }, snap: 0.5, min: -3, max: 3, name: 'Tip of i-hat' });
+    const hj = new Handle(B, 'j', { get: () => st.j, set: v => { stop(); st.j = v; render(); }, snap: 0.5, min: -3, max: 3, name: 'Tip of j-hat' });
+    const out = document.getElementById('out-matrices');
+    const vx = document.getElementById('vx'), vy = document.getElementById('vy');
+    const M = p => [p[0] * st.i[0] + p[1] * st.j[0], p[0] * st.i[1] + p[1] * st.j[1]];
+
+    function render() {
+      for (const L of lines) {
+        const a = L.x ? [L.k, -N] : [-N, L.k], b = L.x ? [L.k, N] : [N, L.k];
+        const pa = B.px(M(a)), pb = B.px(M(b));
+        setA(L.el, { x1: pa[0], y1: pa[1], x2: pb[0], y2: pb[1] });
+      }
+      const corners = [[0, 0], st.i, [st.i[0] + st.j[0], st.i[1] + st.j[1]], st.j].map(p => B.px(p).join(','));
+      cell.setAttribute('points', corners.join(' '));
+      const mv = M(st.v);
+      before.set([0, 0], st.v);
+      MV.set([0, 0], mv);
+      I.set([0, 0], st.i);
+      J.set([0, 0], st.j);
+      hi.place(); hj.place();
+      vx.textContent = fmt(st.v[0]);
+      vy.textContent = fmt(st.v[1]);
+      const i = st.i, j = st.j, x = st.v[0], y = st.v[1];
+      const ci = n => '<span class="t-i">' + fmt(n) + '</span>', cj = n => '<span class="t-j">' + fmt(n) + '</span>';
+      const row = r => fmt(x) + ' × ' + term(i[r]) + ' + ' + fmt(y) + ' × ' + term(j[r]);
+      out.innerHTML =
+        '<div class="eq"><b class="sym">M</b><span>=</span>' + mx(ci(i[0]), cj(j[0]), ci(i[1]), cj(j[1])) + '</div>' +
+        '<div class="note">Column 1 is where <b class="t-i">î</b> lands. Column 2 is where <b class="t-j">ĵ</b> lands.</div>' +
+        '<div class="eq"><b class="sym">M v</b><span>=</span><b>' + fmt(x) + '</b><span>×</span>' + cv(fmt(i[0]), fmt(i[1]), 't-i') +
+          '<span>+</span><b>' + fmt(y) + '</b><span>×</span>' + cv(fmt(j[0]), fmt(j[1]), 't-j') + '</div>' +
+        '<div class="eq"><span>=</span>' + cv(row(0), row(1)) + '<span>=</span>' + cv(fmt(mv[0]), fmt(mv[1]), 'strong') + '</div>';
+    }
+
+    const presets = {
+      turn: [[0, 1], [-1, 0]],
+      mirror: [[-1, 0], [0, 1]],
+      stretch: [[2, 0], [0, 1]],
+      shear: [[1, 0], [1, 1]],
+      squash: [[1, 0.5], [2, 1]],
+      reset: [[1, 0], [0, 1]]
+    };
+    function animateTo(ti, tj) {
+      stop();
+      if (reduceMotion) { st.i = ti.slice(); st.j = tj.slice(); render(); return; }
+      const fi = st.i.slice(), fj = st.j.slice(), t0 = performance.now(), D = 700;
+      const step = now => {
+        const t = Math.min(1, (now - t0) / D);
+        const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        if (t < 1) {
+          st.i = [fi[0] + (ti[0] - fi[0]) * e, fi[1] + (ti[1] - fi[1]) * e];
+          st.j = [fj[0] + (tj[0] - fj[0]) * e, fj[1] + (tj[1] - fj[1]) * e];
+          render();
+          raf = requestAnimationFrame(step);
+        } else {
+          raf = 0;
+          st.i = ti.slice();
+          st.j = tj.slice();
+          render();
+        }
+      };
+      raf = requestAnimationFrame(step);
+    }
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => { const p = presets[btn.dataset.preset]; animateTo(p[0], p[1]); });
+    });
+    document.querySelectorAll('[data-dv]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parts = btn.dataset.dv.split(','), idx = Number(parts[0]), d = Number(parts[1]);
+        const nv = st.v.slice();
+        nv[idx] = Math.max(-3, Math.min(3, nv[idx] + d));
+        st.v = nv;
+        render();
+      });
+    });
+    render();
+    return { show: (i, j, v) => { st.v = v.slice(); animateTo(i, j); } };
+  }
+
+  /* ---------- Chapter 5: interference ---------- */
+  function initInterference() {
+    const F = 2.5, SIG = 0.6;
+    const E = x => Math.exp(-(x / SIG) * (x / SIG));
+    const amps = x => {
+      const m = Math.sqrt(E(x));
+      const t1 = Math.PI / 2 - Math.PI * F * x, t2 = Math.PI / 2 + Math.PI * F * x;
+      return [[m * Math.cos(t1), m * Math.sin(t1)], [m * Math.cos(t2), m * Math.sin(t2)]];
+    };
+    const bright = (mode, x) => mode === 'one' ? E(x) : mode === 'which' ? 2 * E(x) : 2 * E(x) * (1 + Math.cos(2 * Math.PI * F * x));
+    const MAXB = { both: 4, one: 1, which: 2 };
+    const st = { x: 0.1, mode: 'both' };
+
+    // Setup diagram: brightness curve on top, screen band, two slits, source at the bottom.
+    const svg = document.getElementById('setup');
+    svg.setAttribute('viewBox', '0 0 600 430');
+    const X = x => 300 + x * 260;
+    const BASE = 150, SC = 28, BAND = 156, BANDH = 24, BY = 330, SL = [270, 330], GAP = 8;
+    const g = s('g', null, svg);
+    s('text', { x: 40, y: 22, class: 'lbl' }, g).textContent = 'brightness';
+    s('line', { x1: 40, y1: BASE, x2: 560, y2: BASE, class: 'baseline' }, g);
+    const fill = s('polygon', { class: 'curve-fill' }, g);
+    const curve = s('polyline', { class: 'curve' }, g);
+    const guide = s('line', { class: 'guide' }, g);
+    s('rect', { x: 40, y: BAND, width: 520, height: BANDH, rx: 3, class: 'screen-band' }, g);
+    const hitsG = s('g', null, g);
+    s('text', { x: 40, y: BAND + BANDH + 22, class: 'lbl' }, g).textContent = 'screen';
+    const p1 = s('line', { class: 'path p1' }, g), p2 = s('line', { class: 'path p2' }, g);
+    s('line', { x1: 40, y1: BY, x2: SL[0] - GAP, y2: BY, class: 'barrier' }, g);
+    s('line', { x1: SL[0] + GAP, y1: BY, x2: SL[1] - GAP, y2: BY, class: 'barrier' }, g);
+    s('line', { x1: SL[1] + GAP, y1: BY, x2: 560, y2: BY, class: 'barrier' }, g);
+    const plug = s('rect', { x: SL[1] - GAP - 1, y: BY - 3.5, width: GAP * 2 + 2, height: 7, class: 'plug' }, g);
+    s('text', { x: 40, y: BY - 16, class: 'lbl' }, g).textContent = 'two slits';
+    const sensors = s('g', null, g);
+    SL.forEach(sx => s('rect', { x: sx - 8, y: BY + 8, width: 16, height: 11, rx: 2, class: 'sensor' }, sensors));
+    s('text', { x: 356, y: BY + 19, class: 'lbl' }, sensors).textContent = 'which-path detector';
+    s('line', { x1: 300, y1: 398, x2: SL[0], y2: BY + 4, class: 'feed' }, g);
+    const feed2 = s('line', { x1: 300, y1: 398, x2: SL[1], y2: BY + 4, class: 'feed' }, g);
+    s('circle', { cx: 300, cy: 402, r: 7, class: 'source' }, g);
+    s('text', { x: 316, y: 408, class: 'lbl' }, g).textContent = 'photon source';
+    const spot = s('circle', { r: 6.5, class: 'spot' }, g);
+
+    // Amplitude arrows on a clock face.
+    const AP = new Board(document.getElementById('amps'), { range: 2.3, size: 300, labelEvery: 0 });
+    s('circle', { cx: AP.c, cy: AP.c, r: AP.unit, class: 'clockface' }, AP.grid);
+    const sumA = new Arrow(AP, 'ink', { width: 6, label: 'sum', side: 'midR', layer: AP.under });
+    const a1 = new Arrow(AP, 'a', { width: 4 });
+    const a2 = new Arrow(AP, 'b', { width: 4 });
+
+    const out = document.getElementById('out-interference');
+    const note = document.getElementById('mode-note');
+    const slider = document.getElementById('spot');
+    const countEl = document.getElementById('count');
+    const fireBtn = document.getElementById('fire');
+    const NOTES = {
+      both: 'Both slits are open. The two arrows add up, and in some places they cancel, so the photons pile up in stripes.',
+      one: 'The right slit is closed. Only arrow 1 is left, with nothing to cancel against, so the photons form one smooth blob.',
+      which: 'A detector marks which slit each photon went through. Then you square each arrow on its own and add the results. Squares are never negative, so nothing cancels and the stripes disappear.'
+    };
+
+    function drawCurve() {
+      const pts = [];
+      for (let n = 0; n <= 200; n++) {
+        const xx = -1 + n / 100;
+        pts.push(X(xx).toFixed(1) + ',' + (BASE - SC * bright(st.mode, xx)).toFixed(1));
+      }
+      curve.setAttribute('points', pts.join(' '));
+      fill.setAttribute('points', X(-1) + ',' + BASE + ' ' + pts.join(' ') + ' ' + X(1) + ',' + BASE);
+      const one = st.mode === 'one';
+      plug.style.display = one ? '' : 'none';
+      p2.style.display = one ? 'none' : '';
+      feed2.style.display = one ? 'none' : '';
+      sensors.style.display = st.mode === 'which' ? '' : 'none';
+      note.textContent = NOTES[st.mode];
+    }
+
+    function render() {
+      const x = st.x, m = st.mode, A = amps(x), Bx = bright(m, x);
+      const sx = X(x), sy = BASE - SC * Bx;
+      setA(guide, { x1: sx, y1: 30, x2: sx, y2: BAND + BANDH });
+      setA(spot, { cx: sx, cy: sy });
+      setA(p1, { x1: SL[0], y1: BY - 4, x2: sx, y2: BAND + BANDH });
+      setA(p2, { x1: SL[1], y1: BY - 4, x2: sx, y2: BAND + BANDH });
+      const S = [A[0][0] + A[1][0], A[0][1] + A[1][1]];
+      if (m === 'both') { a1.set([0, 0], A[0]); a2.set(A[0], S); sumA.set([0, 0], S); }
+      else if (m === 'one') { a1.set([0, 0], A[0]); a2.hide(); sumA.hide(); }
+      else { a1.set([0, 0], A[0]); a2.set([0, 0], A[1]); sumA.hide(); }
+      const L1 = round2(Math.hypot(A[0][0], A[0][1])), L2 = round2(Math.hypot(A[1][0], A[1][1])), LS = round2(Math.hypot(S[0], S[1]));
+      let html;
+      if (m === 'both') {
+        html = '<div class="eq"><span>length of sum</span><span>=</span><b>' + f2(LS) + '</b></div>' +
+          '<div class="eq"><span>brightness</span><span>=</span><span>' + f2(LS) + '²</span><span>=</span><b>' + f2(LS * LS) + '</b></div>';
+      } else if (m === 'one') {
+        html = '<div class="eq"><span>length of <span class="t-a">arrow 1</span></span><span>=</span><b>' + f2(L1) + '</b></div>' +
+          '<div class="eq"><span>brightness</span><span>=</span><span>' + f2(L1) + '²</span><span>=</span><b>' + f2(L1 * L1) + '</b></div>';
+      } else {
+        html = '<div class="eq"><span>brightness</span><span>=</span><span class="t-a">' + f2(L1) + '²</span><span>+</span><span class="t-b">' + f2(L2) + '²</span></div>' +
+          '<div class="eq"><span>=</span><span>' + f2(L1 * L1) + ' + ' + f2(L2 * L2) + '</span><span>=</span><b>' + f2(L1 * L1 + L2 * L2) + '</b></div>';
+      }
+      let state = 'No stripes', lit = false;
+      if (m === 'both') {
+        const r = Bx / (4 * E(x));
+        if (r > 0.85) { state = 'Bright stripe'; lit = true; }
+        else if (r < 0.1) { state = 'Dark stripe'; }
+        else state = 'Between stripes';
+      }
+      html += '<div class="eq"><span class="pill' + (lit ? ' lit' : '') + '">' + state + '</span></div>';
+      out.innerHTML = html;
+    }
+
+    // Photon hits, sampled from the brightness curve.
+    let count = 0, fireRaf = 0;
+    const LIMIT = 4000;
+    function addHit(x) {
+      s('circle', { cx: (X(x)).toFixed(1), cy: (BAND + 3 + Math.random() * (BANDH - 6)).toFixed(1), r: 1.7, class: 'hit' }, hitsG);
+      count++;
+    }
+    function sample(n) {
+      const xs = [], top = MAXB[st.mode];
+      let guard = 0;
+      while (xs.length < n && guard++ < n * 400) {
+        const x = Math.random() * 2 - 1;
+        if (Math.random() * top < bright(st.mode, x)) xs.push(x);
+      }
+      return xs;
+    }
+    function showCount() {
+      countEl.textContent = count.toLocaleString('en') + ' photons on the screen';
+      fireBtn.disabled = count >= LIMIT;
+    }
+    function fire(n, instant) {
+      if (fireRaf) cancelAnimationFrame(fireRaf);
+      fireRaf = 0;
+      const xs = sample(Math.max(0, Math.min(n, LIMIT - count)));
+      if (instant || reduceMotion) { xs.forEach(addHit); showCount(); return; }
+      let k = 0;
+      const per = Math.max(4, Math.ceil(xs.length / 50));
+      const tick = () => {
+        for (let c = 0; c < per && k < xs.length; c++) addHit(xs[k++]);
+        showCount();
+        fireRaf = k < xs.length ? requestAnimationFrame(tick) : 0;
+      };
+      fireRaf = requestAnimationFrame(tick);
+    }
+    function clearHits() {
+      if (fireRaf) cancelAnimationFrame(fireRaf);
+      fireRaf = 0;
+      while (hitsG.firstChild) hitsG.removeChild(hitsG.firstChild);
+      count = 0;
+      showCount();
+    }
+
+    slider.addEventListener('input', () => { st.x = parseFloat(slider.value); render(); });
+    document.querySelectorAll('input[name="mode"]').forEach(r => {
+      r.addEventListener('change', () => {
+        if (!r.checked) return;
+        st.mode = r.value;
+        drawCurve();
+        render();
+        clearHits();
+        fire(400, false);
+      });
+    });
+    fireBtn.addEventListener('click', () => fire(300, false));
+    document.getElementById('clear').addEventListener('click', clearHits);
+
+    const checked = document.querySelector('input[name="mode"]:checked');
+    if (checked) st.mode = checked.value;
+    st.x = parseFloat(slider.value) || 0;
+    drawCurve();
+    render();
+    fire(400, true);
+    return {
+      show: (mode, x) => {
+        const radio = document.getElementById('mode-' + mode);
+        if (radio) radio.checked = true;
+        slider.value = String(x);
+        st.x = x;
+        if (st.mode !== mode) {
+          st.mode = mode;
+          drawCurve();
+          clearHits();
+          fire(400, false);
+        }
+        render();
+      }
+    };
+  }
+
+  /* ---------- questions: work out an answer, then check it ---------- */
+  function parseNum(raw) {
+    const t = String(raw).trim().replace(/[−–—]/g, '-').replace(',', '.');
+    if (t === '' || t === '-' || t === '+') return null;
+    const n = Number(t);
+    return Number.isFinite(n) ? n : null;
+  }
+  function buildQuestions(api) {
+    const V = (a, b) => cv(fmt(a), fmt(b));
+    const Q = {
+      arrows: [
+        {
+          id: 'arrows-notation', kind: 'vector',
+          prompt: 'Which arrow goes 2 steps left and 5 steps up? Fill in its two numbers.',
+          answer: [-2, 5],
+          right: 'Right. Going left means a negative right-step, so the arrow is ' + V(-2, 5) + '.',
+          hint: 'The top number counts steps to the right. Steps to the left count as a negative number.',
+          show: () => api.arrows.setV([-2, 5])
+        },
+        {
+          id: 'arrows-length', kind: 'number', label: 'length',
+          prompt: 'How long is the arrow ' + V(4, -3) + '? Work it out before you try it on the grid.',
+          answer: [5],
+          right: 'Right. 4² + (−3)² = 16 + 9 = 25, and √25 = 5.',
+          hint: 'Square both numbers, add them, then take the square root. A negative number squared is positive, because minus times minus is plus.',
+          show: () => api.arrows.setV([4, -3])
+        }
+      ],
+      adding: [
+        {
+          id: 'adding-sum', kind: 'vector',
+          prompt: 'What is ' + V(2, 3) + ' + ' + V(1, -2) + '?',
+          answer: [3, 1],
+          right: 'Right. 2 + 1 = 3 on top, and 3 + (−2) = 1 below.',
+          hint: 'Add the two top numbers, then the two bottom numbers. Adding −2 is the same as taking away 2.',
+          show: () => api.adding.set([2, 3], [1, -2])
+        },
+        {
+          id: 'adding-cancel', kind: 'vector',
+          prompt: 'a is ' + V(2, 3) + '. Which b makes a + b land exactly at the centre?',
+          answer: [-2, -3],
+          right: 'Right. ' + V(-2, -3) + ' points exactly the opposite way with the same length, so the two arrows cancel. Remember this for chapter 5.',
+          hint: 'The centre is ' + V(0, 0) + '. What do you add to 2 to get 0? And what do you add to 3?',
+          show: () => api.adding.set([2, 3], [-2, -3])
+        }
+      ],
+      stretching: [
+        {
+          id: 'stretching-flip', kind: 'vector',
+          prompt: 'What is −2 × ' + V(-1, 2) + '?',
+          answer: [2, -4],
+          right: 'Right. −2 × (−1) = 2 and −2 × 2 = −4. The arrow flips around and gets twice as long.',
+          hint: 'Multiply each number by −2 on its own. Minus times minus gives plus.',
+          show: () => api.stretching.set([-1, 2], -2)
+        }
+      ],
+      matrices: [
+        {
+          id: 'matrices-half', kind: 'vector',
+          prompt: 'After a half turn, where does v = ' + V(2, 1) + ' end up?',
+          answer: [-2, -1],
+          right: 'Right. After a half turn î points left and ĵ points down, so v becomes 2 × ' + V(-1, 0) + ' + 1 × ' + V(0, -1) + ' = ' + V(-2, -1) + '. Every arrow now points the opposite way, which is the same as multiplying it by −1.',
+          hint: 'A half turn sends î to ' + V(-1, 0) + ' and ĵ to ' + V(0, -1) + '. v is still 2 × î plus 1 × ĵ, so build it from the new î and ĵ.',
+          show: () => api.matrices.show([-1, 0], [0, -1], [2, 1])
+        },
+        {
+          id: 'matrices-recipe', kind: 'vector',
+          prompt: 'A matrix sends î to ' + V(1, 1) + ' and ĵ to ' + V(-1, 1) + '. Where does v = ' + V(2, 1) + ' land?',
+          answer: [1, 3],
+          right: 'Right. 2 × ' + V(1, 1) + ' = ' + V(2, 2) + ', and adding ' + V(-1, 1) + ' gives ' + V(1, 3) + '. This matrix turns everything an eighth of a turn (45°) and makes it about 1.4 times bigger.',
+          hint: 'Follow v’s recipe with the new arrows: 2 × ' + V(1, 1) + ' plus 1 × ' + V(-1, 1) + '. Then add the top numbers and the bottom numbers.',
+          show: () => api.matrices.show([1, 1], [-1, 1], [2, 1])
+        }
+      ],
+      interference: [
+        {
+          id: 'interference-cancel', kind: 'choice',
+          prompt: 'At one spot, arrow 1 and arrow 2 have the same length but point in exactly opposite directions. Both slits are open. How bright is that spot?',
+          options: ['Twice as bright as with one slit', 'Just as bright as with one slit', 'Completely dark'],
+          answer: 2,
+          right: 'Right. The arrows cancel, so the sum has length 0, and 0² = 0. No photon ever lands there.',
+          hint: 'Add the two arrows tip to tail, like in chapter 2. Where do you end up?',
+          show: () => api.interference.show('both', 0.2)
+        },
+        {
+          id: 'interference-detector', kind: 'choice',
+          prompt: 'Same spot, but now a which-path detector is switched on. What happens there?',
+          options: ['It stays completely dark', 'It lights up, because now the squared lengths add instead of the arrows', 'No photons reach the screen at all'],
+          answer: 1,
+          right: 'Right. Each squared length is positive, so they can’t cancel. The dark stripe fills in and the pattern becomes one smooth blob.',
+          hint: 'With a detector, you square each arrow first and then add. Can two positive numbers add up to zero?',
+          show: () => api.interference.show('which', 0.2)
+        }
+      ]
+    };
+
+    function numField(id, label) {
+      return '<span class="num-row"><button class="pm" type="button" data-for="' + id + '" aria-label="Flip the sign of the ' + label + '">±</button>' +
+        '<input class="num" id="' + id + '" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-label="' + label + '"></span>';
+    }
+    function answerText(q) {
+      if (q.kind === 'choice') return 'The answer is “' + q.options[q.answer] + '”.';
+      if (q.kind === 'number') return 'The answer is ' + fmt(q.answer[0]) + '.';
+      return 'The answer is ' + V(q.answer[0], q.answer[1]) + '.';
+    }
+    function updateChapter(ch) {
+      if (Q[ch].every(q => solved[q.id])) markChapter(ch);
+    }
+
+    function makeQuestion(ch, q, n, count) {
+      const el = document.createElement('div');
+      el.className = 'challenge';
+      el.dataset.state = 'open';
+      const fid = 'f-' + q.id;
+      let inputs;
+      if (q.kind === 'vector') {
+        inputs = '<span class="vec-in">' + numField(fid + '-0', 'top number') + numField(fid + '-1', 'bottom number') + '</span>';
+      } else if (q.kind === 'number') {
+        inputs = '<span class="num-label">' + q.label + ' =</span>' + numField(fid + '-0', q.label);
+      } else {
+        inputs = '<div class="choices">' + q.options.map((o, k) =>
+          '<label><input type="radio" name="' + fid + '" value="' + k + '"><span>' + o + '</span></label>').join('') + '</div>';
+      }
+      el.innerHTML =
+        '<span class="tag">' + (count > 1 ? 'Question ' + (n + 1) + ' of ' + count : 'Question') + '</span>' +
+        '<p class="prompt">' + q.prompt + '</p>' +
+        '<form class="answer" novalidate>' + inputs + '<button class="btn small solid check" type="submit">Check</button></form>' +
+        '<p class="error" role="alert" hidden></p>' +
+        '<p class="feedback" aria-live="polite" hidden></p>' +
+        '<div class="btn-row" hidden><button class="btn small show-me" type="button">Show me on the grid</button></div>';
+      const form = el.querySelector('form'), err = el.querySelector('.error'), fb = el.querySelector('.feedback');
+      const row = el.querySelector('.btn-row'), showBtn = el.querySelector('.show-me');
+      let tries = 0;
+
+      el.querySelectorAll('.pm').forEach(b => b.addEventListener('click', () => {
+        const inp = document.getElementById(b.dataset.for);
+        const t = inp.value.trim();
+        inp.value = /^[-−]/.test(t) ? t.slice(1) : '−' + t;
+        err.hidden = true;
+        inp.focus();
+      }));
+      el.addEventListener('input', () => { err.hidden = true; });
+
+      function read() {
+        if (q.kind === 'choice') {
+          const c = el.querySelector('input[type="radio"]:checked');
+          return c ? Number(c.value) : null;
+        }
+        const vals = Array.prototype.map.call(el.querySelectorAll('.num'), i => parseNum(i.value));
+        return vals.some(v => v === null) ? null : vals;
+      }
+      function finish(store) {
+        el.dataset.state = 'done';
+        el.querySelector('.tag').textContent = 'Correct ✓';
+        fb.innerHTML = q.right;
+        fb.hidden = false;
+        err.hidden = true;
+        el.querySelectorAll('input, .pm').forEach(i => { i.disabled = true; });
+        el.querySelector('.check').hidden = true;
+        showBtn.textContent = 'Show me on the grid';
+        row.hidden = false;
+        if (store) { solved[q.id] = true; save(); }
+        updateChapter(ch);
+      }
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        if (el.dataset.state === 'done') return;
+        const got = read();
+        if (got === null) {
+          err.textContent = q.kind === 'choice' ? 'Pick an answer first.' :
+            q.kind === 'vector' ? 'Type a number in both boxes first.' : 'Type a number in the box first.';
+          err.hidden = false;
+          return;
+        }
+        const ok = q.kind === 'choice' ? got === q.answer : got.every((v, k) => Math.abs(v - q.answer[k]) < 1e-9);
+        if (ok) { finish(true); return; }
+        tries++;
+        el.dataset.state = 'wrong';
+        fb.innerHTML = '<b>Not quite.</b> ' + q.hint;
+        fb.hidden = false;
+        if (tries >= 2) {
+          showBtn.textContent = 'Show me the answer';
+          row.hidden = false;
+        }
+      });
+      showBtn.addEventListener('click', () => {
+        q.show();
+        if (el.dataset.state !== 'done') {
+          fb.innerHTML = '<b>Here it is on the grid.</b> ' + answerText(q) + ' Type it in and press Check once you see why.';
+          fb.hidden = false;
+        }
+        const fig = el.closest('.stage').querySelector('.figure');
+        const r = fig.getBoundingClientRect();
+        if (r.top < 0 || r.bottom > window.innerHeight) {
+          fig.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        }
+      });
+
+      if (solved[q.id]) {
+        if (q.kind === 'choice') {
+          const r = el.querySelector('input[type="radio"][value="' + q.answer + '"]');
+          if (r) r.checked = true;
+        } else {
+          el.querySelectorAll('.num').forEach((inp, k) => { inp.value = fmt(q.answer[k]); });
+        }
+        finish(false);
+      }
+      return el;
+    }
+
+    ORDER.forEach(ch => {
+      const box = document.getElementById('q-' + ch);
+      if (!box) return;
+      Q[ch].forEach((q, n) => box.appendChild(makeQuestion(ch, q, n, Q[ch].length)));
+      updateChapter(ch);
+    });
+  }
+
+  /* ---------- navigation ---------- */
+  function show(id, scroll) {
+    if (ORDER.indexOf(id) < 0) id = 'arrows';
+    ORDER.forEach(k => { document.getElementById('ch-' + k).hidden = k !== id; });
+    document.querySelectorAll('.steps [data-go]').forEach(b => {
+      if (b.dataset.go === id) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    if (scroll) document.getElementById('chapters').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  }
+  let scrollNext = false;
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-go]');
+    if (!b) return;
+    const id = b.dataset.go, fromFoot = !b.closest('.steps');
+    if (location.hash.slice(1) === id) { show(id, fromFoot); return; }
+    scrollNext = fromFoot;
+    location.hash = id;
+  });
+  window.addEventListener('hashchange', () => { show(location.hash.slice(1), scrollNext); scrollNext = false; });
+
+  const api = {
+    arrows: initArrows(),
+    adding: initAdding(),
+    stretching: initStretching(),
+    matrices: initMatrices(),
+    interference: initInterference()
+  };
+  buildQuestions(api);
+  show(location.hash.slice(1), false);
+})();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>
