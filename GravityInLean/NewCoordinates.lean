@@ -22,7 +22,7 @@ a step is unchanged, only the way the step is written changes.
 
 **What is proved here.**
 
-* `christoffel_inNewCoords`: how the connection changes. It is not simply re-written like the
+* `christoffel_inNewCoords_at`: how the connection changes. It is not simply re-written like the
   length measure: an extra term appears, made of the second slopes of `Φ`.
 * `riemann_inNewCoords`: the full curvature (the Riemann tensor of the textbooks), built from the
   connection, *is* simply re-written. The extra terms cancel.
@@ -33,8 +33,14 @@ a step is unchanged, only the way the step is written changes.
   the coordinates.
 
 **What is assumed.** The change of coordinates is three times smoothly differentiable and the
-length measure twice; the length measure is symmetric and has an inverse. These are the
-textbooks' conditions.
+length measure twice; the length measure is symmetric and has an inverse, before and after the
+change. These are the textbooks' conditions. That the inverse is smooth is not assumed: it follows
+(`contDiffAt_of_inverse`).
+
+**The assumptions can be met.** Every change of coordinates that loses no direction (its table of
+slopes can be inverted) is covered: `inverse_inNewCoords`, and `isRicciFlatAt_changeOfCoords` for
+the statement with nothing left to supply. A worked case with a real change of coordinates is in
+`SameSpacetime.lean`.
 -/
 
 @[expose] public section
@@ -574,6 +580,65 @@ theorem ricci_of_law (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
 
 end Curvature
 
+/-! ## The inverse of a smooth table is smooth -/
+
+/-- The determinant of a table of smooth functions is smooth. -/
+theorem contDiffAt_det {T : Fin n → Fin n → Coords n → ℝ} {y : Coords n} {k : WithTop ℕ∞}
+    (hT : ∀ a b, ContDiffAt ℝ k (T a b) y) : ContDiffAt ℝ k (fun w => (tab T w).det) y := by
+  have e : (fun w => (tab T w).det) = fun w => ∑ σ : Equiv.Perm (Fin n),
+      (((Equiv.Perm.sign σ : ℤˣ) : ℤ) : ℝ) * ∏ i, T (σ i) i w := by
+    funext w
+    rw [Matrix.det_apply']
+    rfl
+  rw [e]
+  exact ContDiffAt.sum fun σ _ => contDiffAt_const.mul (contDiffAt_prod fun i _ => hT (σ i) i)
+
+/-- **The inverse of a smooth table is smooth.** If a table of smooth functions has an inverse
+table near a point, the entries of the inverse are just as smooth. So smoothness of the inverse of
+a length measure never has to be assumed. -/
+theorem contDiffAt_of_inverse {T Tinv : Fin n → Fin n → Coords n → ℝ} {y : Coords n}
+    {k : WithTop ℕ∞} (hT : ∀ a b, ContDiffAt ℝ k (T a b) y)
+    (hinv : ∀ᶠ w in 𝓝 y, ∀ a c, ∑ b, T a b w * Tinv b c w = if a = c then 1 else 0)
+    (a c : Fin n) : ContDiffAt ℝ k (Tinv a c) y := by
+  have hmat : ∀ᶠ w in 𝓝 y, tab T w * tab Tinv w = 1 := hinv.mono fun w hw => by
+    ext i j
+    simp only [tab, Matrix.mul_apply, Matrix.of_apply, Matrix.one_apply]
+    exact hw i j
+  have hdet0 : (tab T y).det ≠ 0 := Matrix.det_ne_zero_of_right_inverse hmat.self_of_nhds
+  -- Each entry of the adjugate is the determinant of a table of smooth functions.
+  have hadj : ContDiffAt ℝ k (fun w => (tab T w).adjugate a c) y := by
+    have e : (fun w => (tab T w).adjugate a c) = fun w => (tab (fun i j w =>
+        if i = c then (Pi.single a (1 : ℝ) : Fin n → ℝ) j else T i j w) w).det := by
+      funext w
+      rw [Matrix.adjugate_apply]
+      congr 1
+      ext i j
+      simp [tab, Matrix.updateRow_apply]
+    rw [e]
+    refine contDiffAt_det fun i j => ?_
+    change ContDiffAt ℝ k
+      (fun w => if i = c then (Pi.single a (1 : ℝ) : Fin n → ℝ) j else T i j w) y
+    by_cases hi : i = c
+    · have e1 : (fun w => if i = c then (Pi.single a (1 : ℝ) : Fin n → ℝ) j else T i j w)
+          = fun _ => (Pi.single a (1 : ℝ) : Fin n → ℝ) j := by
+        funext w
+        simp [hi]
+      rw [e1]
+      exact contDiffAt_const
+    · have e1 : (fun w => if i = c then (Pi.single a (1 : ℝ) : Fin n → ℝ) j else T i j w)
+          = T i j := by
+        funext w
+        simp [hi]
+      rw [e1]
+      exact hT i j
+  have hev : Tinv a c =ᶠ[𝓝 y] fun w => ((tab T w).det)⁻¹ * (tab T w).adjugate a c := by
+    filter_upwards [hmat] with w hw
+    have h1 : (tab T w)⁻¹ = tab Tinv w := Matrix.inv_eq_right_inv hw
+    have h2 : tab Tinv w a c = ((tab T w).det)⁻¹ * (tab T w).adjugate a c := by
+      rw [← h1, Matrix.inv_def, Matrix.smul_apply, Ring.inverse_eq_inv, smul_eq_mul]
+    exact h2
+  exact (((contDiffAt_det hT).inv hdet0).mul hadj).congr_of_eventuallyEq hev
+
 /-! ## The theorem -/
 
 /-- The connection belonging to a symmetric length measure is symmetric in its two lower
@@ -639,10 +704,9 @@ coordinates. Then its curvature, computed in the new coordinates from the genera
 the old curvature re-written: each of its two slots is multiplied by the table of slopes of the
 change of coordinates. -/
 theorem ricci_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
-    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x)) (hgi : ∀ α β, ContDiffAt ℝ 1 (ginv α β) (Φ x))
+    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x))
     (hsymm : ∀ᶠ z in 𝓝 (Φ x), ∀ α β, g α β z = g β α z)
     (hinv : ∀ᶠ z in 𝓝 (Φ x), ∀ α γ, ∑ β, g α β z * ginv β γ z = if α = γ then 1 else 0)
-    (hgi' : ∀ μ ν, ContDiffAt ℝ 1 (ginv' μ ν) x)
     (hinv' : ∀ᶠ y in 𝓝 x, ∀ μ κ,
       ∑ ν, inNewCoords Φ g μ ν y * ginv' ν κ y = if μ = κ then 1 else 0)
     (μ ν : Fin n) :
@@ -666,6 +730,10 @@ theorem ricci_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
           + ∑ β, ∑ γ, jac Φ β μ y * christoffel g ginv ε β γ (Φ y) * jac Φ γ ν y := by
     filter_upwards [hΦ2ev, hgev, hsymmev, hinvev, hinv'] with y h1 h2 h3 h4 h5 ε μ ν
     exact christoffel_inNewCoords_at h1 h2 h3 h4 h5 ε μ ν
+  -- The two inverses are smooth, because they are inverses of smooth tables.
+  have hgi : ∀ α β, ContDiffAt ℝ 2 (ginv α β) (Φ x) := contDiffAt_of_inverse hg hinv
+  have hgi' : ∀ μ ν, ContDiffAt ℝ 2 (ginv' μ ν) x :=
+    contDiffAt_of_inverse (contDiffAt_inNewCoords hΦ hg) hinv'
   -- Both connections can be differentiated, and both are symmetric.
   have hΓ' : ∀ a b c, DifferentiableAt ℝ (christoffel (inNewCoords Φ g) ginv' a b c) x :=
     fun a b c => differentiableAt_christoffel (contDiffAt_inNewCoords hΦ hg)
@@ -686,17 +754,16 @@ theorem ricci_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
 
 /-- The same statement for whole tables: new curvature = `Jᵀ · old curvature · J`. -/
 theorem ricciTab_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
-    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x)) (hgi : ∀ α β, ContDiffAt ℝ 1 (ginv α β) (Φ x))
+    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x))
     (hsymm : ∀ᶠ z in 𝓝 (Φ x), ∀ α β, g α β z = g β α z)
     (hinv : ∀ᶠ z in 𝓝 (Φ x), ∀ α γ, ∑ β, g α β z * ginv β γ z = if α = γ then 1 else 0)
-    (hgi' : ∀ μ ν, ContDiffAt ℝ 1 (ginv' μ ν) x)
     (hinv' : ∀ᶠ y in 𝓝 x, ∀ μ κ,
       ∑ ν, inNewCoords Φ g μ ν y * ginv' ν κ y = if μ = κ then 1 else 0) :
     Matrix.of (fun μ ν => ricci (christoffel (inNewCoords Φ g) ginv') μ ν x)
       = (tab (jac Φ) x)ᵀ * Matrix.of (fun α β => ricci (christoffel g ginv) α β (Φ x))
         * tab (jac Φ) x := by
   ext μ ν
-  rw [Matrix.of_apply, ricci_inNewCoords hΦ hg hgi hsymm hinv hgi' hinv' μ ν]
+  rw [Matrix.of_apply, ricci_inNewCoords hΦ hg hsymm hinv hinv' μ ν]
   simp only [tab, Matrix.mul_apply, Matrix.transpose_apply, Matrix.of_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun β _ => Finset.sum_congr rfl fun α _ => by ring
@@ -704,14 +771,13 @@ theorem ricciTab_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) 
 /-- **"Empty" does not depend on the coordinates.** A length measure written in new coordinates
 makes space empty at a point exactly when it does so in the old coordinates. -/
 theorem isRicciFlatAt_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
-    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x)) (hgi : ∀ α β, ContDiffAt ℝ 1 (ginv α β) (Φ x))
+    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x))
     (hsymm : ∀ᶠ z in 𝓝 (Φ x), ∀ α β, g α β z = g β α z)
     (hinv : ∀ᶠ z in 𝓝 (Φ x), ∀ α γ, ∑ β, g α β z * ginv β γ z = if α = γ then 1 else 0)
-    (hgi' : ∀ μ ν, ContDiffAt ℝ 1 (ginv' μ ν) x)
     (hinv' : ∀ᶠ y in 𝓝 x, ∀ μ κ,
       ∑ ν, inNewCoords Φ g μ ν y * ginv' ν κ y = if μ = κ then 1 else 0) :
     IsRicciFlatAt (inNewCoords Φ g) ginv' x ↔ IsRicciFlatAt g ginv (Φ x) := by
-  have htab := ricciTab_inNewCoords hΦ hg hgi hsymm hinv hgi' hinv'
+  have htab := ricciTab_inNewCoords hΦ hg hsymm hinv hinv'
   obtain ⟨K, hK⟩ := exists_inverse_jac (Φ := Φ) (g := g) (ginv' := ginv') hinv'.self_of_nhds
   have hKt : Kᵀ * (tab (jac Φ) x)ᵀ = 1 := by
     rw [← Matrix.transpose_mul, hK, Matrix.transpose_one]
@@ -729,8 +795,62 @@ theorem isRicciFlatAt_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z
       rw [e, ← htab, h0, Matrix.mul_zero, Matrix.zero_mul]
     exact congrFun (congrFun hR α) β
   · intro h μ ν
-    rw [ricci_inNewCoords hΦ hg hgi hsymm hinv hgi' hinv' μ ν]
+    rw [ricci_inNewCoords hΦ hg hsymm hinv hinv' μ ν]
     exact Finset.sum_eq_zero fun α _ => Finset.sum_eq_zero fun β _ => by rw [h α β, mul_zero]
+
+/-! ## Every genuine change of coordinates is covered -/
+
+/-- The inverse of a table of functions, taken point by point. -/
+noncomputable def invT (T : Fin n → Fin n → Coords n → ℝ) (a b : Fin n) : Coords n → ℝ :=
+  fun y => (tab T y)⁻¹ a b
+
+/-- **The assumptions can be met by every genuine change of coordinates.** A change of
+coordinates is genuine at a point when its table of slopes can be inverted there: no direction is
+lost. Then the new length measure has an inverse near the point, which is what the theorems above
+ask for. -/
+theorem inverse_inNewCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
+    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x))
+    (hinv : ∀ α γ, ∑ β, g α β (Φ x) * ginv β γ (Φ x) = if α = γ then 1 else 0)
+    (hJ : (tab (jac Φ) x).det ≠ 0) :
+    ∀ᶠ y in 𝓝 x, ∀ μ κ,
+      ∑ ν, inNewCoords Φ g μ ν y * invT (inNewCoords Φ g) ν κ y = if μ = κ then 1 else 0 := by
+  have hmat : tab g (Φ x) * tab ginv (Φ x) = 1 := by
+    ext i j
+    simp only [tab, Matrix.mul_apply, Matrix.of_apply, Matrix.one_apply]
+    exact hinv i j
+  have hdetg : (tab g (Φ x)).det ≠ 0 := Matrix.det_ne_zero_of_right_inverse hmat
+  have hdet : (tab (inNewCoords Φ g) x).det ≠ 0 := by
+    rw [tab_inNewCoords, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose]
+    exact mul_ne_zero (mul_ne_zero hJ hdetg) hJ
+  have hcont : ContinuousAt (fun y => (tab (inNewCoords Φ g) y).det) x :=
+    (contDiffAt_det (contDiffAt_inNewCoords hΦ hg)).continuousAt
+  filter_upwards [hcont.eventually_ne hdet] with y hy μ κ
+  have h1 : tab (inNewCoords Φ g) y * (tab (inNewCoords Φ g) y)⁻¹ = 1 :=
+    Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.mpr hy)
+  have h2 := congrFun (congrFun h1 μ) κ
+  simp only [Matrix.mul_apply, Matrix.one_apply] at h2
+  exact h2
+
+/-- **The curvature does not depend on the coordinates, for every genuine change of
+coordinates.** The same statement as `ricci_inNewCoords`, with nothing left to supply for the new
+coordinates: the inverse of the new length measure is worked out, not assumed. -/
+theorem ricci_changeOfCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
+    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x))
+    (hsymm : ∀ᶠ z in 𝓝 (Φ x), ∀ α β, g α β z = g β α z)
+    (hinv : ∀ᶠ z in 𝓝 (Φ x), ∀ α γ, ∑ β, g α β z * ginv β γ z = if α = γ then 1 else 0)
+    (hJ : (tab (jac Φ) x).det ≠ 0) (μ ν : Fin n) :
+    ricci (christoffel (inNewCoords Φ g) (invT (inNewCoords Φ g))) μ ν x
+      = ∑ α, ∑ β, jac Φ α μ x * jac Φ β ν x * ricci (christoffel g ginv) α β (Φ x) :=
+  ricci_inNewCoords hΦ hg hsymm hinv (inverse_inNewCoords hΦ hg hinv.self_of_nhds hJ) μ ν
+
+/-- **"Empty" does not depend on the coordinates, for every genuine change of coordinates.** -/
+theorem isRicciFlatAt_changeOfCoords (hΦ : ∀ α, ContDiffAt ℝ 3 (fun z => Φ z α) x)
+    (hg : ∀ α β, ContDiffAt ℝ 2 (g α β) (Φ x))
+    (hsymm : ∀ᶠ z in 𝓝 (Φ x), ∀ α β, g α β z = g β α z)
+    (hinv : ∀ᶠ z in 𝓝 (Φ x), ∀ α γ, ∑ β, g α β z * ginv β γ z = if α = γ then 1 else 0)
+    (hJ : (tab (jac Φ) x).det ≠ 0) :
+    IsRicciFlatAt (inNewCoords Φ g) (invT (inNewCoords Φ g)) x ↔ IsRicciFlatAt g ginv (Φ x) :=
+  isRicciFlatAt_inNewCoords hΦ hg hsymm hinv (inverse_inNewCoords hΦ hg hinv.self_of_nhds hJ)
 
 end Main
 

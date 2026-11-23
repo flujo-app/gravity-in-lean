@@ -115,6 +115,16 @@ quietly go stale. -/
   GravityInLean.eddington_roundEmpty GravityInLean.eddington_outside
   GravityInLean.eddington_inside
 
+-- The curvature formula does not depend on the coordinates
+#audit GravityInLean.slope_comp GravityInLean.slope_slope_comm
+  GravityInLean.christoffel_inNewCoords_at GravityInLean.riemann_inNewCoords
+  GravityInLean.contDiffAt_of_inverse GravityInLean.ricci_inNewCoords
+  GravityInLean.isRicciFlatAt_inNewCoords GravityInLean.inverse_inNewCoords
+  GravityInLean.isRicciFlatAt_changeOfCoords
+  GravityInLean.schwarzschild_ricciFlat_inNewCoords GravityInLean.inNewCoords_toSchw
+  GravityInLean.eddington_ricciFlat_from_schwarzschild GravityInLean.stepLength_inNewCoords
+  GravityInLean.birkhoff_general_inNewCoords
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean
