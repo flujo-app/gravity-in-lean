@@ -537,6 +537,30 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
 .setup .sensor { fill: var(--mark); stroke: var(--ink); stroke-width: 1.5; }
 .setup .lbl { fill: var(--ink-soft); font-family: var(--font-mono); font-size: 17px; }
 
+/* SVG: paths and clocks */
+.pathfig .ground { stroke: var(--grid-strong); stroke-width: 2; }
+.pathfig .alt { fill: none; stroke: var(--ink-soft); stroke-width: 1.3; opacity: 0.4; }
+.pathfig .bundle { fill: var(--mark); opacity: 0.6; }
+.pathfig .best { fill: none; stroke: var(--ink); stroke-width: 4.5; stroke-linecap: round; }
+.pathfig .mine { fill: none; stroke: var(--a); stroke-width: 3.5; stroke-dasharray: 11 7; stroke-linecap: round; }
+.pathfig .end { fill: var(--ink); }
+.pathfig .lbl, .chainfig .lbl { fill: var(--ink-soft); font-family: var(--font-mono); font-size: 17px; }
+.plabel {
+  font-family: var(--font-body);
+  font-size: 19px;
+  font-weight: 700;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--paper-raised);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+}
+.plabel.c-a { fill: var(--a); }
+.chainfig .chain { fill: none; stroke: var(--ink-soft); stroke-width: 1.8; stroke-linejoin: round; }
+.chainfig .agree { fill: none; stroke: var(--mark); stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+.chainfig .sum { stroke: var(--ink); fill: var(--ink); stroke-linecap: round; stroke-linejoin: round; }
+.chainfig .me { fill: var(--paper-raised); stroke: var(--a); stroke-width: 3.5; }
+
 @media (prefers-reduced-motion: reduce) {
   .handle.hint .h-pulse { animation: none; opacity: 0.45; transform: scale(1); }
   .h-ring { transition: none; }
@@ -547,7 +571,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
   <header class="masthead">
     <p class="eyebrow">Maths for quantum physics · Lesson 1</p>
     <h1>Arrows to Amplitudes</h1>
-    <p class="intro">Quantum mechanics is written in arrows. In five short chapters you'll drag arrows around, watch the numbers follow, and answer a question or two in each. Work out your answer first, then check it. No school maths needed.</p>
+    <p class="intro">Quantum mechanics is written in arrows. In six short chapters you'll drag arrows around, watch the numbers follow, and answer a question or two in each. Work out your answer first, then check it. No school maths needed.</p>
   </header>
 
   <nav class="chapters" id="chapters" aria-label="Chapters">
@@ -557,6 +581,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
       <li><button type="button" data-go="stretching"><span class="num">3</span>Stretching</button></li>
       <li><button type="button" data-go="matrices"><span class="num">4</span>Matrices</button></li>
       <li><button type="button" data-go="interference"><span class="num">5</span>Interference</button></li>
+      <li><button type="button" data-go="paths"><span class="num">6</span>Paths and clocks</button></li>
     </ol>
   </nav>
 
@@ -564,7 +589,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     <!-- Chapter 1 -->
     <section class="chapter" id="ch-arrows" aria-labelledby="h-arrows">
       <div class="text">
-        <p class="kicker">Chapter 1 of 5</p>
+        <p class="kicker">Chapter 1 of 6</p>
         <h2 id="h-arrows">A vector is an arrow</h2>
         <p>A vector is an arrow that starts at the centre of the grid. Two numbers describe it completely: how many steps it goes right, and how many steps it goes up. Negative numbers mean left or down.</p>
         <p>Drag the dot at the tip of the blue arrow and watch the numbers change. Physicists write the two numbers stacked inside brackets, with the right-steps on top.</p>
@@ -589,7 +614,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     <!-- Chapter 2 -->
     <section class="chapter" id="ch-adding" aria-labelledby="h-adding" hidden>
       <div class="text">
-        <p class="kicker">Chapter 2 of 5</p>
+        <p class="kicker">Chapter 2 of 6</p>
         <h2 id="h-adding">Adding means walking one arrow, then the other</h2>
         <p>To add two arrows, walk along the first one. Then, from wherever you ended up, walk along the second. The sum is the arrow from the start to where you finished.</p>
         <p>In numbers, you add the matching parts. Right-steps go with right-steps, and up-steps go with up-steps.</p>
@@ -613,7 +638,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     <!-- Chapter 3 -->
     <section class="chapter" id="ch-stretching" aria-labelledby="h-stretching" hidden>
       <div class="text">
-        <p class="kicker">Chapter 3 of 5</p>
+        <p class="kicker">Chapter 3 of 6</p>
         <h2 id="h-stretching">Multiplying by a number stretches the arrow</h2>
         <p>Multiplying an arrow by a number multiplies both of its parts. Times 2 makes it twice as long. Times 0.5 makes it half as long.</p>
         <p>A negative number flips the arrow around. That's also how subtraction works: a − b is the same as a + (−1) × b.</p>
@@ -640,7 +665,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     <!-- Chapter 4 -->
     <section class="chapter has-after" id="ch-matrices" aria-labelledby="h-matrices" hidden>
       <div class="text">
-        <p class="kicker">Chapter 4 of 5</p>
+        <p class="kicker">Chapter 4 of 6</p>
         <h2 id="h-matrices">A matrix moves every arrow at once</h2>
         <p>Two small arrows hold up the whole grid. <b class="t-i">î</b> (say “i-hat”) points one step right, and <b class="t-j">ĵ</b> (“j-hat”) points one step up. Every other arrow is built from them. The arrow v with numbers 2 and 1 means 2 × <b class="t-i">î</b> plus 1 × <b class="t-j">ĵ</b>.</p>
         <p>Drag the tips of <b class="t-i">î</b> and <b class="t-j">ĵ</b>. The whole grid follows, and so does v, because it's still 2 × <b class="t-i">î</b> plus 1 × <b class="t-j">ĵ</b>.</p>
@@ -684,7 +709,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     <!-- Chapter 5 -->
     <section class="chapter has-after" id="ch-interference" aria-labelledby="h-interference" hidden>
       <div class="text">
-        <p class="kicker">Chapter 5 of 5</p>
+        <p class="kicker">Chapter 5 of 6</p>
         <h2 id="h-interference">Arrows that cancel make the stripes</h2>
         <p>Back to the double slit. Quantum mechanics gives each way a photon could travel its own arrow, called an <i>amplitude</i>.</p>
         <p>As a path gets longer, its arrow turns, like the hand of a clock. The paths through the two slits have slightly different lengths, so by the time they reach the screen their arrows point in different directions.</p>
@@ -726,11 +751,71 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
       </div>
       <div class="text after">
         <p class="aside">A which-path detector is one example of what physicists call decoherence. The arrows stop adding, so the stripes go away. Nothing in this maths decides which slit the photon really took, though. That missing piece is the measurement problem.</p>
+      </div>
+      <div class="chapter-foot">
+        <button class="btn" type="button" data-go="matrices">← Matrices</button>
+        <button class="btn solid" type="button" data-go="paths">Next: Paths and clocks →</button>
+      </div>
+    </section>
+
+    <!-- Chapter 6 -->
+    <section class="chapter has-after" id="ch-paths" aria-labelledby="h-paths" hidden>
+      <div class="text">
+        <p class="kicker">Chapter 6 of 6</p>
+        <h2 id="h-paths">Every path gets an arrow, and a clock turns it</h2>
+        <p>In chapter 5 a photon had two ways to go. Feynman’s rule goes much further: take <i>every</i> path from start to finish, give each one its own arrow, and add them all up tip to tail.</p>
+        <p>What turns each arrow is the particle’s own clock. Along every path, the arrow turns a little with each tick of the clock the particle carries along that path.</p>
+        <p>Here a ball is thrown straight up and caught at the same spot a moment later. Sideways is time and up is height, so each line is one possible flight: higher arcs, lower arcs, and some that dip below the start.</p>
+        <h3>Where the arrows agree</h3>
+        <p>Paths close to the one with the most clock time have almost the same clock time, so their arrows point almost the same way and add up. Further out, neighbouring paths differ more and more, and their arrows spin round and cancel. <mark>Only a bundle of paths around the most-clock-time path survives.</mark> It is shaded yellow.</p>
+        <h3>Turn up gravity</h3>
+        <p>Higher up, clocks tick faster, so climbing earns clock time. But to get high and still be back on time, the ball has to move fast, and moving costs clock time. The best trade-off is an arc that goes up and comes back down: the flight of a thrown ball. Nobody tells the arrows that. It is simply where they stop cancelling.</p>
+        <h3>Make it heavier</h3>
+        <p>A heavier thing’s arrow turns more times per tick. Then even paths close to the best one disagree, and the bundle that survives gets thinner.</p>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <svg id="paths" class="pathfig" role="img" aria-label="Possible flights of a ball drawn as arcs, with time going right and height going up. The path with the most clock time is drawn thick, the paths whose arrows agree with it are shaded yellow, and your chosen path is blue."></svg>
+          <figcaption>Each line is one possible flight. The thick line has the most clock time. The yellow bundle is the paths whose arrows agree with it to within half a turn. Your path is the blue dashed line.</figcaption>
+        </figure>
+        <div class="control">
+          <label for="grav">Gravity <output id="grav-out" for="grav">6</output></label>
+          <input type="range" id="grav" min="0" max="12" step="0.5" value="6">
+          <div class="range-ends" aria-hidden="true"><span>none</span><span>strong</span></div>
+        </div>
+        <div class="control">
+          <label for="heavy">How heavy: the arrow turns <output id="heavy-out" for="heavy">2</output> times per tick</label>
+          <input type="range" id="heavy" min="0.5" max="8" step="0.5" value="2">
+          <div class="range-ends" aria-hidden="true"><span>light</span><span>heavy</span></div>
+        </div>
+        <div class="control">
+          <label for="mypath">Your path climbs to <output id="mypath-out" for="mypath">0.2</output></label>
+          <input type="range" id="mypath" min="-1.6" max="3.2" step="0.01" value="0.2">
+          <div class="range-ends" aria-hidden="true"><span>dips low</span><span>climbs high</span></div>
+        </div>
+        <figure class="figure">
+          <svg id="chain" class="chainfig" role="img" aria-label="The arrows of all the paths added tip to tail. The ends curl up into tight spirals and the middle makes one long sweep."></svg>
+          <figcaption>All the arrows, added tip to tail, from the lowest path to the highest. Where they curl into tight spirals they cancel. The long yellow stretch in the middle is the bundle that agrees, and it makes almost all of the <b>sum</b>. The blue dot is your path.</figcaption>
+        </figure>
+        <div class="pair">
+          <figure class="figure">
+            <svg id="clock" role="img" aria-label="The arrow of the best path and the arrow of your path on a clock face"></svg>
+            <figcaption>The <b>best</b> path’s arrow and <b class="t-a">yours</b>, on the clock face. The picture is turned so the best one points right.</figcaption>
+          </figure>
+          <div class="readout" id="out-paths"></div>
+        </div>
+        <div class="questions" id="q-paths"></div>
+      </div>
+      <div class="text after">
+        <p class="aside"><b>Real numbers.</b> An electron’s arrow turns about 10²⁰ times a second, a 1 kg ball’s about 10⁵⁰ times. For a flight of one second, an electron’s surviving bundle is about a centimetre wide. A ball’s is about 10⁻¹⁷ m, ten million times thinner than an atom. So a ball follows one path, and an electron keeps a wide bundle, which is how it can make stripes.</p>
+        <p class="aside"><b>Measured.</b> In 1975 Colella, Overhauser and Werner sent neutrons along a higher and a lower path. Gravity shifted their stripes by close to the amount this rule predicts.</p>
+        <p class="aside"><b>What’s simplified.</b> The real sum also includes every wiggly path. Wiggling only costs clock time, so those arrows cancel in the same way. Gravity, heights, ticks and “how heavy” are in made-up units. All paths also share one enormous amount of turning that comes from the mass alone. It is the same for every path, so the picture leaves it out.</p>
+        <p class="aside"><b>And pilot waves?</b> This sum of arrows is the wave. In pilot-wave theory the wave really does feel out every path, while the particle rides just one of them, steered by the wave.</p>
         <h3>Next lesson</h3>
         <p>Complex numbers. Physicists write these clock-hand arrows as complex numbers, which are arrows with one extra rule for multiplying. That rule is what makes them turn.</p>
       </div>
       <div class="chapter-foot">
-        <button class="btn" type="button" data-go="matrices">← Matrices</button>
+        <button class="btn" type="button" data-go="interference">← Interference</button>
         <button class="btn solid" type="button" data-go="arrows">Back to the start</button>
       </div>
     </section>
@@ -742,7 +827,7 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
   'use strict';
   const NS = 'http://www.w3.org/2000/svg';
   const MINUS = '−';
-  const ORDER = ['arrows', 'adding', 'stretching', 'matrices', 'interference'];
+  const ORDER = ['arrows', 'adding', 'stretching', 'matrices', 'interference', 'paths'];
   const STORE = 'arrows-to-amplitudes:v2';
   const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -1331,6 +1416,162 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     };
   }
 
+  /* ---------- Chapter 6: paths and clocks ----------
+     A ball is thrown straight up and caught at the start height after one unit of time.
+     The paths drawn are arcs y(s) = 4 H s (1 − s), s = time / flight time, peaking at height H.
+     Extra clock time along a path, compared with a clock that stays at the start height
+     (weak gravity, made-up units): climbing earns g × average height = (2/3) g H, and moving
+     costs half the average squared speed = (8/3) H². The best arc peaks at H = g / 8, which is
+     the real flight of a thrown ball. The arrow turns K times per tick, so the arrow of path H
+     lags the best path's arrow by K × (8/3) × (H − g/8)² turns. */
+  function initPaths() {
+    const HMIN = -1.6, HMAX = 3.2, N = 4800, DH = (HMAX - HMIN) / N;
+    const st = { g: 6, k: 2, h: 0.2 };
+    const best = () => st.g / 8;
+    const gain = h => (2 / 3) * st.g * h;
+    const cost = h => (8 / 3) * h * h;
+    const clock = h => gain(h) - cost(h);
+    const half = () => Math.sqrt(3 / (16 * st.k)); // arrows within half a turn of the best one
+    const f1 = n => round2(n).toFixed(1).replace('-', MINUS);
+    const signed = n => (round2(n) > 0 ? '+' : '') + f2(n);
+
+    // Figure 1: the paths, with time going right and height going up.
+    const svg = document.getElementById('paths');
+    svg.setAttribute('viewBox', '0 0 600 390');
+    const X0 = 64, X1 = 560, YT = 34, YB = 352;
+    const X = t => X0 + t * (X1 - X0);
+    const Y = h => YB - (h - HMIN) / (HMAX - HMIN) * (YB - YT);
+    const arcPts = h => {
+      const pts = [];
+      for (let n = 0; n <= 60; n++) { const t = n / 60; pts.push([X(t), Y(4 * h * t * (1 - t))]); }
+      return pts;
+    };
+    const pstr = pts => pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const gradId = 'fast-grad';
+    const grad = s('linearGradient', { id: gradId, x1: 0, y1: 1, x2: 0, y2: 0 }, s('defs', null, svg));
+    s('stop', { offset: 0, style: 'stop-color: var(--i); stop-opacity: 0' }, grad);
+    s('stop', { offset: 1, style: 'stop-color: var(--i); stop-opacity: 1' }, grad);
+    const pg = s('g', null, svg);
+    const fast = s('rect', { x: X0, y: YT - 20, width: X1 - X0, height: Y(0) - YT + 20, fill: 'url(#' + gradId + ')' }, pg);
+    const fastLab = s('text', { x: X1 - 4, y: YT - 4, class: 'lbl', 'text-anchor': 'end' }, pg);
+    fastLab.textContent = 'higher up, clocks tick faster';
+    const bundle = s('polygon', { class: 'bundle' }, pg);
+    for (let h = HMIN; h <= HMAX + 1e-9; h += 0.2) s('polyline', { points: pstr(arcPts(h)), class: 'alt' }, pg);
+    s('line', { x1: X0, y1: Y(0), x2: X1, y2: Y(0), class: 'ground' }, pg);
+    const bestL = s('polyline', { class: 'best' }, pg);
+    const mineL = s('polyline', { class: 'mine' }, pg);
+    s('circle', { cx: X0, cy: Y(0), r: 7, class: 'end' }, pg);
+    s('circle', { cx: X1, cy: Y(0), r: 7, class: 'end' }, pg);
+    s('text', { x: X0 - 8, y: Y(0) + 28, class: 'lbl', 'text-anchor': 'middle' }, pg).textContent = 'start';
+    s('text', { x: X1, y: Y(0) + 28, class: 'lbl', 'text-anchor': 'middle' }, pg).textContent = 'catch';
+    s('text', { x: X1, y: 382, class: 'lbl', 'text-anchor': 'end' }, pg).textContent = 'time →';
+    s('text', { x: 8, y: 20, class: 'lbl' }, pg).textContent = 'height ↑';
+    const bestLab = s('text', { class: 'plabel', 'text-anchor': 'middle' }, pg);
+    bestLab.textContent = 'most clock time';
+    const mineLab = s('text', { class: 'plabel c-a', 'text-anchor': 'middle' }, pg);
+    mineLab.textContent = 'your path';
+
+    // Figure 2: every path's arrow, added tip to tail.
+    const csvg = document.getElementById('chain');
+    const CW = 600, CH = 300, PAD = 26;
+    csvg.setAttribute('viewBox', '0 0 ' + CW + ' ' + CH);
+    const cg = s('g', null, csvg);
+    const agreeL = s('polyline', { class: 'agree' }, cg);
+    const chainL = s('polyline', { class: 'chain' }, cg);
+    const sumG = s('g', { class: 'sum' }, cg);
+    const sumLine = s('line', { 'stroke-width': 5 }, sumG);
+    const sumHead = s('polygon', { 'stroke-width': 2 }, sumG);
+    const sumLab = s('text', { class: 'plabel', 'text-anchor': 'middle' }, cg);
+    sumLab.textContent = 'sum';
+    const meDot = s('circle', { r: 8, class: 'me' }, cg);
+    const xs = new Float64Array(N + 1), ys = new Float64Array(N + 1);
+
+    // Figure 3: the best arrow and yours on a clock face.
+    const CB = new Board(document.getElementById('clock'), { range: 1.6, size: 300, labelEvery: 0 });
+    s('circle', { cx: CB.c, cy: CB.c, r: CB.unit, class: 'clockface' }, CB.grid);
+    const bestA = new Arrow(CB, 'ink', { width: 6, label: 'best', side: 'midR', layer: CB.under });
+    const mineA = new Arrow(CB, 'a', { width: 5, label: 'yours' });
+
+    const out = document.getElementById('out-paths');
+    const gIn = document.getElementById('grav'), kIn = document.getElementById('heavy'), hIn = document.getElementById('mypath');
+    const gOut = document.getElementById('grav-out'), kOut = document.getElementById('heavy-out'), hOut = document.getElementById('mypath-out');
+
+    function render() {
+      const hb = best(), cb = clock(hb), w = half(), h = st.h;
+      // Figure 1
+      fast.style.opacity = String(0.22 * st.g / 12);
+      fastLab.style.display = st.g > 0 ? '' : 'none';
+      const lo = Math.max(HMIN, hb - w), hi = Math.min(HMAX, hb + w);
+      bundle.setAttribute('points', pstr(arcPts(hi)) + ' ' + pstr(arcPts(lo).reverse()));
+      bestL.setAttribute('points', pstr(arcPts(hb)));
+      mineL.setAttribute('points', pstr(arcPts(h)));
+      const bx = X(0.5), by = Y(hb);
+      setA(bestLab, { x: bx, y: by - 14 });
+      const mt = 0.2, my = Y(4 * h * mt * (1 - mt));
+      setA(mineLab, { x: X(mt) + 6, y: h >= 0 ? my - 12 : my + 26 });
+      // Figure 2
+      let x = 0, y = 0, minX = 0, maxX = 0, minY = 0, maxY = 0;
+      xs[0] = 0; ys[0] = 0;
+      for (let n = 0; n < N; n++) {
+        const hh = HMIN + (n + 0.5) * DH;
+        const a = 2 * Math.PI * st.k * (clock(hh) - cb); // never positive: every other path lags the best one
+        x += Math.cos(a) / N; y += Math.sin(a) / N;
+        xs[n + 1] = x; ys[n + 1] = y;
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+      const sc = Math.min((CW - 2 * PAD) / Math.max(1e-9, maxX - minX), (CH - 2 * PAD - 24) / Math.max(1e-9, maxY - minY));
+      const ox = CW / 2 - sc * (minX + maxX) / 2, oy = (CH - 24) / 2 + sc * (minY + maxY) / 2;
+      const cx = n => ox + sc * xs[n], cy = n => oy - sc * ys[n];
+      const all = [];
+      for (let n = 0; n <= N; n += 2) all.push(cx(n).toFixed(1) + ',' + cy(n).toFixed(1));
+      chainL.setAttribute('points', all.join(' '));
+      const i0 = Math.max(0, Math.floor((lo - HMIN) / DH)), i1 = Math.min(N, Math.ceil((hi - HMIN) / DH));
+      const ag = [];
+      for (let n = i0; n <= i1; n++) ag.push(cx(n).toFixed(1) + ',' + cy(n).toFixed(1));
+      agreeL.setAttribute('points', ag.join(' '));
+      const p0 = [cx(0), cy(0)], p1 = [cx(N), cy(N)];
+      const dx = p1[0] - p0[0], dy = p1[1] - p0[1], len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
+      const hl = Math.min(20, len * 0.4), hw = hl * 0.5, bx2 = p1[0] - ux * hl, by2 = p1[1] - uy * hl;
+      setA(sumLine, { x1: p0[0], y1: p0[1], x2: bx2, y2: by2 });
+      sumHead.setAttribute('points', p1[0] + ',' + p1[1] + ' ' + (bx2 - uy * hw) + ',' + (by2 + ux * hw) + ' ' + (bx2 + uy * hw) + ',' + (by2 - ux * hw));
+      setA(sumLab, { x: (p0[0] + p1[0]) / 2 - uy * 26, y: Math.min(CH - 8, (p0[1] + p1[1]) / 2 + ux * 26 + 7) });
+      const im = Math.max(0, Math.min(N, Math.round((h - HMIN) / DH)));
+      setA(meDot, { cx: cx(im), cy: cy(im) });
+      // Figure 3 and the numbers
+      const lagTicks = cb - clock(h), lagTurns = st.k * lagTicks;
+      const a = -2 * Math.PI * lagTurns;
+      bestA.set([0, 0], [1, 0]);
+      mineA.set([0, 0], [Math.cos(a), Math.sin(a)]);
+      const agrees = Math.abs(h - hb) < w;
+      const share = Math.round(100 * (hi - lo) / (HMAX - HMIN));
+      gOut.textContent = fmt(st.g);
+      kOut.textContent = fmt(st.k);
+      hOut.textContent = fmt(h);
+      out.innerHTML =
+        '<div class="eq"><span>' + (h < 0 ? 'dipping low costs' : 'climbing earns') + '</span><b>' + signed(gain(h)) + '</b><span class="words">ticks</span></div>' +
+        '<div class="eq"><span>moving costs</span><b>' + f2(-cost(h)) + '</b><span class="words">ticks</span></div>' +
+        '<div class="eq"><span>your clock time</span><b>' + signed(clock(h)) + '</b><span class="words">ticks</span></div>' +
+        '<div class="eq"><span>best path</span><b>' + signed(cb) + '</b><span class="words">ticks, climbs to ' + fmt(hb) + '</span></div>' +
+        '<div class="eq"><span>your arrow lags by</span><span>' + f2(lagTicks) + ' × ' + fmt(st.k) + '</span><span>=</span><b>' + f1(lagTurns) + ' turns</b></div>' +
+        '<div class="eq"><span class="pill' + (agrees ? ' lit' : '') + '">' + (agrees ? 'Agrees with the best path' : 'Cancels with its neighbours') + '</span></div>' +
+        '<div class="note">About ' + share + '% of the arcs drawn agree with the best one.</div>';
+    }
+
+    gIn.addEventListener('input', () => { st.g = parseFloat(gIn.value); render(); });
+    kIn.addEventListener('input', () => { st.k = parseFloat(kIn.value); render(); });
+    hIn.addEventListener('input', () => { st.h = parseFloat(hIn.value); render(); });
+    st.g = parseFloat(gIn.value); st.k = parseFloat(kIn.value); st.h = parseFloat(hIn.value);
+    render();
+    return {
+      show: (g, k, h) => {
+        st.g = g; st.k = k; st.h = h;
+        gIn.value = String(g); kIn.value = String(k); hIn.value = String(h);
+        render();
+      }
+    };
+  }
+
   /* ---------- questions: work out an answer, then check it ---------- */
   function parseNum(raw) {
     const t = String(raw).trim().replace(/[−–—]/g, '-').replace(',', '.');
@@ -1423,6 +1664,34 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
           right: 'Right. Each squared length is positive, so they can’t cancel. The dark stripe fills in and the pattern becomes one smooth blob.',
           hint: 'With a detector, you square each arrow first and then add. Can two positive numbers add up to zero?',
           show: () => api.interference.show('which', 0.2)
+        }
+      ],
+      paths: [
+        {
+          id: 'paths-straight', kind: 'choice',
+          prompt: 'Gravity is switched off. Which flight has the most clock time?',
+          options: ['A high arc, because it travels further', 'The flat line: the ball just stays at the start height', 'They all have the same clock time'],
+          answer: 1,
+          right: 'Right. Without gravity, climbing earns nothing, and every bit of moving costs clock time. So staying put wins. In empty space, “the path with the most clock time” is just another way of saying “the straight line”.',
+          hint: 'Turn gravity down to none and watch the readout. What does climbing earn now, and what does moving cost?',
+          show: () => api.paths.show(0, 2, 1)
+        },
+        {
+          id: 'paths-heavier', kind: 'choice',
+          prompt: 'You make the ball heavier. What happens to the yellow bundle of paths that agree?',
+          options: ['It gets wider', 'It gets thinner', 'It stays the same'],
+          answer: 1,
+          right: 'Right. Each arrow turns more times per tick, so even close neighbours of the best path end up pointing different ways. For a real ball the bundle is far thinner than an atom, so you only ever see one path.',
+          hint: 'More turns per tick means a small difference in clock time becomes a big difference in where the arrow points.',
+          show: () => api.paths.show(6, 8, 0.75)
+        },
+        {
+          id: 'paths-turns', kind: 'number', label: 'turns',
+          prompt: 'Your path has 0.5 ticks less clock time than the best path, and the arrow turns 4 times per tick. How many turns does your arrow lag behind the best one?',
+          answer: [2],
+          right: 'Right. 4 × 0.5 = 2 whole turns, so this one arrow happens to point the same way as the best one again. But its neighbours lag by a bit less and a bit more than 2 turns, so out here the arrows still go all the way round and cancel. What counts is whether neighbouring arrows agree.',
+          hint: 'Each tick turns the arrow 4 times. How many turns do half a tick make?',
+          show: () => api.paths.show(6, 4, 1.18)
         }
       ]
     };
@@ -1574,7 +1843,8 @@ input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--
     adding: initAdding(),
     stretching: initStretching(),
     matrices: initMatrices(),
-    interference: initInterference()
+    interference: initInterference(),
+    paths: initPaths()
   };
   buildQuestions(api);
   show(location.hash.slice(1), false);
