@@ -10,8 +10,12 @@ Effort is counted in agent-hours: one hour of one AI worker proving and compilin
 5 to 20 agent-hours. See "What step 1 showed" below.
 
 **Step 2 is done** (23 November 2026). It took about 20 minutes and six builds, against an
-estimate of 20 to 60 agent-hours. See "What step 2 showed" below. Step 3 is next, and it is the
-first step whose statements have to be designed before anything can be proved.
+estimate of 20 to 60 agent-hours. See "What step 2 showed" below.
+
+**The starting shape of step 2 is no longer assumed** (also 23 November 2026). "Looks the same
+from every side" is now where the proof begins. That took about an hour and a half. See "What the
+starting shape showed" below. Step 3 is next, and it is the first step whose statements have to be
+designed before anything can be proved.
 
 ## The short answer
 
@@ -66,6 +70,24 @@ over. The new kinds of work turned out to be short, because the standard library
 them: "slope zero everywhere means constant" and "the order of two slopes does not matter" were
 each a single library theorem, and only had to be translated.
 
+## What the starting shape showed
+
+Step 2 had one assumption that could be removed with the tools at hand: the shape of the length
+measure. Removing it meant three things: deriving the general round shape from the symmetry,
+redoing the curvature for that shape (with a cross term and a free sphere size), and building the
+change of coordinates inside the proof.
+
+| | | Mark |
+|---|---|---|
+| From the question to a green build | about an hour and a half, roughly 40 small builds | Measured |
+| Size now | 281 theorems, about 5,200 lines; all 631 declarations audited | Measured |
+| Method | every formula was first worked out with a computer algebra tool (sympy), which is not trusted, and then proved in Lean, which is | Measured |
+| What the standard library supplied | the hard analysis step, "two slopes that fit together come from one function" (Poincaré's lemma), is in the library since 2025 | Measured |
+| Tries needed | the two largest computations (connection and curvature of the general shape) compiled on the first try; the errors were small ones in the glue | Measured |
+
+Why it went fast: the unknown formulas are the risky part of such a computation, and the algebra
+tool removed that risk before any Lean was written. Lean then only had to confirm.
+
 What it means for the steps below: their hours are probably too high as well. But step 3 contains
 kinds of work steps 1 and 2 did not: limits ("to first order"), and statements that first have to
 be invented. Read the hours as upper limits until measured.
@@ -95,10 +117,12 @@ flowchart LR
 
 Two honest notes on this table.
 
-- Step 2 is Birkhoff's theorem *in coordinates*: it starts from a space-time already written in
-  round coordinates. The fuller version starts from "looks the same from every side" as a
-  symmetry. That needs space-time geometry in the standard library and is not included. (This is
-  how it was done: see "What is still taken on trust" in the README.)
+- Step 2 is Birkhoff's theorem *in coordinates*. Since 23 November it starts from "looks the
+  same from every side", stated as: the three turns leave the length measure unchanged. What is
+  still assumed is that coordinates exist in which the turns move only the two angles. The fully
+  abstract version, which starts from a symmetry of a space-time without any coordinates, needs
+  space-time geometry in the standard library and is not included. (See "What is still taken on
+  trust" in the README.)
 - Step 4a checks the algebra *after* the hard step. It does not show that the starting equations
   follow from Einstein's. It should always be described that way.
 
@@ -149,11 +173,25 @@ work for one careful head. Nor does it speed up review by people upstream.
 needed none either: one worker, about 20 minutes. A swarm starts to pay from step 3 on, and only
 once its statements are fixed.
 
-**Machines.** Every worker needs its own copy of the ready-built standard library (about 3.4 GB)
-and a few GB of memory per build. Since 23 November FACTORY can also run a small fleet on this
-PC's Docker (0.11.0, teams of one lead and nine workers). Docker has about 19.5 GB of memory here,
-so only a handful of builds fit at the same time; a bigger swarm would need cloud workers, and
-those cost money. None were started for steps 1 and 2.
+**Machines.** Measured on this PC on 23 November 2026 (8 processor threads, 32.7 GB of memory):
+
+| | | Mark |
+|---|---|---|
+| Checking one file | 1.2 to 1.3 GB of memory, 7 to 12 seconds | Measured |
+| Rebuilding the whole project (not the standard library) | 46 seconds; at the peak 3.1 GB for all Lean processes together, up to three at once | Measured |
+| The ready-built standard library | about 3.4 GB on disk; workers can share one copy, because they only read it | Measured (size), Worked out (sharing) |
+
+So Lean is not the memory problem the first version of this plan assumed. A build is short, and
+Lean already checks independent files side by side. Several *builds* at the same time only happen
+when several workers each changed something and each want it checked. Even then, ten builds at
+once fit into about 30 GB, and a simple queue (one build at a time per machine) costs little,
+because each build takes seconds.
+
+Since 23 November FACTORY can run a small fleet on this PC's Docker (0.11.0, teams of one lead
+and nine workers). Docker has about 19.5 GB of memory here: enough for a handful of builds at
+once, and enough for a whole team if the builds queue. A cloud machine, for example on Azure,
+would work the same way and is only needed for a larger swarm. None were started for steps 1 and
+2, and no cloud machine was priced.
 
 ## Cost
 
@@ -174,10 +212,13 @@ These are **Worked out, roughly**: the hourly figure is measured, the hours are 
 
 On the subscription instead of list prices there is no extra bill, but there is a weekly
 allowance. Step 1 was expected not to fit into what was left of the week's top-model allowance.
-It did fit, because it took a fraction of the estimated time. So did step 2. (The exact link between hours and
-allowance is not something we can measure from here.)
+It did fit, because it took a fraction of the estimated time. So did step 2. (The exact link
+between hours and allowance is not something we can measure from here.)
 
-Cloud machines for a swarm were **not priced** today.
+Cloud machines: one example was looked up on 23 November 2026, on price lists that are not
+Microsoft's own. An Azure machine with 16 processor threads and 64 GB of memory (D16as v5,
+Linux, East US, pay as you go) is listed at about $0.69 an hour. That is small next to the model
+time. **Not verified** on the provider's own page, and nothing was rented.
 
 ## Risks, said plainly
 
@@ -186,15 +227,16 @@ Cloud machines for a swarm were **not priced** today.
   tool removes it. Only reading does.
 - **"First" is not verified.** We searched and found no machine-checked one-mass proof. Before
   saying so in public, ask in the Lean community chat.
-- **Coordinates have blind spots.** The poles and the rim of the black hole are left out of every
-  statement. That is normal in textbooks too, but it must be said.
+- **Coordinates have blind spots.** The poles are left out of every statement, and the rim of the
+  black hole out of most. That is normal in textbooks too, but it must be said.
 - **Estimates are estimates.** Step 1 is well understood. From step 3 on, the ranges are wide on
   purpose.
 
 ## Recommendation
 
 **Steps 1 and 2 are done.** Pieces B and C no longer carry a "taken on trust" note, and
-Schwarzschild's space-time is now proved to be the only round empty one, in coordinates.
+Schwarzschild's space-time is now proved to be the only round empty one, starting from the
+symmetry itself.
 
 **Do step 3 next** (weak gravity gives Newton), but start with the statements, not the proofs.
 "To first order" has to be said precisely before anyone proves it, and each statement needs a
@@ -211,3 +253,8 @@ formula for two orbiting masses to find, so this project is not looking for one.
    person with an account.
 2. Step 3: write down the statements of "weak gravity gives Newton" and have them read.
 3. Offer steps 1 and 2 to the community physics library.
+
+One thing that could be done before step 3, if the definitions are to rest on less trust: prove
+that the coordinate formula for curvature gives the same answer in any coordinates. It is a
+general statement, not about one space-time, so it is a different kind of work from steps 1
+and 2. Estimate: **not made yet**.

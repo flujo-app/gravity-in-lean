@@ -48,22 +48,6 @@ open Real Filter Topology Set
 /-- The constant function 1 of time and distance. -/
 noncomputable def one2 (_t _ρ : ℝ) : ℝ := 1
 
-theorem dt_onlyR_fun (f : ℝ → ℝ) : dt (onlyR f) = zero2 := by
-  funext t r
-  simp [dt, onlyR, zero2]
-
-theorem dr_onlyR_fun (f : ℝ → ℝ) : dr (onlyR f) = onlyR (deriv f) := by
-  funext t r
-  simp [dr, onlyR]
-
-theorem dt_zero2_fun : dt zero2 = zero2 := by
-  funext t r
-  simp [dt, zero2]
-
-theorem dr_zero2_fun : dr zero2 = zero2 := by
-  funext t r
-  simp [dr, zero2]
-
 theorem dt_one2_fun : dt one2 = zero2 := by
   funext t r
   simp [dt, one2, zero2]

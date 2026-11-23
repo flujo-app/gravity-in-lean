@@ -84,9 +84,9 @@ quietly go stale. -/
   GravityInLean.roundOrbit_kepler GravityInLean.roundOrbit_exists
   GravityInLean.roundOrbit_needs_room GravityInLean.budget GravityInLean.budget_light
 
--- Probe: curvature from the general formulas, on a sphere
+-- Probes: curvature from the general formulas, on a sphere and for de Sitter's space-time
 #audit GravityInLean.christoffel_sphere GravityInLean.sphereG_mul_sphereGinv
-  GravityInLean.ricci_sphere
+  GravityInLean.ricci_sphere GravityInLean.ricci_deSitter
 
 -- Step 1: the round space-time and free fall, from the general definitions
 #audit GravityInLean.christoffel_round GravityInLean.round_ricciFlat_iff
@@ -99,13 +99,15 @@ quietly go stale. -/
   GravityInLean.christoffel_changing GravityInLean.changing_ricciFlat_iff
   GravityInLean.changingG_mul_changingGinv GravityInLean.changingG_static
   GravityInLean.static_unique GravityInLean.birkhoff GravityInLean.birkhoff_nothingChanges
-  GravityInLean.birkhoff_resetClocks GravityInLean.schwarzschild_setting
+  GravityInLean.birkhoff_resetClocks GravityInLean.birkhoff_mass_unique
+  GravityInLean.schwarzschild_setting
   GravityInLean.schwarzschild_isEmptyOn GravityInLean.relabelled_isEmptyOn
 
 -- Step 2, from symmetry: the general round shape, and Birkhoff's theorem without a starting shape
 #audit GravityInLean.christoffel_gen GravityInLean.genG_mul_genGinv GravityInLean.genG_diagonal
   GravityInLean.gen_ricciFlat_iff GravityInLean.sizeEquations GravityInLean.exists_potential
-  GravityInLean.massFn_const GravityInLean.newTime_closed GravityInLean.relabel_path
+  GravityInLean.massFn_const GravityInLean.usable_somewhere GravityInLean.massFn_schwarzschild
+  GravityInLean.newTime_closed GravityInLean.relabel_path
   GravityInLean.birkhoff_general GravityInLean.rotX_turns GravityInLean.rotY_turns
   GravityInLean.rotZ_turns GravityInLean.shape_of_round GravityInLean.genG_isRound
   GravityInLean.birkhoff_of_round GravityInLean.roundEmpty_genG

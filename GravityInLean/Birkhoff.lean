@@ -38,14 +38,17 @@ holds at every point of the region away from the poles.
   length of every step is Schwarzschild's length of the same step. The factor `k(t)` is only a
   choice of how the clocks were labelled.
 * `static_unique`: the core step in the unchanging case, at one moment of time.
+* `birkhoff_mass_unique`: the mass `M` is fixed by the ruler function; it cannot be chosen.
 * `schwarzschild_setting`, `schwarzschild_isEmptyOn`, `relabelled_isEmptyOn`: the assumptions can
   be met, by Schwarzschild's space-time itself and by one whose clock labels really do change.
 
-**What is still assumed.** The starting shape: that a round space-time can be written with just a
-clock function and a ruler function in these coordinates. The textbooks get there from the
-symmetry by a change of coordinates; that step is not done here. The definitions of curvature are
-the classic coordinate formulas, and the poles are left out, as in step 1. The mass `M` is not
-required to be positive: a negative mass also solves the equations, as it does in the textbooks.
+**What is still assumed here.** The starting shape: that a round space-time can be written with
+just a clock function and a ruler function in these coordinates. The textbooks get there from the
+symmetry by a change of coordinates. That step is not done in this file; it is done in
+`Symmetry.lean`, `BirkhoffGeneral.lean` and `BirkhoffFromSymmetry.lean`. The definitions of
+curvature are the classic coordinate formulas, and the poles are left out, as in step 1. The mass
+`M` is not required to be positive: a negative mass also solves the equations, as it does in the
+textbooks.
 -/
 
 @[expose] public section
@@ -310,6 +313,19 @@ theorem birkhoff (h : Setting A B J I) :
     IsEmptyOn A B J I ↔ ∃ M : ℝ, ∃ k : ℝ → ℝ, ∀ t ∈ J, ∀ r ∈ I,
       B t r = schwB M r ∧ A t r = k t * schwA M r :=
   ⟨birkhoff_forward h, birkhoff_converse h⟩
+
+/-- Schwarzschild's ruler function fixes the mass: two masses that give the same ruler function at
+one distance are equal. -/
+theorem schwB_inj {M M' r : ℝ} (hr : r ≠ 0) (h : schwB M r = schwB M' r) : M = M' := by
+  have h1 : 1 - 2 * M / r = 1 - 2 * M' / r := inv_injective h
+  field_simp at h1
+  linarith
+
+/-- **The mass is determined.** The mass `M` in `birkhoff` cannot be chosen: it is fixed by the
+ruler function at any single point of the region. -/
+theorem birkhoff_mass_unique (h : Setting A B J I) {M M' t r : ℝ} (hr : r ∈ I)
+    (h1 : B t r = schwB M r) (h2 : B t r = schwB M' r) : M = M' :=
+  schwB_inj (h.pos r hr).ne' (h1.symm.trans h2)
 
 /-! ## What it means -/
 

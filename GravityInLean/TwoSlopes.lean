@@ -51,6 +51,14 @@ theorem dt_zero2 (t r : ℝ) : dt zero2 t r = 0 := by simp [dt, zero2]
 
 theorem dr_zero2 (t r : ℝ) : dr zero2 t r = 0 := by simp [dr, zero2]
 
+theorem dt_zero2_fun : dt zero2 = zero2 := by
+  funext t r
+  simp [dt, zero2]
+
+theorem dr_zero2_fun : dr zero2 = zero2 := by
+  funext t r
+  simp [dr, zero2]
+
 /-- `F` is twice smoothly differentiable around the point `(t, r)`. -/
 def TwiceSmooth (F : ℝ → ℝ → ℝ) (t r : ℝ) : Prop :=
   ContDiffAt ℝ 2 (Function.uncurry F) (t, r)
