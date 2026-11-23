@@ -29,8 +29,8 @@ shape of the length measure assumed:
   meets them. `Eddington.lean` gives one explicitly.
 
 On the way: the definitions of connection and curvature only look at what happens near a point
-(`slope_congr`, `christoffel_congr`, `ricci_congr`), and a table of numbers has at most one
-inverse (`inverse_unique`).
+(`christoffel_congr`, `ricci_congr`), and a table of numbers has at most one inverse
+(`inverse_unique`).
 
 **What is still assumed.** Coordinates `(t, ρ, θ, φ)` in which the three turns move only the two
 angles, in the usual way; the classic coordinate formulas for curvature; and the poles and the
@@ -44,14 +44,6 @@ namespace GravityInLean
 open Real Filter Topology Set
 
 /-! ## The definitions only look near a point -/
-
-/-- Two functions that agree near `x` have the same slopes at `x`. -/
-theorem slope_congr {n : ℕ} {f f' : Coords n → ℝ} {x : Coords n} (h : f =ᶠ[𝓝 x] f')
-    (i : Fin n) : slope i f x = slope i f' x := by
-  have hc : Tendsto (Function.update x i) (𝓝 (x i)) (𝓝 x) := by
-    have h1 := (hasDerivAt_update x i (x i)).continuousAt.tendsto
-    rwa [Function.update_eq_self] at h1
-  exact Filter.EventuallyEq.deriv_eq (hc.eventually h)
 
 /-- Two length measures that agree near `x`, with inverses that agree near `x`, have connections
 that agree near `x`. -/
