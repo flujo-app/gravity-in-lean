@@ -126,7 +126,7 @@ theorem sphere_regular : IsRegularTableOn sphereG sphereGinv sphereRegion where
   isOpen := isOpen_sphereRegion
   smooth := fun a b ↦ by
     have h : ContDiff ℝ ∞ (fun x : Coords 2 ↦ sin (x 0) ^ 2) :=
-      (Real.contDiff_sin.comp (contDiff_apply ℝ ℝ (0 : Fin 2))).pow 2
+      (Real.contDiff_sin.comp (contDiff_apply ℝ (fun _ : Fin 2 ↦ ℝ) 0)).pow 2
     unfold sphereG
     split_ifs
     · exact contDiffOn_const
@@ -252,5 +252,437 @@ theorem round_oneTime_of_neg {x : Coords 4} (hA : A (x 1) < 0) (hB : B (x 1) < 0
         mul_pos (sq_pos_iff.mpr hr) (sq_pos_iff.mpr hs)
 
 end Round
+
+/-! ## Known answer 2: de Sitter's space-time -/
+
+section DeSitter
+
+/-- The part of de Sitter's space-time that its coordinates cover: inside the distance `L`, away
+from the centre and the poles. -/
+def deSitterRegion (L : ℝ) : Set (Coords 4) := {x | 0 < x 1 ∧ x 1 < L ∧ sin (x 2) ≠ 0}
+
+theorem isOpen_deSitterRegion (L : ℝ) : IsOpen (deSitterRegion L) :=
+  (isOpen_lt continuous_const (continuous_apply 1)).inter
+    ((isOpen_lt (continuous_apply 1) continuous_const).inter
+      (isOpen_ne_fun (Real.continuous_sin.comp (continuous_apply 2)) continuous_const))
+
+theorem dsA_pos {L r : ℝ} (hr : 0 < r) (hL : r < L) : 0 < dsA L r := by
+  have hL0 : 0 < L := hr.trans hL
+  unfold dsA
+  rw [sub_pos, div_lt_one (pow_pos hL0 2)]
+  exact pow_lt_pow_left₀ hL hr.le two_ne_zero
+
+theorem smooth_dsA (L r : ℝ) {k : WithTop ℕ∞} : ContDiffAt ℝ k (dsA L) r :=
+  contDiffAt_const.sub ((contDiffAt_id.pow 2).div_const _)
+
+theorem smooth_dsB {L r : ℝ} (hh : dsA L r ≠ 0) {k : WithTop ℕ∞} : ContDiffAt ℝ k (dsB L) r :=
+  (smooth_dsA L r).inv hh
+
+/-- De Sitter's table is good on its region. -/
+theorem deSitter_regularTable (L : ℝ) :
+    IsRegularTableOn (roundG (dsA L) (dsB L)) (roundGinv (dsA L) (dsB L)) (deSitterRegion L) :=
+  round_regular (isOpen_deSitterRegion L) (fun x _ ↦ smooth_dsA L (x 1))
+    (fun _ hx ↦ smooth_dsB (dsA_pos hx.1 hx.2.1).ne')
+    (fun _ hx ↦ deSitter_regular hx.1 hx.2.1 hx.2.2)
+
+/-- **De Sitter's space-time is a space-time in the sense of `Basic.lean`:** it has exactly one
+time direction, at every point of its region. -/
+theorem deSitter_isSpaceTimeOn (L : ℝ) :
+    IsSpaceTimeOn (flatMeasure (tableMeasure (roundG (dsA L) (dsB L)))) (deSitterRegion L) where
+  symm := fun _ hx v w ↦ (deSitter_regularTable L).measure_symm hx v w
+  oneTime := fun _ hx ↦
+    round_oneTime_of_pos (dsA_pos hx.1 hx.2.1) (inv_pos.mpr (dsA_pos hx.1 hx.2.1)) hx.1.ne'
+      hx.2.2
+  smooth := (deSitter_regularTable L).isSmoothOn
+
+/-- **Known answer 2.** The curvature of de Sitter's space-time, in the sense of `Basic.lean`, is
+`3 / L²` times its length measure. So it is curved, and it is not empty. -/
+theorem deSitter_curvature {L : ℝ} {x : Coords 4} (hx : x ∈ deSitterRegion L)
+    (v w : TangentSpace 𝓘(ℝ, Coords 4) x) :
+    ricciAt (flatTransport (tableCorr (christoffel (roundG (dsA L) (dsB L))
+        (roundGinv (dsA L) (dsB L))))) x v w
+      = 3 / L ^ 2 * flatMeasure (tableMeasure (roundG (dsA L) (dsB L))) x v w := by
+  rw [(deSitter_regularTable L).ricciAt hx]
+  have e : (fun b c : Fin 4 ↦ ricci (christoffel (roundG (dsA L) (dsB L))
+        (roundGinv (dsA L) (dsB L))) c b x)
+      = fun b c ↦ 3 / L ^ 2 * roundG (dsA L) (dsB L) b c x := by
+    funext b c
+    rw [ricci_deSitter hx.1 hx.2.1 hx.2.2 c b, roundG_symm (dsA L) (dsB L) c b x]
+  rw [e, formOf_const_mul]
+  rfl
+
+end DeSitter
+
+/-! ## Known answer 3: Schwarzschild's space-time -/
+
+section Schwarzschild
+
+/-- Outside the rim of the black hole, away from the poles. -/
+def outside (M : ℝ) : Set (Coords 4) := {x | 0 < x 1 ∧ 2 * M < x 1 ∧ sin (x 2) ≠ 0}
+
+/-- Inside the rim of the black hole, away from the centre and the poles. -/
+def inside (M : ℝ) : Set (Coords 4) := {x | 0 < x 1 ∧ x 1 < 2 * M ∧ sin (x 2) ≠ 0}
+
+theorem isOpen_outside (M : ℝ) : IsOpen (outside M) :=
+  (isOpen_lt continuous_const (continuous_apply 1)).inter
+    ((isOpen_lt continuous_const (continuous_apply 1)).inter
+      (isOpen_ne_fun (Real.continuous_sin.comp (continuous_apply 2)) continuous_const))
+
+theorem isOpen_inside (M : ℝ) : IsOpen (inside M) :=
+  (isOpen_lt continuous_const (continuous_apply 1)).inter
+    ((isOpen_lt (continuous_apply 1) continuous_const).inter
+      (isOpen_ne_fun (Real.continuous_sin.comp (continuous_apply 2)) continuous_const))
+
+theorem schwA_pos_outside {M r : ℝ} (hr : 0 < r) (hrim : 2 * M < r) : 0 < schwA M r := by
+  unfold schwA
+  rw [sub_pos, div_lt_one hr]
+  exact hrim
+
+theorem schwA_neg_inside {M r : ℝ} (hr : 0 < r) (hrim : r < 2 * M) : schwA M r < 0 := by
+  unfold schwA
+  rw [sub_neg, one_lt_div hr]
+  exact hrim
+
+theorem smooth_schwA (M : ℝ) {r : ℝ} (hr : r ≠ 0) {k : WithTop ℕ∞} :
+    ContDiffAt ℝ k (schwA M) r :=
+  contDiffAt_const.sub (contDiffAt_const.div contDiffAt_id hr)
+
+theorem smooth_schwB (M : ℝ) {r : ℝ} (hr : r ≠ 0) (hh : schwA M r ≠ 0) {k : WithTop ℕ∞} :
+    ContDiffAt ℝ k (schwB M) r :=
+  (smooth_schwA M hr).inv hh
+
+/-- The conditions of step 1 also hold inside the rim. -/
+theorem schwarzschild_regular_inside (M : ℝ) {x : Coords 4} (hr : 0 < x 1)
+    (hrim : x 1 < 2 * M) (hs : sin (x 2) ≠ 0) : Regular (schwA M) (schwB M) x := by
+  have hr0 : x 1 ≠ 0 := hr.ne'
+  have hneg : schwA M (x 1) < 0 := schwA_neg_inside hr hrim
+  exact
+    { r_ne := hr0
+      sin_ne := hs
+      A_ne := hneg.ne
+      B_ne := inv_ne_zero hneg.ne
+      diffA := (hasDerivAt_schwA M hr0).differentiableAt
+      diffA' := (hasDerivAt_deriv_schwA M hr0).differentiableAt
+      diffB := (hasDerivAt_schwB M hr0 hneg.ne).differentiableAt }
+
+/-- Schwarzschild's table is good outside the rim. -/
+theorem schwarzschild_regularTable_outside (M : ℝ) :
+    IsRegularTableOn (roundG (schwA M) (schwB M)) (roundGinv (schwA M) (schwB M)) (outside M) :=
+  round_regular (isOpen_outside M) (fun _ hx ↦ smooth_schwA M hx.1.ne')
+    (fun _ hx ↦ smooth_schwB M hx.1.ne' (schwA_pos_outside hx.1 hx.2.1).ne')
+    (fun _ hx ↦ schwarzschild_regular M hx.1 hx.2.1 hx.2.2)
+
+/-- Schwarzschild's table is good inside the rim as well. -/
+theorem schwarzschild_regularTable_inside (M : ℝ) :
+    IsRegularTableOn (roundG (schwA M) (schwB M)) (roundGinv (schwA M) (schwB M)) (inside M) :=
+  round_regular (isOpen_inside M) (fun _ hx ↦ smooth_schwA M hx.1.ne')
+    (fun _ hx ↦ smooth_schwB M hx.1.ne' (schwA_neg_inside hx.1 hx.2.1).ne)
+    (fun _ hx ↦ schwarzschild_regular_inside M hx.1 hx.2.1 hx.2.2)
+
+/-- **Schwarzschild's space-time is a space-time in the sense of `Basic.lean`, outside the rim:**
+one time direction, the time label. -/
+theorem schwarzschild_isSpaceTimeOn_outside (M : ℝ) :
+    IsSpaceTimeOn (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) (outside M) where
+  symm := fun _ hx v w ↦ (schwarzschild_regularTable_outside M).measure_symm hx v w
+  oneTime := fun _ hx ↦
+    round_oneTime_of_pos (schwA_pos_outside hx.1 hx.2.1)
+      (inv_pos.mpr (schwA_pos_outside hx.1 hx.2.1)) hx.1.ne' hx.2.2
+  smooth := (schwarzschild_regularTable_outside M).isSmoothOn
+
+/-- **And inside the rim:** still exactly one time direction, but now it is the distance label.
+Falling inward is as unavoidable there as growing older is outside. -/
+theorem schwarzschild_isSpaceTimeOn_inside (M : ℝ) :
+    IsSpaceTimeOn (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) (inside M) where
+  symm := fun _ hx v w ↦ (schwarzschild_regularTable_inside M).measure_symm hx v w
+  oneTime := fun _ hx ↦
+    round_oneTime_of_neg (schwA_neg_inside hx.1 hx.2.1)
+      (inv_lt_zero.mpr (schwA_neg_inside hx.1 hx.2.1)) hx.1.ne' hx.2.2
+  smooth := (schwarzschild_regularTable_inside M).isSmoothOn
+
+/-- **Known answer 3.** Schwarzschild's space-time is empty in the sense of `Basic.lean`, outside
+the rim. -/
+theorem schwarzschild_isEmptyOn (M : ℝ) :
+    IsEmptyOn (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) (outside M) :=
+  (schwarzschild_regularTable_outside M).isEmptyOn fun _ hx ↦
+    schwarzschild_ricciFlat M hx.1 hx.2.1 hx.2.2
+
+/-! ### It looks the same from every side -/
+
+section Round
+
+theorem smooth_sepA {f h : ℝ → ℝ} {z : Coords 4} {k : WithTop ℕ∞} (hf : ContDiffAt ℝ k f (z 2))
+    (hh : ContDiffAt ℝ k h (z 3)) : ContDiffAt ℝ k (sepA f h) z := by
+  have h1 : ContDiffAt ℝ k (fun y : Coords 4 ↦ f (y 2)) z :=
+    ContDiffAt.comp (g := f) z hf (contDiffAt_apply ℝ (fun _ : Fin 4 ↦ ℝ) 2 z)
+  have h2 : ContDiffAt ℝ k (fun y : Coords 4 ↦ h (y 3)) z :=
+    ContDiffAt.comp (g := h) z hh (contDiffAt_apply ℝ (fun _ : Fin 4 ↦ ℝ) 3 z)
+  exact h1.mul h2
+
+theorem smooth_negCot {θ : ℝ} (hs : sin θ ≠ 0) {k : WithTop ℕ∞} : ContDiffAt ℝ k negCot θ :=
+  (Real.contDiff_cos.contDiffAt.div Real.contDiff_sin.contDiffAt hs).neg
+
+theorem smooth_negSin (φ : ℝ) {k : WithTop ℕ∞} : ContDiffAt ℝ k negSin φ :=
+  Real.contDiff_sin.contDiffAt.neg
+
+theorem smooth_constOne (θ : ℝ) {k : WithTop ℕ∞} : ContDiffAt ℝ k constOne θ :=
+  (contDiffAt_const : ContDiffAt ℝ k (fun _ : ℝ ↦ (1 : ℝ)) θ)
+
+theorem smooth_rotX {z : Coords 4} (hs : sin (z 2) ≠ 0) (i : Fin 4) {k : WithTop ℕ∞} :
+    ContDiffAt ℝ k (rotX i) z := by
+  unfold rotX
+  split_ifs
+  · exact smooth_sepA (smooth_constOne _) (smooth_negSin _)
+  · exact smooth_sepA (smooth_negCot hs) Real.contDiff_cos.contDiffAt
+  · exact contDiffAt_const
+
+theorem smooth_rotY {z : Coords 4} (hs : sin (z 2) ≠ 0) (i : Fin 4) {k : WithTop ℕ∞} :
+    ContDiffAt ℝ k (rotY i) z := by
+  unfold rotY
+  split_ifs
+  · exact smooth_sepA (smooth_constOne _) Real.contDiff_cos.contDiffAt
+  · exact smooth_sepA (smooth_negCot hs) Real.contDiff_sin.contDiffAt
+  · exact contDiffAt_const
+
+theorem smooth_rotZ (z : Coords 4) (i : Fin 4) {k : WithTop ℕ∞} : ContDiffAt ℝ k (rotZ i) z := by
+  unfold rotZ
+  split_ifs <;> exact contDiffAt_const
+
+theorem slope_rotZ (m k : Fin 4) (x : Coords 4) : slope m (rotZ k) x = 0 := by
+  unfold rotZ
+  split_ifs <;> exact slope_const _ _ _
+
+/-- A fact about the pole angle that the bracket of two turns needs. -/
+theorem negCot_identity {θ : ℝ} (hs : sin θ ≠ 0) : deriv negCot θ - negCot θ ^ 2 = 1 := by
+  rw [deriv_negCot hs, negCot]
+  field_simp
+  linear_combination -Real.sin_sq_add_cos_sq θ
+
+/-- **The three turns combine the way turns do, 1.** -/
+theorem bracket_rotY_rotX {x : Coords 4} (hs : sin (x 2) ≠ 0) :
+    VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotY) (fieldOf rotX) x = fieldOf rotZ x := by
+  have hY := differentiableAt_rotY hs
+  have hX := differentiableAt_rotX hs
+  have c0 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotY) (fieldOf rotX) x 0
+      = rotZ 0 x := by
+    rw [mlieBracket_fieldOf hY hX 0]
+    simp [rotX, rotY, rotZ, slope_const]
+  have c1 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotY) (fieldOf rotX) x 1
+      = rotZ 1 x := by
+    rw [mlieBracket_fieldOf hY hX 1]
+    simp [rotX, rotY, rotZ, slope_const]
+  have c2 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotY) (fieldOf rotX) x 2
+      = rotZ 2 x := by
+    rw [mlieBracket_fieldOf hY hX 2]
+    simp only [Fin.sum_univ_four, slope_rotX_two, slope_rotY_two]
+    simp [rotX, rotY, rotZ, sepA, constOne, negSin]
+    ring
+  have c3 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotY) (fieldOf rotX) x 3
+      = rotZ 3 x := by
+    rw [mlieBracket_fieldOf hY hX 3]
+    simp only [Fin.sum_univ_four, slope_rotX_three, slope_rotY_three]
+    simp [rotX, rotY, rotZ, sepA, constOne, negSin]
+    linear_combination (deriv negCot (x 2) - negCot (x 2) ^ 2)
+      * Real.sin_sq_add_cos_sq (x 3) + negCot_identity hs
+  have key : ∀ k, VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotY) (fieldOf rotX) x k
+      = rotZ k x := by
+    intro k
+    fin_cases k
+    exacts [c0, c1, c2, c3]
+  exact funext key
+
+/-- **The three turns combine the way turns do, 2.** -/
+theorem bracket_rotX_rotZ {x : Coords 4} (hs : sin (x 2) ≠ 0) :
+    VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotX) (fieldOf rotZ) x = fieldOf rotY x := by
+  have hX := differentiableAt_rotX hs
+  have hZ := differentiableAt_rotZ x
+  have c0 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotX) (fieldOf rotZ) x 0
+      = rotY 0 x := by
+    rw [mlieBracket_fieldOf hX hZ 0]
+    simp [rotX, rotY, rotZ, slope_const]
+  have c1 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotX) (fieldOf rotZ) x 1
+      = rotY 1 x := by
+    rw [mlieBracket_fieldOf hX hZ 1]
+    simp [rotX, rotY, rotZ, slope_const]
+  have c2 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotX) (fieldOf rotZ) x 2
+      = rotY 2 x := by
+    rw [mlieBracket_fieldOf hX hZ 2]
+    simp only [Fin.sum_univ_four, slope_rotZ, slope_rotX_two]
+    simp [rotY, rotZ, sepA, constOne]
+  have c3 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotX) (fieldOf rotZ) x 3
+      = rotY 3 x := by
+    rw [mlieBracket_fieldOf hX hZ 3]
+    simp only [Fin.sum_univ_four, slope_rotZ, slope_rotX_three]
+    simp [rotY, rotZ, sepA]
+  have key : ∀ k, VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotX) (fieldOf rotZ) x k
+      = rotY k x := by
+    intro k
+    fin_cases k
+    exacts [c0, c1, c2, c3]
+  exact funext key
+
+/-- **The three turns combine the way turns do, 3.** -/
+theorem bracket_rotZ_rotY {x : Coords 4} (hs : sin (x 2) ≠ 0) :
+    VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotZ) (fieldOf rotY) x = fieldOf rotX x := by
+  have hY := differentiableAt_rotY hs
+  have hZ := differentiableAt_rotZ x
+  have c0 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotZ) (fieldOf rotY) x 0
+      = rotX 0 x := by
+    rw [mlieBracket_fieldOf hZ hY 0]
+    simp [rotX, rotY, rotZ, slope_const]
+  have c1 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotZ) (fieldOf rotY) x 1
+      = rotX 1 x := by
+    rw [mlieBracket_fieldOf hZ hY 1]
+    simp [rotX, rotY, rotZ, slope_const]
+  have c2 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotZ) (fieldOf rotY) x 2
+      = rotX 2 x := by
+    rw [mlieBracket_fieldOf hZ hY 2]
+    simp only [Fin.sum_univ_four, slope_rotZ, slope_rotY_two]
+    simp [rotX, rotZ, sepA, constOne, negSin]
+  have c3 : VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotZ) (fieldOf rotY) x 3
+      = rotX 3 x := by
+    rw [mlieBracket_fieldOf hZ hY 3]
+    simp only [Fin.sum_univ_four, slope_rotZ, slope_rotY_three]
+    simp [rotX, rotZ, sepA]
+  have key : ∀ k, VectorField.mlieBracket 𝓘(ℝ, Coords 4) (fieldOf rotZ) (fieldOf rotY) x k
+      = rotX k x := by
+    intro k
+    fin_cases k
+    exacts [c0, c1, c2, c3]
+  exact funext key
+
+/-- The three turns of ordinary space, as fields of arrows on coordinate space, in the order in
+which the bracket of two of them is the third. -/
+noncomputable def turns : Fin 3 → Arrows 𝓘(ℝ, Coords 4) (Coords 4) :=
+  ![fieldOf rotY, fieldOf rotX, fieldOf rotZ]
+
+theorem rotY_eq (x : Coords 4) : (fun k ↦ rotY k x)
+    = cos (x 3) • (Pi.single 2 1 : Coords 4) + (negCot (x 2) * sin (x 3)) • Pi.single 3 1 := by
+  funext k
+  fin_cases k <;> simp [rotY, sepA, constOne]
+
+theorem rotX_eq (x : Coords 4) : (fun k ↦ rotX k x)
+    = (-sin (x 3)) • (Pi.single 2 1 : Coords 4) + (negCot (x 2) * cos (x 3)) • Pi.single 3 1 := by
+  funext k
+  fin_cases k <;> simp [rotX, sepA, constOne, negSin]
+
+theorem rotZ_eq (x : Coords 4) : (fun k ↦ rotZ k x) = (Pi.single 3 1 : Coords 4) := by
+  funext k
+  fin_cases k <;> simp [rotZ]
+
+theorem single_two_eq (x : Coords 4) : (Pi.single 2 1 : Coords 4)
+    = cos (x 3) • (fun k ↦ rotY k x) - sin (x 3) • fun k ↦ rotX k x := by
+  funext k
+  fin_cases k
+  · simp [rotX, rotY]
+  · simp [rotX, rotY]
+  · simp [rotX, rotY, sepA, constOne, negSin]
+    linear_combination -(Real.cos_sq_add_sin_sq (x 3))
+  · simp [rotX, rotY, sepA]
+    ring
+
+/-- At every point, the three turns span the two angle directions. -/
+theorem span_turns (x : Coords 4) :
+    Submodule.span ℝ (Set.range fun i : Fin 3 ↦ (turns i x : Coords 4))
+      = Submodule.span ℝ (Set.range ![(Pi.single 2 1 : Coords 4), Pi.single 3 1]) := by
+  apply le_antisymm
+  · rw [Submodule.span_le]
+    rintro _ ⟨i, rfl⟩
+    fin_cases i
+    · change (fun k ↦ rotY k x) ∈ _
+      rw [rotY_eq]
+      exact Submodule.add_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩))
+        (Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
+    · change (fun k ↦ rotX k x) ∈ _
+      rw [rotX_eq]
+      exact Submodule.add_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩))
+        (Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
+    · change (fun k ↦ rotZ k x) ∈ _
+      rw [rotZ_eq]
+      exact Submodule.subset_span ⟨1, rfl⟩
+  · rw [Submodule.span_le]
+    rintro _ ⟨i, rfl⟩
+    fin_cases i
+    · change (Pi.single 2 1 : Coords 4) ∈ _
+      rw [single_two_eq x]
+      exact Submodule.sub_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩))
+        (Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
+    · change (Pi.single 3 1 : Coords 4) ∈ _
+      rw [← rotZ_eq x]
+      exact Submodule.subset_span ⟨2, rfl⟩
+
+theorem finrank_span_angles : Module.finrank ℝ
+    (Submodule.span ℝ (Set.range ![(Pi.single 2 1 : Coords 4), Pi.single 3 1])) = 2 := by
+  have hli : LinearIndependent ℝ ![(Pi.single 2 1 : Coords 4), Pi.single 3 1] := by
+    rw [LinearIndependent.pair_iff]
+    intro a b h
+    exact ⟨by simpa using congrFun h 2, by simpa using congrFun h 3⟩
+  rw [finrank_span_eq_card hli]
+  simp
+
+/-- On the two angle directions, a round table gives every step a positive squared length. -/
+theorem round_pos_on_angles {A B : ℝ → ℝ} {x : Coords 4} (hr : x 1 ≠ 0) (hs : sin (x 2) ≠ 0)
+    (v : Coords 4)
+    (hv : v ∈ Submodule.span ℝ (Set.range ![(Pi.single 2 1 : Coords 4), Pi.single 3 1]))
+    (hne : v ≠ 0) : 0 < tableMeasure (roundG A B) x v v := by
+  obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).mp hv
+  have hc : c 0 ≠ 0 ∨ c 1 ≠ 0 := by
+    by_contra hcon
+    push Not at hcon
+    apply hne
+    simp [Fin.sum_univ_two, hcon.1, hcon.2]
+  have e : tableMeasure (roundG A B) x
+        (∑ i, c i • ![(Pi.single 2 1 : Coords 4), Pi.single 3 1] i)
+        (∑ i, c i • ![(Pi.single 2 1 : Coords 4), Pi.single 3 1] i)
+      = x 1 ^ 2 * c 0 ^ 2 + x 1 ^ 2 * sin (x 2) ^ 2 * c 1 ^ 2 := by
+    rw [round_measure_apply]
+    simp [Fin.sum_univ_two, Fin.sum_univ_four, roundDiag, sep, gr, gθ, sqF, sin2, constOne]
+    ring
+  rw [e]
+  have h1 : 0 < x 1 ^ 2 := sq_pos_iff.mpr hr
+  have h2 : 0 < sin (x 2) ^ 2 := sq_pos_iff.mpr hs
+  rcases hc with h | h
+  · have h3 : 0 < c 0 ^ 2 := sq_pos_iff.mpr h
+    nlinarith [mul_pos h1 h3, mul_nonneg (mul_pos h1 h2).le (sq_nonneg (c 1))]
+  · have h3 : 0 < c 1 ^ 2 := sq_pos_iff.mpr h
+    nlinarith [mul_pos (mul_pos h1 h2) h3, mul_nonneg h1.le (sq_nonneg (c 0))]
+
+/-- **Known answer 3, second half.** Schwarzschild's space-time looks the same from every side,
+in the sense of `Basic.lean`: the three turns of ordinary space are smooth, leave the length
+measure unchanged, combine the way turns do, and sweep out surfaces on which all lengths are
+positive. -/
+theorem schwarzschild_isRoundOn (M : ℝ) :
+    IsRoundOn (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) turns (outside M) where
+  smooth := by
+    intro i
+    fin_cases i
+    · exact contMDiffOn_arrows_iff.mpr (contDiffOn_pi.2 fun k x hx ↦
+        (smooth_rotY (z := x) hx.2.2 k).contDiffWithinAt)
+    · exact contMDiffOn_arrows_iff.mpr (contDiffOn_pi.2 fun k x hx ↦
+        (smooth_rotX (z := x) hx.2.2 k).contDiffWithinAt)
+    · exact contMDiffOn_arrows_iff.mpr (contDiffOn_pi.2 fun k x _ ↦
+        (smooth_rotZ x k).contDiffWithinAt)
+  unchanged := by
+    intro i x hx
+    have hg := fun a b ↦ (schwarzschild_regularTable_outside M).differentiableAt hx a b
+    have hround := schwarzschild_isRound M hx.2.2
+    fin_cases i
+    · exact (leavesUnchangedAt_table_iff hg (differentiableAt_rotY hx.2.2)).mpr hround.2.1
+    · exact (leavesUnchangedAt_table_iff hg (differentiableAt_rotX hx.2.2)).mpr hround.1
+    · exact (leavesUnchangedAt_table_iff hg (differentiableAt_rotZ x)).mpr hround.2.2
+  likeTurns := fun _ hx ↦
+    ⟨bracket_rotY_rotX hx.2.2, bracket_rotX_rotZ hx.2.2, bracket_rotZ_rotY hx.2.2⟩
+  surfaces := fun x _ ↦ by
+    have h := finrank_span_angles
+    rw [← span_turns x] at h
+    exact h
+  positive := fun x hx v hv hne ↦ by
+    have hv' : (v : Coords 4)
+        ∈ Submodule.span ℝ (Set.range fun i : Fin 3 ↦ (turns i x : Coords 4)) := hv
+    rw [span_turns] at hv'
+    exact round_pos_on_angles hx.1.ne' hx.2.2 v hv' hne
+
+end Round
+
+end Schwarzschild
 
 end GravityInLean.Curved
