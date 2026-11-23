@@ -88,6 +88,12 @@ quietly go stale. -/
 #audit GravityInLean.christoffel_sphere GravityInLean.sphereG_mul_sphereGinv
   GravityInLean.ricci_sphere
 
+-- Step 1: the round space-time and free fall, from the general definitions
+#audit GravityInLean.christoffel_round GravityInLean.round_ricciFlat_iff
+  GravityInLean.schwarzschild_ricciFlat GravityInLean.roundG_mul_roundGinv
+  GravityInLean.roundOrbit_isFreeFall_iff GravityInLean.roundOrbit_keepsOwnTime_iff
+  GravityInLean.roundOrbit_clockRate_of_freeFall GravityInLean.roundOrbit_freeFall_exists
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

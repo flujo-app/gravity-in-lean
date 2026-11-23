@@ -278,7 +278,8 @@ theorem hasDerivAt_cotF {θ : ℝ} (hs : sin θ ≠ 0) :
 
 /-- The conditions under which the computation makes sense at the point `x`: away from the centre
 and the poles, clock and ruler function not zero there, and smooth enough to take the slopes the
-curvature needs. -/
+curvature needs. The ruler function needs only one slope: its second slope enters the curvature
+twice, with opposite signs, and drops out. -/
 structure Regular (A B : ℝ → ℝ) (x : Coords 4) : Prop where
   r_ne : x 1 ≠ 0
   sin_ne : sin (x 2) ≠ 0

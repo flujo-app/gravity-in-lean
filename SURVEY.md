@@ -124,7 +124,8 @@ download or build any of it.
 - The standard library stops just short of curvature, and has nothing for space-time. So the
   very first step, "Schwarzschild's solution solves Einstein's equations, from the definitions",
   seems not to have been done by machine. It is small, and the probe in this repository shows the
-  method works.
+  method works. (Update, 23 November 2026: that step is now done in this repository, in
+  coordinates. Whether it was done elsewhere before is still not verified.)
 - The far end, two masses, is not a gap in machine-checking. It is a gap in mathematics itself.
   No proof checker can check a formula that does not exist.
 - Everything marked "Not verified" above should be read before anyone builds on it. In

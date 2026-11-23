@@ -31,11 +31,10 @@ and `ricciAng` below.
 **What is proved here:** Schwarzschild's functions `A = 1 - 2M/r`, `B = 1/(1 - 2M/r)` make all three
 parts vanish at every distance outside the rim (`r > 2M`).
 
-**What is NOT proved here (the gap):** that Einstein's full equations, written for a general
-space-time, come down to exactly these three formulas in the round, unchanging case. That step is
-taken from the textbooks. It cannot yet be checked by machine in a standard way, because the
-standard library (mathlib) has no curvature for space-times. Closing this gap is the first rung
-of the plan.
+**Where the three formulas come from:** this file takes them as given. `RoundSpacetime.lean`
+then proves that they are exactly what the general definition of curvature gives for a round,
+unchanging space-time, all sixteen parts of it (`round_ricciFlat_iff`). So nothing here is taken
+on trust any more, apart from the general definitions themselves.
 -/
 
 @[expose] public section
