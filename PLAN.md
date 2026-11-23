@@ -149,11 +149,12 @@ to cases with known answers.
 | | | Mark |
 |---|---|---|
 | From the request to a green build of everything | 57 minutes: 27 of reading the library and designing, 30 of writing and testing | Measured |
-| Size now | 513 theorems, about 10,000 lines; all 1,076 declarations audited | Measured |
-| New for this | about 2,600 lines, 138 theorems, in seven files | Measured |
+| With the second reading and what it led to | 80 minutes in all | Measured |
+| Size now | 523 theorems, about 10,300 lines; all 1,089 declarations audited | Measured |
+| New for this | about 2,900 lines, 148 theorems, in eight files | Measured |
 | Tries needed | the definitions compiled at once; the errors were in the glue to the library's flat space, where a step and a plain vector are two types that happen to be equal | Measured |
 | Known answers that passed | flat space-time, a sphere, de Sitter's and Schwarzschild's space-time: time direction, connection, curvature, emptiness, roundness | Measured |
-| Second reading | two independent readers, one for the definitions and one for the statements | see below |
+| Second reading | two independent readers, one for the definitions and one for the statements; about 12 minutes each | Measured |
 
 **How the tests work.** On coordinate space every new definition was shown to equal the
 coordinate formula this project already uses (`Tables.lean`). The known answers computed in
@@ -171,8 +172,28 @@ the known answers come in coordinates that fail somewhere, and Birkhoff's theore
 neighbourhood of a point. For a whole space the region is everything.
 
 **What was written but not proved.** The goal (`BirkhoffNoCoordinates`), the two statements of
-stream 1 (`SmoothFlowStatement`, `TurnsCoordinatesStatement`) and the first two of stream 2. Each
-has a check that its assumptions can be met. They live in files that workers may not change.
+stream 1 (`SmoothFlowStatement`, `TurnsCoordinatesStatement`) and one of stream 2
+(`ConnectionExistsStatement`). Each has a check that its assumptions can be met. They live in
+files that workers may not change.
+
+**What the second reading found.** Neither reader found a definition that says the wrong thing
+where it is used, and both judged every statement true as written. They did find gaps, and each
+was closed the same day:
+
+| Found | Done about it |
+|---|---|
+| On a region with an edge, "its connection", "empty" and "combine the way turns do" say nothing at the edge: one could make de Sitter's space-time "empty" on a single point. | Regions are open by definition now (`IsConnectionOf`, `IsRoundOn`). |
+| No test showed that "empty" can ever fail. Nothing ruled out a second, convenient connection. | Proved: a length measure has at most one connection, on any curved space (`connectionUnique`; this was one of the statements of stream 2). Proved: de Sitter's space-time is not empty (`deSitter_not_isEmptyOn`). For tables, empty in the new sense and empty in coordinates are now the same thing in both directions (`isEmptyOn_iff`). |
+| The conclusion of the goal had never been tried on anything. | It holds for Schwarzschild's space-time with the chart that does nothing (`schwarzschild_meets_conclusion`). |
+| "Unchanged along a field" gave a meaningless answer for a field that cannot be differentiated. | The definition now asks that it can. |
+| The turns statement should say where the starting point lands. | It now puts it on the equator at angle zero. |
+| The turns statement does not, as its comment claimed, make `shape_of_round` and `birkhoff_of_round` applicable: those ask for all angles, the statement gives a small patch. | The comment is corrected. Two more lemmas are needed and belong to stream 4: the shape of a round table on a small patch, and its continuation to all angles. |
+
+**What the second reading could not settle, said plainly.** All tests are on coordinate space,
+with the one chart that does nothing; nothing has been tried across a real change of charts.
+There is no test that "looks the same from every side" or "usable distance" can fail. And the
+check of the turns statement on Schwarzschild's own coordinates would not notice a table of
+slopes written the wrong way round; that direction was checked by hand by the second reader.
 
 ## Next: Birkhoff's theorem with no coordinates at all
 
@@ -198,9 +219,9 @@ own. It is not new physics: the paper version is in Hawking and Ellis (1973), ap
 |---|---|---|---|
 | 0 · Definitions | A length measure with a time sign on a curved space; its connection; its curvature; "a motion that keeps all lengths"; "looks the same from every side". Each tested on cases with known answers (a sphere, de Sitter, Schwarzschild). | Nothing | No. One careful head, and a second reader |
 | 1 · Coordinates that fit the turns ([#20](https://github.com/flujo-app/gravity-in-lean/issues/20)) | In coordinates: paths along a field that depend smoothly on where they start; Frobenius's theorem; any turning of a surface that combines like turns is, after relabelling, the turning of a globe. | Its statements only | Yes, a few big jobs |
-| 2 · Curvature on curved spaces | The connection for a length measure with a time sign (the library's 414-line file assumes all lengths positive), curvature, Ricci's part of it, and how all of them behave under motions that keep lengths. | Stream 0 | Yes, many small jobs |
+| 2 · Curvature on curved spaces | The connection for a length measure with a time sign (the library's 414-line file assumes all lengths positive; that there is at most one is proved since 23 November), curvature, Ricci's part of it, and how all of them behave under motions that keep lengths. | Stream 0 | Yes, many small jobs |
 | 3 · The bridge | In any chart, each object of stream 2 equals the coordinate formula this repository already uses. | Streams 0 and 2 | Yes, many small jobs |
-| 4 · Joining | The goal, from streams 1 and 3 and `birkhoff_of_round`, carried back by the "any coordinates" theorems. | Streams 1 and 3 | No |
+| 4 · Joining | The goal, from streams 1 and 3 and `birkhoff_of_round`, carried back by the "any coordinates" theorems. Also two lemmas the second reading turned up: the shape of a round table on a small patch of angles, and its continuation to all angles. | Streams 1 and 3 | No |
 
 Streams 1 and 2 can run side by side, so two teams can work from the start, and a third once
 stream 3 opens. More teams than that would mostly wait for each other: five to ten teams would
@@ -237,6 +258,9 @@ one head, read twice, and tested on known answers before any worker starts.
 2. A build queue for the fleet: one Lean build at a time on this PC. **Done:**
    `scripts/queued-build.sh`. Tested with three overlapping jobs: they ran one after another, and
    the log shows how long each waited. It is not strictly first come, first served.
+   A worker image is built too (`fleet/Dockerfile`, 11.5 GB, with Lean and the ready-built
+   standard library inside). Tested: a fresh copy of the repository inside a container built the
+   whole project through the queue in 82 seconds, with every declaration passing the audit.
 3. A trial: one team on stream 1. Measure jobs finished per hour and allowance used per hour.
    **Next.**
 4. Then decide how many teams, and whether any run in the cloud.
