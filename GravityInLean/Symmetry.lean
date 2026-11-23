@@ -6,7 +6,7 @@ Authors: flujo-app
 module
 
 public import GravityInLean.GeneralShape
-public import Mathlib.Analysis.Calculus.Deriv.Pi
+public import GravityInLean.SlopeRules
 
 import Mathlib.Tactic
 
@@ -233,17 +233,6 @@ theorem InRegion.update_three {J I : Set ℝ} {x : Coords 4} (h : InRegion J I x
 theorem InRegion.update_two {J I : Set ℝ} {x : Coords 4} (h : InRegion J I x) {s : ℝ}
     (h0 : 0 < s) (hπ : s < π) : InRegion J I (Function.update x 2 s) :=
   ⟨by simpa using h.1, by simpa using h.2.1, by simpa using h0, by simpa using hπ⟩
-
-/-- A function that can be differentiated at a point can be differentiated along each coordinate
-line through it. -/
-theorem differentiableAt_line {n : ℕ} {f : Coords n → ℝ} {x : Coords n}
-    (hf : DifferentiableAt ℝ f x) (k : Fin n) :
-    DifferentiableAt ℝ (fun s => f (Function.update x k s)) (x k) := by
-  have h1 : DifferentiableAt ℝ (Function.update x k) (x k) :=
-    (hasDerivAt_update x k (x k)).differentiableAt
-  have h2 : DifferentiableAt ℝ f (Function.update x k (x k)) := by
-    rwa [Function.update_eq_self]
-  exact h2.comp (x k) h1
 
 /-! ## The shape that symmetry allows -/
 
