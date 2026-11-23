@@ -18,8 +18,10 @@ starting shape showed" below.
 
 **The formulas no longer depend on the coordinates on trust** (also 23 November 2026). Curvature,
 free fall and "unchanged by a turn" are each proved to give the same answer in any coordinates.
-That took about an hour. See "What the coordinate question showed" below. Step 3 is next, and it
-is the first step whose statements have to be designed before anything can be proved.
+That took about an hour. See "What the coordinate question showed" below.
+
+**Next, before step 3:** Birkhoff's theorem with no coordinates at all, as the first trial of a
+small swarm. See "Next: Birkhoff's theorem with no coordinates at all" below.
 
 ## The short answer
 
@@ -133,6 +135,69 @@ Birkhoff's theorem ("empty and round, so Schwarzschild's in other coordinates" a
 "exactly when" needs the new time label to be shown three times differentiable, which asks for
 one more degree of smoothness in the setting, and a version of step 1 inside the rim.
 
+## Next: Birkhoff's theorem with no coordinates at all
+
+Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
+of workers. Step 3 waits.
+
+**The goal.** A space-time is a curved space where time counts with the opposite sign to space.
+Take one with four dimensions, that is empty, and that looks the same from every side: three
+motions leave all lengths unchanged, combine the way turns do, and sweep out spheres. Then near
+almost every point it is a piece of Schwarzschild's space-time. No coordinates are given at the
+start; the proof has to find them.
+
+**Why it is worth it.** It closes both items that are still "taken on trust" in the README at
+once. Item 2, because the coordinates that fit the turns are no longer assumed. Item 1, because
+the coordinate formulas for curvature and symmetry get tied to curvature defined on a curved
+space, which is what the textbooks mean by them. And Lean's standard library has none of the
+pieces this needs (see [SURVEY.md](SURVEY.md)), so they would be worth offering upstream on their
+own. It is not new physics: the paper version is in Hawking and Ellis (1973), appendix B.
+
+**The work, in five streams.**
+
+| Stream | What | Needs first | Fits a swarm? |
+|---|---|---|---|
+| 0 · Definitions | A length measure with a time sign on a curved space; its connection; its curvature; "a motion that keeps all lengths"; "looks the same from every side". Each tested on cases with known answers (a sphere, de Sitter, Schwarzschild). | Nothing | No. One careful head, and a second reader |
+| 1 · Coordinates that fit the turns ([#20](https://github.com/flujo-app/gravity-in-lean/issues/20)) | In coordinates: paths along a field that depend smoothly on where they start; Frobenius's theorem; any turning of a surface that combines like turns is, after relabelling, the turning of a globe. | Its statements only | Yes, a few big jobs |
+| 2 · Curvature on curved spaces | The connection for a length measure with a time sign (the library's 414-line file assumes all lengths positive), curvature, Ricci's part of it, and how all of them behave under motions that keep lengths. | Stream 0 | Yes, many small jobs |
+| 3 · The bridge | In any chart, each object of stream 2 equals the coordinate formula this repository already uses. | Streams 0 and 2 | Yes, many small jobs |
+| 4 · Joining | The goal, from streams 1 and 3 and `birkhoff_of_round`, carried back by the "any coordinates" theorems. | Streams 1 and 3 | No |
+
+Streams 1 and 2 can run side by side, so two teams can work from the start, and a third once
+stream 3 opens. More teams than that would mostly wait for each other: five to ten teams would
+not make it five to ten times faster.
+
+**Machines, measured on 23 November 2026.**
+
+| | | Mark |
+|---|---|---|
+| One Lean check that loads the library's curved-space parts | 6 seconds and 1.4 GB once the files are warm; 112 seconds the first time | Measured |
+| One Claude Code worker on this PC | typically 0.2 to 0.35 GB; a long-running one up to 1.1 GB | Measured |
+| Room on this PC | 8 processor threads, 32 GB of memory (13 GB free at the time), Docker allowed 19.5 GB, no containers running | Measured |
+
+So Lean stays cheap and a build queue holds. This PC fits one team of ten with queued builds;
+two would be tight. Five to ten teams would need cloud machines, which FACTORY can already start.
+The real limit is the weekly model allowance, not the machine. FACTORY's own notes say to check
+the AI plan's terms before running many agents on one subscription.
+
+**Effort.** Not measured, and not like steps 1 and 2: those were calculations with known answers,
+this is building general theory the library lacks. The first plan said months, at a person's
+pace. A guess for a swarm: one to three weeks from start to finish, limited by the order of the
+streams and by the allowance. Read it as a guess until the trial below has run.
+
+**What the Riemann proof of November 2026 teaches here.** Its statement was already in the
+standard library, so nobody had to trust a new definition; the work was all proof, and size was
+no obstacle (17.4 million lines in about six weeks). Here it is the other way round. The proofs
+are textbook material, and the risk is in the new definitions. That is why stream 0 is done by
+one head, read twice, and tested on known answers before any worker starts.
+
+**Order.**
+
+1. Stream 0, and the statements of stream 1: one worker.
+2. A build queue for the fleet: one Lean build at a time on this PC.
+3. A trial: one team on stream 1. Measure jobs finished per hour and allowance used per hour.
+4. Then decide how many teams, and whether any run in the cloud.
+
 ## The steps
 
 ```mermaid
@@ -162,8 +227,8 @@ Two honest notes on this table.
   same from every side", stated as: the three turns leave the length measure unchanged. What is
   still assumed is that coordinates exist in which the turns move only the two angles. The fully
   abstract version, which starts from a symmetry of a space-time without any coordinates, needs
-  space-time geometry in the standard library and is not included. (See "What is still taken on
-  trust" in the README.)
+  space-time geometry the standard library does not have. It is the next piece of work (see
+  "Next: Birkhoff's theorem with no coordinates at all").
 - Step 4a checks the algebra *after* the hard step. It does not show that the starting equations
   follow from Einstein's. It should always be described that way.
 
@@ -288,7 +353,10 @@ time. **Not verified** on the provider's own page, and nothing was rented.
 Schwarzschild's space-time is now proved to be the only round empty one, starting from the
 symmetry itself. The formulas used on the way are proved not to depend on the coordinates.
 
-**Do step 3 next** (weak gravity gives Newton), but start with the statements, not the proofs.
+**First, Birkhoff's theorem with no coordinates at all** (see the section of that name, issue [#21](https://github.com/flujo-app/gravity-in-lean/issues/21)). It
+closes the two items still taken on trust, and it is the first real trial for FACTORY.
+
+**Then step 3** (weak gravity gives Newton), but start with the statements, not the proofs.
 "To first order" has to be said precisely before anyone proves it, and each statement needs a
 second reader. Once the statements are fixed, step 3 is the better first trial for FACTORY with
 Lean as the judge, because it has more independent pieces than steps 1 and 2 had.
@@ -298,10 +366,11 @@ formula for two orbiting masses to find, so this project is not looking for one.
 
 ### The next three moves
 
-1. Ask the Lean community chat whether a machine-checked proof that Schwarzschild's solution
-   solves Einstein's equations, or of Birkhoff's theorem, already exists. Five minutes for a
+1. Ask the Lean community chat whether a machine-checked proof of Birkhoff's theorem already
+   exists. (One of Schwarzschild's solution does; see [SURVEY.md](SURVEY.md).) Five minutes for a
    person with an account.
-2. Step 3: write down the statements of "weak gravity gives Newton" and have them read.
+2. Birkhoff's theorem with no coordinates: stream 0 and the statements of stream 1, then a trial
+   with one team.
 3. Offer steps 1 and 2 to the community physics library.
 
 One thing that was open before step 3 is done: the formulas for curvature, free fall and

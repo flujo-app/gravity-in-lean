@@ -102,7 +102,8 @@ of Piece C. Both are now proved. What is left:
    still assumed lies one step earlier: that there are coordinates in which turning space moves
    only the two angles, in the usual way. The textbooks get such coordinates from an abstract
    description of the symmetry. That needs space-time geometry the standard library does not have
-   yet.
+   yet. Building it here, and so removing this item and item 1 together, is the next piece of
+   work ([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all").
 3. **The blind spots.** The two poles and the centre are left out of every statement. The rim of
    the black hole is left out of the statements about new labels, because there the size of the
    spheres cannot serve as a distance; the statements "the mass is the same everywhere" and
