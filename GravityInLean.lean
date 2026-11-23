@@ -3,6 +3,7 @@ import GravityInLean.OneMass
 import GravityInLean.RoundOrbit
 import GravityInLean.Curvature
 import GravityInLean.Probe.Sphere
+import GravityInLean.Probe.DeSitter
 import GravityInLean.RoundSpacetime
 import GravityInLean.FreeFall
 import GravityInLean.TwoSlopes

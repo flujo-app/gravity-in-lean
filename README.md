@@ -21,9 +21,10 @@ project asks the stricter question: can a machine confirm the formulas exactly? 
 could that go, perhaps as far as two masses circling each other?
 
 The short answer: one mass, yes, and that part is now done in both directions. Schwarzschild's
-space-time is empty, and it is the only round empty one, even if it is allowed to change in time.
-Two masses: an exact formula almost certainly does not exist, so that is not the goal. The honest
-steps in between are in [PLAN.md](PLAN.md).
+space-time is empty, and it is the only round empty one: any space-time that looks the same from
+every side and is empty turns out to be Schwarzschild's, whatever coordinates it was first written
+in, and whether or not it seemed to change in time. Two masses: an exact formula almost certainly
+does not exist, so that is not the goal. The honest steps in between are in [PLAN.md](PLAN.md).
 
 ```mermaid
 flowchart LR
@@ -55,32 +56,47 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **Step 2, curvature** | Let the clock and ruler functions also change in time, and apply the general definition of curvature again. All sixteen parts come out: Piece B's three formulas with new terms for the change in time, one new mixed part that measures how fast the ruler function changes, and the rest zero or a multiple. | [RoundChanging.lean](GravityInLean/RoundChanging.lean), `changing_ricciFlat_iff` |
 | **Step 2, Birkhoff** | A round space-time, allowed to change in time, is empty exactly when it is Schwarzschild's: the ruler function is `1/(1 - 2M/r)` and the clock function is `1 - 2M/r` times a factor that depends on time only. On paper this is Birkhoff's theorem of 1923; Jebsen had found it two years earlier. | [Birkhoff.lean](GravityInLean/Birkhoff.lean), `birkhoff` |
 | **Step 2, what it means** | Nothing measurable changes: the ruler function stays put, and clocks at two distances keep the same ratio of rates. So a round star that pulsates sends out no gravity waves. The time factor is only a choice of clock labels: re-set the far clocks and the space-time is Schwarzschild's, step for step, outside the rim. | [Birkhoff.lean](GravityInLean/Birkhoff.lean), `birkhoff_nothingChanges`, `birkhoff_resetClocks` |
-| **Probe** | The curvature of a sphere, computed from the same general definitions, comes out equal to the sphere's own length measure, as the textbooks say. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere` |
+| **Step 2, symmetry gives the shape** | "Looks the same from every side" is made precise: turning space around any of three axes leaves the length measure unchanged. A length measure with that property must have one particular shape, fixed by four functions of time and distance. And that shape does have the property. So the shape is exactly what the symmetry allows: nothing is lost, nothing is smuggled in. | [Symmetry.lean](GravityInLean/Symmetry.lean), `shape_of_round`, `genG_isRound` |
+| **Step 2, the general shape** | That general shape has a cross term between time and distance, and the size of the spheres is free. The general definition of curvature gives all sixteen parts for it as well. In empty space they boil down to three equations for the size of the spheres. | [GeneralShape.lean](GravityInLean/GeneralShape.lean), [GeneralCurvature.lean](GravityInLean/GeneralCurvature.lean), `christoffel_gen`, `gen_ricciFlat_iff`, `sizeEquations` |
+| **Step 2, without a starting shape** | A space-time that looks the same from every side and is empty is Schwarzschild's. Its mass can be read off anywhere from how fast the spheres grow, and is the same everywhere. There are new labels for time and distance in which every step has exactly Schwarzschild's length. This holds wherever the size of the spheres can serve as a distance; the places where it cannot (the rim) contain no region at all. | [BirkhoffGeneral.lean](GravityInLean/BirkhoffGeneral.lean), [BirkhoffFromSymmetry.lean](GravityInLean/BirkhoffFromSymmetry.lean), `massFn_const`, `usable_somewhere`, `birkhoff_general`, `birkhoff_of_round` |
+| **Step 2, an example** | Eddington's and Finkelstein's way of writing a black hole has a cross term, no ruler function, and stays regular at the rim. Computed from the definitions it is empty everywhere, its mass reads `M` everywhere, and the theorem turns it back into Schwarzschild's form, outside the rim and inside it. | [Eddington.lean](GravityInLean/Eddington.lean), `eddington_isEmptyOn`, `eddington_mass`, `eddington_outside`, `eddington_inside` |
+| **Probes** | Two tests of the definitions on curvatures that are known and not zero. A sphere: its curvature comes out equal to its own length measure. De Sitter's space-time, an empty universe with a cosmological constant: its curvature comes out as `3/L²` times its own length measure, with the textbooks' sign, in the time direction too. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere`; [Probe/DeSitter.lean](GravityInLean/Probe/DeSitter.lean), `ricci_deSitter` |
 
-In numbers: 145 theorems in about 2,400 lines.
+In numbers: 281 theorems in about 5,200 lines.
 
 Every statement with assumptions also has a check that the assumptions can be met. For step 2:
 Schwarzschild's own space-time meets them (`schwarzschild_isEmptyOn`), and so does one whose clock
 labels really do change in time (`relabelled_isEmptyOn`). The second shows the time factor cannot
-be left out of the statement.
+be left out of the statement. For the theorems without a starting shape: every empty space-time
+of the general round shape meets them (`roundEmpty_genG`), and Eddington's and Finkelstein's is
+one written out (`eddington_roundEmpty`).
 
 ## What is still taken on trust
 
 Before step 1 this list said: the three curvature formulas of Piece B, and the two starting facts
 of Piece C. Both are now proved. What is left:
 
-1. **The definitions themselves.** Curvature and free fall are written down here as the classic
-   textbook formulas in coordinates ([Curvature.lean](GravityInLean/Curvature.lean)). They are not
-   yet tied to the abstract geometry of Lean's standard library, because that library has no
-   curvature yet.
-2. **The starting shape.** Step 2 starts from a space-time already written with just a clock
-   function and a ruler function, both allowed to change in time. The textbooks reach that shape
-   from "it looks the same from every side" by a change of coordinates. That step is not done
-   here; it needs space-time geometry that the standard library does not have yet.
-3. **The blind spots of the coordinates.** The two poles, the centre, and everything at or inside
-   the rim of the black hole are left out of every statement. Textbooks that use these coordinates
-   leave them out too. (Step 2's main theorem itself also holds inside the rim; only the clock
-   re-setting needs the outside.)
+1. **The definitions themselves.** Curvature, free fall and "unchanged by a turn" are written
+   down here as the classic textbook formulas in coordinates
+   ([Curvature.lean](GravityInLean/Curvature.lean), [Symmetry.lean](GravityInLean/Symmetry.lean)).
+   They are not yet tied to the abstract geometry of Lean's standard library, because that library
+   has no curvature yet. Three things speak for the formulas: the two probes give the textbook
+   answers; two different ways of writing the same black hole, Schwarzschild's and Eddington's,
+   both come out empty; and the three fields of arrows are shown to be the three turns of ordinary
+   space (`rotX_turns`, `rotY_turns`, `rotZ_turns`). A proof that the curvature formulas do not
+   depend on the coordinates is not included.
+2. **Coordinates that fit the symmetry.** The starting shape is no longer assumed. It is derived
+   from "looks the same from every side" (`shape_of_round`), and the cross term and the choice of
+   distance label are dealt with by new labels inside the proof (`birkhoff_of_round`). What is
+   still assumed lies one step earlier: that there are coordinates in which turning space moves
+   only the two angles, in the usual way. The textbooks get such coordinates from an abstract
+   description of the symmetry. That needs space-time geometry the standard library does not have
+   yet.
+3. **The blind spots.** The two poles and the centre are left out of every statement. The rim of
+   the black hole is left out of the statements about new labels, because there the size of the
+   spheres cannot serve as a distance; the statements "the mass is the same everywhere" and
+   "Eddington's form is empty" do hold across it. The new labels are shown to be coordinates near
+   every point, not to be one-to-one over a whole region.
 4. **Meaning.** Lean checks that a proof proves its statement. It cannot check that the statement
    says what we mean. That is why the statements are short and each has a plain-language comment:
    they are meant to be read.
@@ -99,7 +115,7 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and seven lines that end in
+You should see `Build completed successfully` and eight lines that end in
 `none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about a
 minute.
 
@@ -116,12 +132,13 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 332 declarations in the project rests on (every definition and theorem, plus the helper
+of the 631 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
-It was tested. A deliberately planted hole made the build fail, and the error named both the
-theorem with the hole and a second theorem that merely used it.
+It was tested, twice. A deliberately planted hole made the build fail, and the error named both
+the theorem with the hole and a second theorem that merely used it. The test was repeated on
+23 November 2026 with the files of step 2 in place.
 
 So a green build means three things at once: proved, no holes, no extra assumptions.
 
@@ -131,9 +148,12 @@ So a green build means three things at once: proved, no holes, no extra assumpti
   for the Sun, about 1.5 km.
 - **Coordinates.** A point of space-time is four numbers: far time, distance, angle from the pole,
   angle around the axis.
-- **Smooth enough.** Step 2 asks the clock and ruler functions to be twice smoothly
+- **Smooth enough.** Step 2 asks the functions in the length measure to be twice smoothly
   differentiable, the usual condition in the textbooks. It is written into the statement, not
   assumed in the background.
+- **"Schwarzschild's, in other labels"** means: there are new labels for time and distance such
+  that every step has the same length as Schwarzschild's length measure gives the same step in
+  the new labels. What "the same step in new labels" is, is itself a theorem (`relabel_path`).
 - **Versions are pinned:** Lean 4.36.0 and its standard library mathlib v4.36.0. Updating either
   is a deliberate step, not something that happens by itself.
 - **GitHub repeats the check** on a clean machine after every push
@@ -152,7 +172,15 @@ GravityInLean/FreeFall.lean         step 1: the round orbit as free fall
 GravityInLean/TwoSlopes.lean        step 2: functions of time and distance, and their slopes
 GravityInLean/RoundChanging.lean    step 2: the curvature of a round space-time that may change
 GravityInLean/Birkhoff.lean         step 2: Birkhoff's theorem and what it means
-GravityInLean/Probe/Sphere.lean     the probe
+GravityInLean/Symmetry.lean         step 2: the three turns, and the shape that symmetry allows
+GravityInLean/GeneralShape.lean     step 2: the general round shape and its connection
+GravityInLean/GeneralCurvature.lean step 2: its curvature, and the three size equations
+GravityInLean/Potential.lean        step 2: a function with two given slopes (for the new time)
+GravityInLean/BirkhoffGeneral.lean  step 2: the theorem for the general round shape
+GravityInLean/BirkhoffFromSymmetry.lean  step 2: the theorem with no starting shape assumed
+GravityInLean/Eddington.lean        step 2: an example with a cross term
+GravityInLean/Probe/Sphere.lean     probe: a sphere
+GravityInLean/Probe/DeSitter.lean   probe: de Sitter's space-time
 pages/                              the interactive pages
 
 SURVEY.md                           what already exists elsewhere

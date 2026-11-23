@@ -34,7 +34,8 @@ This is the usual starting shape for Birkhoff's theorem in the textbooks.
 
 **What is still assumed.** As in step 1: curvature is defined by the classic coordinate formulas
 (`Curvature.lean`), the poles and the centre are left out, and the starting shape is taken as
-given. New here: the clock and ruler functions have to be twice smoothly differentiable, because
+given in this file (`GeneralShape.lean` and `Symmetry.lean` start one step earlier). New here: the
+clock and ruler functions have to be twice smoothly differentiable, because
 the mixed time-distance part is only free of second slopes when the order of two slopes does not
 matter.
 -/
@@ -96,6 +97,14 @@ theorem dt_onlyR (f : ℝ → ℝ) (t r : ℝ) : dt (onlyR f) t r = 0 := by
   simp [dt, onlyR]
 
 theorem dr_onlyR (f : ℝ → ℝ) (t r : ℝ) : dr (onlyR f) t r = deriv f r := by
+  simp [dr, onlyR]
+
+theorem dt_onlyR_fun (f : ℝ → ℝ) : dt (onlyR f) = zero2 := by
+  funext t r
+  simp [dt, onlyR, zero2]
+
+theorem dr_onlyR_fun (f : ℝ → ℝ) : dr (onlyR f) = onlyR (deriv f) := by
+  funext t r
   simp [dr, onlyR]
 
 theorem dt_half {P Q : ℝ → ℝ → ℝ} {t r P' Q' : ℝ} (hP : HasDerivAt (fun s => P s r) P' t)

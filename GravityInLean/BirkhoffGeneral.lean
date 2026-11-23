@@ -27,15 +27,17 @@ space-time of this shape is Schwarzschild's, after new labels for time and dista
 
 * `massFn_const`: in an empty round space-time the number `M = (√S / 2) · (1 - |∇√S|²)` is the
   same everywhere. It can be read off at any place from how fast the spheres grow there.
+* `massFn_schwarzschild`: in the shape of steps 1 and 2 this number is the mass `M` of `birkhoff`.
+* `usable_somewhere`: the size of the spheres is a usable distance somewhere on every region. The
+  places where it is not (the rim) contain no region at all.
 * `birkhoff_general`: where the size of the spheres is a usable distance (`sizeSlopeSq ≠ 0`),
   there is a new time `T(t, ρ)` such that, with the new labels `T` and `r = √S`, the length of
   every step is Schwarzschild's length of the same step. The new labels are differentiable and
   really are coordinates (their Jacobian is not zero).
 * `relabel_path`: the meaning of "the same step in new labels": it is the speed of a path, read
   in the new labels (the chain rule).
-* `eddington_isEmptyOn`, `eddington_isSchwarzschild`: the assumptions can be met by a space-time
-  with a cross term: Eddington's and Finkelstein's way of writing a black hole, which stays
-  regular at the rim.
+
+That the assumptions can be met is shown in `Eddington.lean`, by a space-time with a cross term.
 
 **What is still assumed.** That the length measure has the general round shape; `Symmetry.lean`
 shows that this is all that "looks the same from every side" allows. The places where the sphere
@@ -262,6 +264,80 @@ theorem massFn_const_of_sizeEquations (h : SettingG A B C S J I)
 theorem massFn_const (h : SettingG A B C S J I) (hE : IsEmptyOnG A B C S J I) :
     ∀ t ∈ J, ∀ t' ∈ J, ∀ ρ ∈ I, ∀ ρ' ∈ I, massFn A B C S t ρ = massFn A B C S t' ρ' :=
   massFn_const_of_sizeEquations h fun _ ht _ hρ => h.sizeEquations hE ht hρ
+
+/-- **The rim is thin.** In an empty round space-time the size of the spheres is a usable distance
+somewhere on every region: `sizeSlopeSq` cannot be zero on a whole stretch of times and distances.
+So the places where `birkhoff_general` below does not apply contain no region at all. -/
+theorem usable_somewhere (h : SettingG A B C S J I) (hE : IsEmptyOnG A B C S J I)
+    (hJ : J.Nonempty) (hI : I.Nonempty) : ∃ t ∈ J, ∃ ρ ∈ I, sizeSlopeSq A B C S t ρ ≠ 0 := by
+  by_contra hcon
+  push Not at hcon
+  obtain ⟨t₀, ht₀⟩ := hJ
+  obtain ⟨ρ₀, hρ₀⟩ := hI
+  -- Then the radius does not grow in any direction,
+  have hN : ∀ t ∈ J, ∀ ρ ∈ I, radiusSlopeSq A B C S t ρ = 0 := fun t ht ρ hρ => by
+    unfold radiusSlopeSq
+    rw [hcon t ht ρ hρ, zero_div]
+  -- the mass is half the radius, so the size of the spheres is the same everywhere,
+  have hSc : ∀ t ∈ J, ∀ ρ ∈ I, S t ρ = S t₀ ρ₀ := by
+    intro t ht ρ hρ
+    have hm := massFn_const h hE t ht t₀ ht₀ ρ hρ ρ₀ hρ₀
+    unfold massFn at hm
+    rw [hN t ht ρ hρ, hN t₀ ht₀ ρ₀ hρ₀] at hm
+    have hsq : √(S t ρ) = √(S t₀ ρ₀) := by linarith
+    exact (Real.sqrt_inj (h.S_pos t ht ρ hρ).le (h.S_pos t₀ ht₀ ρ₀ hρ₀).le).mp hsq
+  -- and it has no slopes at all.
+  have hSt : ∀ t ∈ J, ∀ ρ ∈ I, dt S t ρ = 0 := fun t ht ρ hρ =>
+    deriv_eq_zero_of_eventually_const (c := S t₀ ρ₀) (by
+      filter_upwards [h.openJ.mem_nhds ht] with s hs
+      exact hSc s hs ρ hρ)
+  have hSr : ∀ t ∈ J, ∀ ρ ∈ I, dr S t ρ = 0 := fun t ht ρ hρ =>
+    deriv_eq_zero_of_eventually_const (c := S t₀ ρ₀) (by
+      filter_upwards [h.openI.mem_nhds hρ] with s hs
+      exact hSc t ht s hs)
+  have hStt : dt (dt S) t₀ ρ₀ = 0 := deriv_eq_zero_of_eventually_const (c := 0) (by
+    filter_upwards [h.openJ.mem_nhds ht₀] with s hs
+    exact hSt s hs ρ₀ hρ₀)
+  have hStr : dr (dt S) t₀ ρ₀ = 0 := deriv_eq_zero_of_eventually_const (c := 0) (by
+    filter_upwards [h.openI.mem_nhds hρ₀] with s hs
+    exact hSt t₀ ht₀ s hs)
+  have hSrr : dr (dr S) t₀ ρ₀ = 0 := deriv_eq_zero_of_eventually_const (c := 0) (by
+    filter_upwards [h.openI.mem_nhds hρ₀] with s hs
+    exact hSr t₀ ht₀ s hs)
+  -- The three size equations then say that the time-distance part is degenerate.
+  obtain ⟨e1, e2, e3⟩ := h.sizeEquations hE ht₀ hρ₀
+  rw [hessTT, hStt, hSt t₀ ht₀ ρ₀ hρ₀, hSr t₀ ht₀ ρ₀ hρ₀, hN t₀ ht₀ ρ₀ hρ₀] at e1
+  rw [hessTR, hStr, hSt t₀ ht₀ ρ₀ hρ₀, hSr t₀ ht₀ ρ₀ hρ₀, hN t₀ ht₀ ρ₀ hρ₀] at e2
+  rw [hessRR, hSrr, hSt t₀ ht₀ ρ₀ hρ₀, hSr t₀ ht₀ ρ₀ hρ₀, hN t₀ ht₀ ρ₀ hρ₀] at e3
+  ring_nf at e1 e2 e3
+  have hA : A t₀ ρ₀ = 0 := by linarith
+  have hC : C t₀ ρ₀ = 0 := by linarith
+  have hB : B t₀ ρ₀ = 0 := by linarith
+  have hd : 0 < A t₀ ρ₀ * B t₀ ρ₀ + C t₀ ρ₀ * C t₀ ρ₀ := h.spaceTime t₀ ht₀ ρ₀ hρ₀
+  rw [hA, hB, hC] at hd
+  simp at hd
+
+/-- In the shape of steps 1 and 2 (no cross term, distance label = radius of the spheres) the
+mass function is `(r / 2) · (1 - 1 / B)`. -/
+theorem massFn_diagonal (A B : ℝ → ℝ → ℝ) (t : ℝ) {r : ℝ} (hr : 0 < r) (hA : A t r ≠ 0)
+    (hB : B t r ≠ 0) : massFn A B zero2 (onlyR sqF) t r = r / 2 * (1 - 1 / B t r) := by
+  have hr0 := hr.ne'
+  have hsq : √(r ^ 2) = r := Real.sqrt_sq hr.le
+  simp only [massFn, radiusSlopeSq, sizeSlopeSq, det2, dt_onlyR_fun, dr_onlyR_fun, onlyR, zero2,
+    deriv_sqF, mul_zero, add_zero, sub_zero]
+  unfold sqF
+  rw [hsq]
+  field_simp
+  ring
+
+/-- For Schwarzschild's ruler function the mass function is the mass `M` of `birkhoff`. -/
+theorem massFn_schwarzschild (A B : ℝ → ℝ → ℝ) (M t : ℝ) {r : ℝ} (hr : 0 < r) (hA : A t r ≠ 0)
+    (hB0 : B t r ≠ 0) (hB : B t r = schwB M r) :
+    massFn A B zero2 (onlyR sqF) t r = M := by
+  have hr0 := hr.ne'
+  rw [massFn_diagonal A B t hr hA hB0, hB, schwB, one_div, inv_inv]
+  field_simp
+  ring
 
 /-! ## The new time -/
 
