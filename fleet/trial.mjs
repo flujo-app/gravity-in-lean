@@ -1,5 +1,5 @@
 // The one-team trial: one container, a lead and nine workers, on the smooth-flow statement.
-//   node trial.mjs <minutes>
+//   node trial.mjs <minutes> <run name> <goal file>
 // It deploys the team, watches it, writes status.json every 30 seconds, and ends the trial by itself
 // when the time is up or when a file named STOP appears in the run folder. At the end it asks every
 // agent to stop, copies the branches out as one git bundle, and stops the container.
@@ -13,16 +13,17 @@ import { ROOT, REPOSITORY, REVISION, IMAGE, MODEL, githubToken, makeFleet, sleep
 const minutes = Number(process.argv[2]);
 if (!Number.isFinite(minutes) || minutes < 1 || minutes > 240) throw new Error('Give the length of the trial in minutes (1 to 240).');
 const RUN = process.argv[3] ?? 'trial1';
+const GOAL = process.argv[4] ?? 'goal-flows.md';
 const directory = join(ROOT, 'runs', RUN);
 mkdirSync(directory, { recursive: true });
 const docker = async args => (await promisify(execFile)('docker', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true })).stdout;
 const fleet = makeFleet(directory);
-const runId = `gravity-flows-${RUN}`;
+const runId = `gravity-${RUN}`;
 const plan = { runId, app: runId, workerProgram: 'claude',
   repository: REPOSITORY, repositoryRevision: REVISION,
   machines: 1, agentsPerMachine: 10, cpus: 7, memoryMb: 18432,
   model: MODEL, subagentModel: MODEL, reasoningEffort: 'high',
-  goal: readFileSync(new URL('./goal-flows.md', import.meta.url), 'utf8') };
+  goal: readFileSync(new URL(`./${GOAL}`, import.meta.url), 'utf8') };
 const agents = Array.from({ length: plan.agentsPerMachine }, (_, index) => `m0-a${index}`);
 const container = `factory-${runId}-m0`;
 

@@ -7,7 +7,7 @@ showed is in [PLAN.md](../PLAN.md), "What the first team trial showed".
 | File | What it is |
 |---|---|
 | `Dockerfile` | The worker image: Node, Lean 4.36.0, and the ready-built standard library. |
-| `goal-flows.md` | The brief the team got: what to prove, the rules, how turns work. |
+| `goal-flows.md`, `goal-turns.md` | The briefs for the first and the second job: what to prove, the rules, how turns work. |
 | `image-check.sh` | Checks the image the way an agent uses it: only the search path and the home folder are set. |
 | `common.mjs` | Shared settings: which commit, which image, which model. |
 | `smoke.mjs` | A small check before a real run: one container, two agents, one short job. |
