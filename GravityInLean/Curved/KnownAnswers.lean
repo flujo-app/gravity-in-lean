@@ -14,10 +14,12 @@ import Mathlib.Geometry.Manifold.Notation
 import Mathlib.Tactic
 
 /-!
-# The definitions of `Basic.lean`, tested on three known answers
+# The definitions of `Basic.lean`, tested on known answers
 
 A definition that nobody has tested is a guess. Before anything is built on the definitions of
-`Basic.lean`, this file applies them to three cases where the answer is known beforehand.
+`Basic.lean`, this file applies them to cases where the answer is known beforehand.
+
+**Flat space-time.** One time direction, and empty (`flat_isSpaceTimeOn`, `flat_isEmptyOn`).
 
 **A sphere.** All lengths are positive, so it has no time direction (`sphere_noTime`). Its
 curvature is its own length measure (`sphere_curvature`): positive, with the textbooks' sign.
@@ -112,6 +114,49 @@ end Diagonal
 theorem not_hasOneTimeDirection_of_nonneg {V : Type*} [Zero V] {b : V → V → ℝ}
     (h : ∀ v, 0 ≤ b v v) : ¬ HasOneTimeDirection b :=
   fun ⟨t, ht, _⟩ ↦ absurd ht (not_lt.mpr (h t))
+
+/-! ## Known answer 0: flat space-time -/
+
+section Flat
+
+/-- The table of flat space-time (Minkowski's): `-1` for time, `1` for each of the three space
+directions, the same at every point. It is its own inverse. -/
+noncomputable def flatG (a b : Fin 4) : Coords 4 → ℝ := fun _ ↦
+  if a = b then (if a = 0 then -1 else 1) else 0
+
+/-- Flat space-time has no connection beyond the plain slope: all its Christoffel symbols are
+zero. -/
+theorem christoffel_flatG (a b c : Fin 4) (x : Coords 4) : christoffel flatG flatG a b c x = 0 := by
+  have h : ∀ (i j k : Fin 4), slope k (flatG i j) x = 0 := fun i j k ↦ slope_const _ _ _
+  simp [christoffel, h]
+
+theorem flatG_regular : IsRegularTableOn flatG flatG Set.univ where
+  isOpen := isOpen_univ
+  smooth := fun _ _ ↦ contDiffOn_const
+  symm := fun x _ a b ↦ by fin_cases a <;> fin_cases b <;> simp [flatG]
+  inverse := fun x _ a c ↦ by
+    fin_cases a <;> fin_cases c <;> simp [flatG]
+
+/-- **Flat space-time is a space-time in the sense of `Basic.lean`,** everywhere. -/
+theorem flat_isSpaceTimeOn :
+    IsSpaceTimeOn (flatMeasure (tableMeasure flatG)) (Set.univ : Set (Coords 4)) where
+  symm := fun _ hx v w ↦ flatG_regular.measure_symm hx v w
+  oneTime := fun _ _ ↦
+    hasOneTimeDirection_diag (D := fun a : Fin 4 ↦ if a = 0 then (-1 : ℝ) else 1) 0 (by simp)
+      (fun a ha ↦ by simp [ha])
+  smooth := flatG_regular.isSmoothOn
+
+/-- **Known answer 0.** Flat space-time is empty in the sense of `Basic.lean`, everywhere. -/
+theorem flat_isEmptyOn :
+    IsEmptyOn (flatMeasure (tableMeasure flatG)) (Set.univ : Set (Coords 4)) :=
+  flatG_regular.isEmptyOn fun x _ i j ↦ by
+    have h : christoffel flatG flatG = fun _ _ _ _ ↦ 0 := by
+      funext a b c y
+      exact christoffel_flatG a b c y
+    rw [h]
+    simp [ricci, slope_const]
+
+end Flat
 
 /-! ## Known answer 1: a sphere -/
 

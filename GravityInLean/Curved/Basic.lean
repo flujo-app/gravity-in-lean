@@ -9,6 +9,7 @@ public import Mathlib.Geometry.Manifold.VectorBundle.CovariantDerivative.Torsion
 public import Mathlib.Geometry.Manifold.VectorBundle.Hom
 public import Mathlib.LinearAlgebra.Dimension.Free
 public import Mathlib.LinearAlgebra.FiniteDimensional.Defs
+public import Mathlib.Algebra.QuadraticDiscriminant
 
 import Mathlib.Geometry.Manifold.Notation
 import Mathlib.Tactic
@@ -39,7 +40,8 @@ The words used here, and the textbooks' words for them:
 
 **What is defined here.**
 
-* `HasOneTimeDirection`: a two-slot function on steps that counts exactly one direction as time.
+* `HasOneTimeDirection`: a two-slot function on steps that counts exactly one direction as time
+  (`HasOneTimeDirection.not_orthogonal` shows that it is exactly one).
 * `IsLengthMeasureOn`, `IsSpaceTimeOn`: a smooth length measure on a region, and one with a time
   direction.
 * `IsConnectionOf`: the connection that belongs to a length measure.
@@ -92,6 +94,80 @@ theorem HasOneTimeDirection.nondegenerate {b : V → V → ℝ} (h : HasOneTimeD
   exact lt_irrefl 0 h2
 
 end TimeDirection
+
+section OnlyOne
+
+variable {V : Type*} [AddCommGroup V] [Module ℝ V]
+
+/-- **There is only one time direction.** If a symmetric two-slot function has one time direction
+in the sense above, then two steps through time are never at right angles to each other. So the
+steps through time do not contain two independent directions that the measure keeps apart: the
+definition really says "one", not "at least one". -/
+theorem HasOneTimeDirection.not_orthogonal {B : V →ₗ[ℝ] V →ₗ[ℝ] ℝ}
+    (h : HasOneTimeDirection fun v w ↦ B v w) (hsymm : ∀ v w, B v w = B w v) {u w : V}
+    (hu : B u u < 0) (hw : B w w < 0) : B u w ≠ 0 := by
+  obtain ⟨t, ht, hpos⟩ := h
+  have hnn : ∀ v, B t v = 0 → 0 ≤ B v v := fun v hv ↦ by
+    by_cases h0 : v = 0
+    · simp [h0]
+    · exact (hpos v hv h0).le
+  intro huw
+  have hq : B t t ≠ 0 := ht.ne
+  -- The parts of `u` and `w` at right angles to the time direction.
+  have htu' : B t (u - (B t u / B t t) • t) = 0 := by
+    simp only [map_sub, map_smul, smul_eq_mul]
+    field_simp
+    ring
+  have htw' : B t (w - (B t w / B t t) • t) = 0 := by
+    simp only [map_sub, map_smul, smul_eq_mul]
+    field_simp
+    ring
+  set α := B t u / B t t with hα
+  set β := B t w / B t t with hβ
+  set u' := u - α • t with hu'
+  set w' := w - β • t with hw'
+  have hsu : B u' t = 0 := by rw [hsymm]; exact htu'
+  have hsw : B w' t = 0 := by rw [hsymm]; exact htw'
+  -- On these parts all squared lengths are at least zero: the Cauchy-Schwarz inequality.
+  have hquad : ∀ l : ℝ, 0 ≤ B w' w' * (l * l) + 2 * B u' w' * l + B u' u' := fun l ↦ by
+    have h1 := hnn (u' + l • w') (by simp [map_add, map_smul, htu', htw'])
+    have e : B (u' + l • w') (u' + l • w')
+        = B w' w' * (l * l) + 2 * B u' w' * l + B u' u' := by
+      simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul]
+      rw [hsymm w' u']
+      ring
+    linarith
+  have hdisc := discrim_le_zero hquad
+  rw [discrim] at hdisc
+  -- `u` and `w`, split into their parts.
+  have eu : u = u' + α • t := by rw [hu']; abel
+  have ew : w = w' + β • t := by rw [hw']; abel
+  have e1 : B u u = B u' u' + α ^ 2 * B t t := by
+    conv_lhs => rw [eu]
+    simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul, hsu,
+      htu']
+    ring
+  have e2 : B w w = B w' w' + β ^ 2 * B t t := by
+    conv_lhs => rw [ew]
+    simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul, hsw,
+      htw']
+    ring
+  have e3 : B u w = B u' w' + α * β * B t t := by
+    conv_lhs => rw [eu, ew]
+    simp only [map_add, map_smul, LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul, hsu,
+      htw']
+    ring
+  have ha0 : 0 ≤ B u' u' := hnn u' htu'
+  have hb0 : 0 ≤ B w' w' := hnn w' htw'
+  have ha : B u' u' < α ^ 2 * (-B t t) := by linarith
+  have hb : B w' w' < β ^ 2 * (-B t t) := by linarith
+  have hprod : B u' u' * B w' w' < α ^ 2 * (-B t t) * (β ^ 2 * (-B t t)) :=
+    mul_lt_mul'' ha hb ha0 hb0
+  have hx : B u' w' = -(α * β * B t t) := by linarith
+  rw [hx] at hdisc
+  nlinarith
+
+end OnlyOne
 
 /-! ## Length measures on a curved space -/
 
