@@ -393,6 +393,28 @@ theorem curvatureMap_apply (A : E → E →L[ℝ] E →L[ℝ] E) (x v w u : E) :
       = fderiv ℝ A x u w v - fderiv ℝ A x v w u + A x (A x w v) u - A x (A x w u) v := by
   simp [curvatureMap]
 
+theorem curvatureMap_add_left (A : E → E →L[ℝ] E →L[ℝ] E) (x v v' w : E) :
+    curvatureMap A x (v + v') w = curvatureMap A x v w + curvatureMap A x v' w := by
+  ext u
+  simp only [curvatureMap_apply, add_apply, map_add]
+  abel
+
+theorem curvatureMap_smul_left (A : E → E →L[ℝ] E →L[ℝ] E) (x : E) (c : ℝ) (v w : E) :
+    curvatureMap A x (c • v) w = c • curvatureMap A x v w := by
+  ext u
+  simp only [curvatureMap_apply, smul_apply, map_smul, smul_sub, smul_add]
+
+theorem curvatureMap_add_right (A : E → E →L[ℝ] E →L[ℝ] E) (x v w w' : E) :
+    curvatureMap A x v (w + w') = curvatureMap A x v w + curvatureMap A x v w' := by
+  ext u
+  simp only [curvatureMap_apply, add_apply, map_add]
+  abel
+
+theorem curvatureMap_smul_right (A : E → E →L[ℝ] E →L[ℝ] E) (x : E) (c : ℝ) (v w : E) :
+    curvatureMap A x v (c • w) = c • curvatureMap A x v w := by
+  ext u
+  simp only [curvatureMap_apply, smul_apply, map_smul, smul_sub, smul_add]
+
 variable [FiniteDimensional ℝ E]
 
 /-- **The curvature at a point of flat space** is the trace of the full curvature over its first
