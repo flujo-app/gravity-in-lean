@@ -94,6 +94,14 @@ quietly go stale. -/
   GravityInLean.roundOrbit_isFreeFall_iff GravityInLean.roundOrbit_keepsOwnTime_iff
   GravityInLean.roundOrbit_clockRate_of_freeFall GravityInLean.roundOrbit_freeFall_exists
 
+-- Step 2: a round space-time that may change in time, and Birkhoff's theorem
+#audit GravityInLean.TwiceSmooth.swap GravityInLean.const_of_hasDerivAt_zero
+  GravityInLean.christoffel_changing GravityInLean.changing_ricciFlat_iff
+  GravityInLean.changingG_mul_changingGinv GravityInLean.changingG_static
+  GravityInLean.static_unique GravityInLean.birkhoff GravityInLean.birkhoff_nothingChanges
+  GravityInLean.birkhoff_resetClocks GravityInLean.schwarzschild_setting
+  GravityInLean.schwarzschild_isEmptyOn GravityInLean.relabelled_isEmptyOn
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

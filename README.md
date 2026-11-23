@@ -20,14 +20,15 @@ a heavy mass and watch clocks slow down and light bend. That page was tested wit
 project asks the stricter question: can a machine confirm the formulas exactly? And how far up
 could that go, perhaps as far as two masses circling each other?
 
-The short answer: one mass, yes, and that part is now done. Two masses: an exact formula almost
-certainly does not exist, so that is not the goal. The honest steps in between are in
-[PLAN.md](PLAN.md).
+The short answer: one mass, yes, and that part is now done in both directions. Schwarzschild's
+space-time is empty, and it is the only round empty one, even if it is allowed to change in time.
+Two masses: an exact formula almost certainly does not exist, so that is not the goal. The honest
+steps in between are in [PLAN.md](PLAN.md).
 
 ```mermaid
 flowchart LR
   T["Three pieces<br/>and a probe<br/>(done)"] --> R1["1 · One mass,<br/>from the definitions<br/>(done)"]
-  R1 --> R2["2 · It is the only one<br/>(Birkhoff)"]
+  R1 --> R2["2 · It is the only one<br/>(Birkhoff)<br/>(done)"]
   R2 --> R3["3 · Weak gravity<br/>gives Newton"]
   R3 --> R4["4a · Two masses,<br/>approximately"]
   R4 -.-> R5["4b · Derive that from<br/>Einstein's equations"]
@@ -51,9 +52,17 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **The budget** | Speed through time, squared, plus speed through space, squared, always adds up to the same total. Light spends all of it on space. | [RoundOrbit.lean](GravityInLean/RoundOrbit.lean), `budget`, `budget_light` |
 | **Step 1, curvature** | Take the general definition of curvature and apply it to a round, unchanging space-time. All sixteen parts come out: three of them are the formulas of Piece B, one is a multiple of the third, twelve are zero. So Schwarzschild's space-time is empty in the full sense of Einstein's equation. | [RoundSpacetime.lean](GravityInLean/RoundSpacetime.lean), `round_ricciFlat_iff`, `schwarzschild_ricciFlat` |
 | **Step 1, orbit** | Take the general equation of free fall and apply it to a round orbit. Three of its four equations hold by themselves, the fourth is exactly a starting fact of Piece C. So the orbit's clock rate now follows from free fall itself. | [FreeFall.lean](GravityInLean/FreeFall.lean), `roundOrbit_isFreeFall_iff`, `roundOrbit_clockRate_of_freeFall` |
+| **Step 2, curvature** | Let the clock and ruler functions also change in time, and apply the general definition of curvature again. All sixteen parts come out: Piece B's three formulas with new terms for the change in time, one new mixed part that measures how fast the ruler function changes, and the rest zero or a multiple. | [RoundChanging.lean](GravityInLean/RoundChanging.lean), `changing_ricciFlat_iff` |
+| **Step 2, Birkhoff** | A round space-time, allowed to change in time, is empty exactly when it is Schwarzschild's: the ruler function is `1/(1 - 2M/r)` and the clock function is `1 - 2M/r` times a factor that depends on time only. On paper this is Birkhoff's theorem of 1923; Jebsen had found it two years earlier. | [Birkhoff.lean](GravityInLean/Birkhoff.lean), `birkhoff` |
+| **Step 2, what it means** | Nothing measurable changes: the ruler function stays put, and clocks at two distances keep the same ratio of rates. So a round star that pulsates sends out no gravity waves. The time factor is only a choice of clock labels: re-set the far clocks and the space-time is Schwarzschild's, step for step, outside the rim. | [Birkhoff.lean](GravityInLean/Birkhoff.lean), `birkhoff_nothingChanges`, `birkhoff_resetClocks` |
 | **Probe** | The curvature of a sphere, computed from the same general definitions, comes out equal to the sphere's own length measure, as the textbooks say. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere` |
 
-In numbers: 79 theorems in about 1,300 lines.
+In numbers: 145 theorems in about 2,400 lines.
+
+Every statement with assumptions also has a check that the assumptions can be met. For step 2:
+Schwarzschild's own space-time meets them (`schwarzschild_isEmptyOn`), and so does one whose clock
+labels really do change in time (`relabelled_isEmptyOn`). The second shows the time factor cannot
+be left out of the statement.
 
 ## What is still taken on trust
 
@@ -64,11 +73,14 @@ of Piece C. Both are now proved. What is left:
    textbook formulas in coordinates ([Curvature.lean](GravityInLean/Curvature.lean)). They are not
    yet tied to the abstract geometry of Lean's standard library, because that library has no
    curvature yet.
-2. **The starting shape.** That a round, unchanging space-time can be described by just a clock
-   function and a ruler function. Showing that is part of step 2.
+2. **The starting shape.** Step 2 starts from a space-time already written with just a clock
+   function and a ruler function, both allowed to change in time. The textbooks reach that shape
+   from "it looks the same from every side" by a change of coordinates. That step is not done
+   here; it needs space-time geometry that the standard library does not have yet.
 3. **The blind spots of the coordinates.** The two poles, the centre, and everything at or inside
    the rim of the black hole are left out of every statement. Textbooks that use these coordinates
-   leave them out too.
+   leave them out too. (Step 2's main theorem itself also holds inside the rim; only the clock
+   re-setting needs the outside.)
 4. **Meaning.** Lean checks that a proof proves its statement. It cannot check that the statement
    says what we mean. That is why the statements are short and each has a plain-language comment:
    they are meant to be read.
@@ -87,7 +99,7 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and six lines that end in
+You should see `Build completed successfully` and seven lines that end in
 `none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about a
 minute.
 
@@ -104,7 +116,7 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 189 declarations in the project rests on (every definition and theorem, plus the helper
+of the 332 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
@@ -119,6 +131,9 @@ So a green build means three things at once: proved, no holes, no extra assumpti
   for the Sun, about 1.5 km.
 - **Coordinates.** A point of space-time is four numbers: far time, distance, angle from the pole,
   angle around the axis.
+- **Smooth enough.** Step 2 asks the clock and ruler functions to be twice smoothly
+  differentiable, the usual condition in the textbooks. It is written into the statement, not
+  assumed in the background.
 - **Versions are pinned:** Lean 4.36.0 and its standard library mathlib v4.36.0. Updating either
   is a deliberate step, not something that happens by itself.
 - **GitHub repeats the check** on a clean machine after every push
@@ -134,6 +149,9 @@ GravityInLean/RoundOrbit.lean       Piece C and the budget
 GravityInLean/Curvature.lean        the general definitions: connection, curvature, free fall
 GravityInLean/RoundSpacetime.lean   step 1: the curvature of the round space-time
 GravityInLean/FreeFall.lean         step 1: the round orbit as free fall
+GravityInLean/TwoSlopes.lean        step 2: functions of time and distance, and their slopes
+GravityInLean/RoundChanging.lean    step 2: the curvature of a round space-time that may change
+GravityInLean/Birkhoff.lean         step 2: Birkhoff's theorem and what it means
 GravityInLean/Probe/Sphere.lean     the probe
 pages/                              the interactive pages
 
