@@ -6,6 +6,7 @@ Authors: flujo-app
 module
 
 public import GravityInLean.Curved.Basic
+public import GravityInLean.Curved.Unique
 public import Mathlib.Analysis.Calculus.VectorField
 public import Mathlib.Analysis.Calculus.FDeriv.Symmetric
 public import Mathlib.Analysis.Calculus.ContDiff.Operations
@@ -41,6 +42,9 @@ drawn on a map. So this covers every space-time that fits into one set of coordi
 * `leavesUnchangedAt_flat_iff`: "moving along a field leaves the length measure unchanged", in
   formulas.
 * `isSmoothOn_flat_iff`: smooth in the sense of curved spaces is smooth in the ordinary sense.
+* `ricciAt_eq_of_isConnectionOf`: every connection of a length measure on flat space has the same
+  curvature as "the plain slope plus a correction". So curvature belongs to the length measure,
+  not to a choice of connection.
 
 **A technical remark.** The standard library treats a step at a point of flat space and a plain
 vector as two types that happen to be the same. This file uses that on purpose, and says so to
@@ -244,10 +248,12 @@ unchanged at `x` exactly when: the slope of `g` along `ξ`, plus `g` with the sl
 its first slot, plus `g` with the slope of `ξ` put into its second slot, is zero. This is
 Killing's equation as the textbooks write it in coordinates. -/
 theorem leavesUnchangedAt_flat_iff {g : E → E →L[ℝ] E →L[ℝ] ℝ} {ξ : Arrows 𝓘(ℝ, E) E} {x : E}
-    (hg : DifferentiableAt ℝ g x) :
+    (hg : DifferentiableAt ℝ g x) (hξ : DifferentiableAt ℝ (plain ξ) x) :
     LeavesUnchangedAt (flatMeasure g) ξ x ↔ ∀ y z : E,
       fderiv ℝ g x (plain ξ x) y z + g x (fderiv ℝ (plain ξ) x y) z
         + g x y (fderiv ℝ (plain ξ) x z) = 0 := by
+  unfold LeavesUnchangedAt
+  rw [and_iff_right (mdiffAt_arrows_iff.mpr hξ)]
   constructor
   · intro h y z
     have hy : MDiffAt (T% (arrows fun _ : E ↦ y)) x :=
@@ -431,6 +437,70 @@ theorem ricciAt_flat (hA : DifferentiableAt ℝ A x) (v w : TangentSpace 𝓘(�
   exact traceIn_eq_trace (stepBasis 𝓘(ℝ, E) x) (curvatureMap A x v w : E →ₗ[ℝ] E)
 
 end Ricci
+
+/-! ## Any connection of the length measure has the same curvature -/
+
+section AnyConnection
+
+variable {g : E → E →L[ℝ] E →L[ℝ] ℝ} {A : E → E →L[ℝ] E →L[ℝ] E} {s : Set E}
+  {cov : Transport 𝓘(ℝ, E) E} {x : E}
+
+/-- Carrying one fixed step along another with "the plain slope plus a correction" gives a field
+that can be differentiated. -/
+theorem mdiffAt_flatTransport_extend (hA : DifferentiableAt ℝ A x)
+    (v w : TangentSpace 𝓘(ℝ, E) x) :
+    MDiffAt (T% fun y ↦ flatTransport A (extend E w) y (extend E v y)) x := by
+  rw [mdiffAt_arrows_iff]
+  have e : plain (fun y ↦ flatTransport A (extend E w) y (extend E v y)) = fun y ↦ A y w v := by
+    funext y
+    change fderiv ℝ (plain (extend E w)) y (plain (extend E v) y)
+      + A y (plain (extend E w) y) (plain (extend E v) y) = A y w v
+    rw [plain_extend, plain_extend]
+    simp
+  rw [e]
+  exact differentiableAt_apply₂ hA (differentiableAt_const w) (differentiableAt_const v)
+
+/-- **The full curvature does not depend on which connection of the length measure is used.** If
+"the plain slope plus the correction `A`" is a connection of `g` on a region, then any other
+connection of `g` on that region has the same full curvature at every point of it. -/
+theorem curvatureAt_eq_of_isConnectionOf (hg : IsLengthMeasureOn (flatMeasure g) s)
+    (h₀ : IsConnectionOf (flatMeasure g) (flatTransport A) s)
+    (h : IsConnectionOf (flatMeasure g) cov s) (hx : x ∈ s) (hA : DifferentiableAt ℝ A x)
+    (u v w : TangentSpace 𝓘(ℝ, E) x) :
+    curvatureAt cov x u v w = curvatureAt (flatTransport A) x u v w := by
+  have hconst : ∀ (z : TangentSpace 𝓘(ℝ, E) x) (y : E), MDiffAt (T% (extend E z)) y :=
+    fun z y ↦ mdiffAt_arrows_iff.mpr (by rw [plain_extend]; exact differentiableAt_const _)
+  have hagree : ∀ y ∈ s, ∀ W : Arrows 𝓘(ℝ, E) E, MDiffAt (T% W) y →
+      cov W y = flatTransport A W y := fun y hy W hW ↦ h.unique hg h₀ hy hW
+  have hs : s ∈ 𝓝 x := h.isOpen.mem_nhds hx
+  -- Near `x` the two connections carry `w` along a fixed step in the same way.
+  have hnear : ∀ z : TangentSpace 𝓘(ℝ, E) x, ∀ᶠ y in 𝓝 x,
+      cov (extend E w) y (extend E z y) = flatTransport A (extend E w) y (extend E z y) :=
+    fun z ↦ Filter.eventually_of_mem hs fun y hy ↦ by rw [hagree y hy _ (hconst w y)]
+  have hfirst : ∀ z : TangentSpace 𝓘(ℝ, E) x,
+      cov (fun y ↦ cov (extend E w) y (extend E z y)) x
+        = flatTransport A (fun y ↦ flatTransport A (extend E w) y (extend E z y)) x := by
+    intro z
+    have h0 := mdiffAt_flatTransport_extend hA z w
+    have h1 : MDiffAt (T% fun y ↦ cov (extend E w) y (extend E z y)) x :=
+      h0.congr_of_eventuallyEq ((hnear z).mono fun y hy ↦ congrArg (TotalSpace.mk' E y) hy)
+    rw [h.isConnection.congr_of_eventuallyEq h1 h0 hs (hnear z), hagree x hx _ h0]
+  unfold curvatureAt curvatureOfFields
+  rw [hfirst v, hfirst u, hagree x hx _ (hconst w x)]
+
+/-- **So does the curvature.** -/
+theorem ricciAt_eq_of_isConnectionOf [FiniteDimensional ℝ E]
+    (hg : IsLengthMeasureOn (flatMeasure g) s)
+    (h₀ : IsConnectionOf (flatMeasure g) (flatTransport A) s)
+    (h : IsConnectionOf (flatMeasure g) cov s) (hx : x ∈ s) (hA : DifferentiableAt ℝ A x)
+    (v w : TangentSpace 𝓘(ℝ, E) x) :
+    ricciAt cov x v w = ricciAt (flatTransport A) x v w := by
+  unfold ricciAt
+  congr 1
+  funext u
+  exact curvatureAt_eq_of_isConnectionOf hg h₀ h hx hA u v w
+
+end AnyConnection
 
 /-! ## Checking on the basic steps -/
 

@@ -54,6 +54,10 @@ The words used here, and the textbooks' words for them:
 For the whole space take `s = Set.univ`. Regions are needed because the known answers come in
 coordinates that fail somewhere (at the poles, at the centre), and because Birkhoff's theorem is a
 statement about the neighbourhood of a point.
+
+**Regions are open.** Curvature at a point looks at the connection near that point, and a bracket
+looks at the fields near the point. On a region with an edge these notions would say nothing at
+the edge. So `IsConnectionOf` and `IsRoundOn` ask for an open region as part of their meaning.
 -/
 
 @[expose] public section
@@ -240,6 +244,8 @@ connection of the textbooks). Three conditions:
 The textbooks prove that a length measure has exactly one such connection. That is not shown
 here; it is part of the work that builds on these definitions. -/
 structure IsConnectionOf (g : LengthMeasure I M) (cov : Transport I M) (s : Set M) : Prop where
+  /-- The region is open: curvature at a point looks at the connection near the point. -/
+  isOpen : IsOpen s
   /-- It is a connection, in the sense of the standard library. -/
   isConnection : IsCovariantDerivativeOn E cov s
   /-- It has no twist (it is torsion-free). -/
@@ -286,7 +292,9 @@ end Trace
 variable [FiniteDimensional ℝ E]
 
 variable (I) in
-/-- A basis of the steps at `x`: the steps along the coordinates of the chart around `x`. -/
+/-- A basis of the steps at `x`, chosen once and for all. Which basis it is does not matter: it
+is only used to take a trace, and the trace of a linear function does not depend on the basis
+(`traceIn_eq_trace` in `Flat.lean`). -/
 noncomputable def stepBasis (x : M) :
     Module.Basis (Fin (Module.finrank ℝ E)) ℝ (TangentSpace I x) :=
   (Module.finBasis ℝ E).map (tangentSpaceCastModel I x).symm.toLinearEquiv
@@ -306,11 +314,12 @@ def IsEmptyOn (g : LengthMeasure I M) (s : Set M) : Prop :=
 /-! ## Symmetry -/
 
 /-- **Moving along the field of arrows `ξ` leaves the length measure unchanged at `x`** (`ξ` is a
-Killing field at `x`). For any two fields `X` and `Y`: the change of `g(X, Y)` along `ξ` is what
-the changes of `X` and of `Y` along `ξ` account for. "The change of `X` along `ξ`" is the bracket
-of the two fields, so no connection is needed to say this. -/
+Killing field at `x`). The field can be differentiated at `x`, and for any two fields `X` and `Y`:
+the change of `g(X, Y)` along `ξ` is what the changes of `X` and of `Y` along `ξ` account for.
+"The change of `X` along `ξ`" is the bracket of the two fields, so no connection is needed to say
+this. -/
 def LeavesUnchangedAt (g : LengthMeasure I M) (ξ : Arrows I M) (x : M) : Prop :=
-  ∀ X Y : Arrows I M, MDiffAt (T% X) x → MDiffAt (T% Y) x →
+  MDiffAt (T% ξ) x ∧ ∀ X Y : Arrows I M, MDiffAt (T% X) x → MDiffAt (T% Y) x →
     d% (fun y ↦ g y (X y) (Y y)) x (ξ x)
       = g x (mlieBracket I ξ X x) (Y x) + g x (X x) (mlieBracket I ξ Y x)
 
@@ -327,6 +336,8 @@ of arrows `ξ 0`, `ξ 1`, `ξ 2` that
 This is the statement "the turns of ordinary space act on the space-time, keeping all lengths,
 and move each point over a sphere", said for small turns. No coordinates are mentioned. -/
 structure IsRoundOn (g : LengthMeasure I M) (ξ : Fin 3 → Arrows I M) (s : Set M) : Prop where
+  /-- The region is open: a bracket looks at the fields near a point. -/
+  isOpen : IsOpen s
   /-- The three fields are smooth. -/
   smooth : ∀ i, CMDiff[s] ∞ (T% (ξ i))
   /-- Each leaves the length measure unchanged. -/

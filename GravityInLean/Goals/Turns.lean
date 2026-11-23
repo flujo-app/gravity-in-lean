@@ -32,7 +32,8 @@ Two statements:
   three fields of arrows that leave it unchanged, combine the way turns do, and sweep out
   surfaces on which all lengths are positive (`TurnsOn`). Then around every point there are new
   coordinates in which the three fields, after one fixed rotation among themselves, are exactly
-  the three standard turns `rotY`, `rotX`, `rotZ`.
+  the three standard turns `rotY`, `rotX`, `rotZ`. This is a large job, and it needs the first
+  statement.
 
 Each statement comes with a check that it is not about nothing, and that its conclusion is formed
 the right way round: `smoothFlow_const` (a field that is the same everywhere),
@@ -138,17 +139,21 @@ that turn (`TurnsOn`). Then for every point `p` of the region there are
 
 such that, in the new coordinates, the rotated fields are exactly the three standard turns: the
 table of slopes of `Φ` turns `stdTurn i` at `y` into `∑ j, R i j * ξ j` at `Φ y`. The new
-coordinates stay away from the poles.
+coordinates stay away from the poles, and `p` itself sits on the equator, at angle zero around
+the axis: `y₀ 2 = π / 2` and `y₀ 3 = 0`.
 
-With this, `shape_of_round` and `birkhoff_of_round` apply in the new coordinates, and the "any
-coordinates" theorems carry everything back. -/
+**What this does not yet give.** `shape_of_round` and `birkhoff_of_round` ask for their
+assumptions at all angles, while this statement only gives a small patch `W` of new coordinates
+(it cannot give more: the region `s` may be small). Two more lemmas are needed before they can be
+used: the shape of a round table on a small patch, and the continuation of that shape to all
+angles. They are not part of this statement. -/
 def TurnsCoordinatesStatement : Prop :=
   ∀ (g ginv : Fin 4 → Fin 4 → Coords 4 → ℝ) (ξ : Fin 3 → Fin 4 → Coords 4 → ℝ)
     (s : Set (Coords 4)), Curved.IsRegularTableOn g ginv s → TurnsOn g ξ s → ∀ p ∈ s,
     ∃ (Φ : Coords 4 → Coords 4) (R : Matrix (Fin 3) (Fin 3) ℝ) (W : Set (Coords 4))
       (y₀ : Coords 4),
-      IsOpen W ∧ y₀ ∈ W ∧ Φ y₀ = p ∧ (∀ y ∈ W, Φ y ∈ s) ∧ ContDiffOn ℝ ∞ Φ W ∧
-      R * R.transpose = 1 ∧ R.det = 1 ∧
+      IsOpen W ∧ y₀ ∈ W ∧ Φ y₀ = p ∧ y₀ 2 = π / 2 ∧ y₀ 3 = 0 ∧ (∀ y ∈ W, Φ y ∈ s) ∧
+      ContDiffOn ℝ ∞ Φ W ∧ R * R.transpose = 1 ∧ R.det = 1 ∧
       (∀ y ∈ W, sin (y 2) ≠ 0 ∧ (tab (jac Φ) y).det ≠ 0) ∧
       ∀ y ∈ W, ∀ i α, ∑ μ, jac Φ α μ y * stdTurn i μ y = ∑ j, R i j * ξ j α (Φ y)
 
@@ -204,18 +209,21 @@ theorem jac_id (y : Coords 4) (α μ : Fin 4) :
     simpa [jac] using slope_along α (fun r : ℝ ↦ r) y
   · simpa [jac, h] using slope_across (i := μ) (j := α) h (fun r : ℝ ↦ r) y
 
-/-- **The conclusion of statement 2 holds for Schwarzschild's own coordinates,** with the change
-of coordinates that does nothing and no rotation. So the conclusion is formed the right way
-round. -/
-theorem turnsCoordinates_schwarzschild (M : ℝ) {p : Coords 4} (hp : p ∈ Curved.outside M) :
+/-- **The conclusion of statement 2 holds for Schwarzschild's own coordinates,** at a point on
+the equator at angle zero, with the change of coordinates that does nothing and no rotation. So
+the conclusion can be met. (This check would not notice if the table of slopes or the rotation
+were written the wrong way round; that was checked by hand by a second reader.) -/
+theorem turnsCoordinates_schwarzschild (M : ℝ) {p : Coords 4} (hp : p ∈ Curved.outside M)
+    (hp2 : p 2 = π / 2) (hp3 : p 3 = 0) :
     ∃ (Φ : Coords 4 → Coords 4) (R : Matrix (Fin 3) (Fin 3) ℝ) (W : Set (Coords 4))
       (y₀ : Coords 4),
-      IsOpen W ∧ y₀ ∈ W ∧ Φ y₀ = p ∧ (∀ y ∈ W, Φ y ∈ Curved.outside M) ∧ ContDiffOn ℝ ∞ Φ W ∧
+      IsOpen W ∧ y₀ ∈ W ∧ Φ y₀ = p ∧ y₀ 2 = π / 2 ∧ y₀ 3 = 0 ∧
+      (∀ y ∈ W, Φ y ∈ Curved.outside M) ∧ ContDiffOn ℝ ∞ Φ W ∧
       R * R.transpose = 1 ∧ R.det = 1 ∧
       (∀ y ∈ W, sin (y 2) ≠ 0 ∧ (tab (jac Φ) y).det ≠ 0) ∧
       ∀ y ∈ W, ∀ i α, ∑ μ, jac Φ α μ y * stdTurn i μ y = ∑ j, R i j * stdTurn j α (Φ y) := by
-  refine ⟨fun z ↦ z, 1, Curved.outside M, p, Curved.isOpen_outside M, hp, rfl, fun y hy ↦ hy,
-    contDiffOn_id, by simp, by simp, fun y hy ↦ ⟨hy.2.2, ?_⟩, fun y _ i α ↦ ?_⟩
+  refine ⟨fun z ↦ z, 1, Curved.outside M, p, Curved.isOpen_outside M, hp, rfl, hp2, hp3,
+    fun y hy ↦ hy, contDiffOn_id, by simp, by simp, fun y hy ↦ ⟨hy.2.2, ?_⟩, fun y _ i α ↦ ?_⟩
   · have e : tab (jac fun z : Coords 4 ↦ z) y = 1 := by
       ext a b
       simp [tab, jac_id, Matrix.one_apply]

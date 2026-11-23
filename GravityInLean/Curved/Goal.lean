@@ -30,7 +30,9 @@ before they are used:
   (`schwarzschild_usable`: true everywhere off the rim).
 
 **The assumptions can be met.** Schwarzschild's space-time meets all assumptions of the goal at
-once (`schwarzschild_meets_goal`). So the goal is not a statement about nothing.
+once (`schwarzschild_meets_goal`), and the conclusion holds for it with the chart that does
+nothing (`schwarzschild_meets_conclusion`). So the goal is not a statement about nothing, and its
+conclusion is formed the right way round.
 -/
 
 @[expose] public section
@@ -60,8 +62,9 @@ noncomputable def sizeSq (g : LengthMeasure I M) (ξ : Fin 3 → Arrows I M) (x 
 
 /-- **The size of the spheres is a usable distance at `p`.** There is a step `n` at `p` that
 points the way the spheres grow (it turns the length measure into the slope of `sizeSq`), and its
-own squared length is not zero: the spheres do not grow along a path of light. On the rim of a
-black hole this fails. -/
+own squared length is not zero: the spheres do not grow along a path of light. (In the
+textbooks this is what fails on the rim of a black hole. Here it is only shown where it holds:
+`schwarzschild_usable`, `schwarzschild_usable_inside`.) -/
 def UsableDistanceAt (g : LengthMeasure I M) (ξ : Fin 3 → Arrows I M) (p : M) : Prop :=
   ∃ n : TangentSpace I p,
     (∀ w : TangentSpace I p, g p n w = d% (sizeSq g ξ) p w) ∧ g p n n ≠ 0
@@ -186,5 +189,27 @@ theorem schwarzschild_meets_goal (M : ℝ) :
         UsableDistanceAt (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) turns p :=
   ⟨isOpen_outside M, schwarzschild_isSpaceTimeOn_outside M, schwarzschild_isEmptyOn M,
     schwarzschild_isRoundOn M, fun _ hp ↦ schwarzschild_usable M hp⟩
+
+/-- **The conclusion of the goal holds for Schwarzschild's space-time itself,** with the chart
+that does nothing, cut down to the outside of the rim. So the conclusion is formed the right way
+round: lengths in the space-time are Schwarzschild's lengths of the steps as the chart sees
+them. -/
+theorem schwarzschild_meets_conclusion (m : ℝ) {p : Coords 4} (hp : p ∈ outside m) :
+    ∃ φ : OpenPartialHomeomorph (Coords 4) (Coords 4),
+      φ ∈ IsManifold.maximalAtlas 𝓘(ℝ, Coords 4) ∞ (Coords 4) ∧ p ∈ φ.source ∧
+      ∀ q ∈ φ.source, (φ q ∈ outside m ∨ φ q ∈ inside m) ∧
+        ∀ v w : TangentSpace 𝓘(ℝ, Coords 4) q,
+          flatMeasure (tableMeasure (roundG (schwA m) (schwB m))) q v w
+            = flatMeasure (tableMeasure (roundG (schwA m) (schwB m))) (φ q)
+              (mfderiv 𝓘(ℝ, Coords 4) 𝓘(ℝ, Coords 4) φ q v)
+              (mfderiv 𝓘(ℝ, Coords 4) 𝓘(ℝ, Coords 4) φ q w) := by
+  refine ⟨OpenPartialHomeomorph.ofSet (outside m) (isOpen_outside m),
+    StructureGroupoid.mem_maximalAtlas_of_mem_groupoid _
+      (ofSet_mem_contDiffGroupoid (isOpen_outside m)), hp, fun q hq ↦ ⟨Or.inl hq, fun v w ↦ ?_⟩⟩
+  have e : mfderiv 𝓘(ℝ, Coords 4) 𝓘(ℝ, Coords 4)
+      (OpenPartialHomeomorph.ofSet (outside m) (isOpen_outside m)) q
+      = ContinuousLinearMap.id ℝ (TangentSpace 𝓘(ℝ, Coords 4) q) := mfderiv_id
+  rw [e]
+  rfl
 
 end GravityInLean.Curved

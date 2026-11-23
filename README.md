@@ -66,9 +66,27 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **Any coordinates: free fall** | A path that falls freely in one set of coordinates falls freely in every other, and its own clock keeps the same time in all of them. | [SamePath.lean](GravityInLean/SamePath.lean), `isFreeFallAt_inNewCoords`, `keepsOwnTimeAt_inNewCoords` |
 | **Any coordinates: symmetry** | A move that leaves the length measure unchanged in one set of coordinates leaves it unchanged in every other. | [SameSymmetry.lean](GravityInLean/SameSymmetry.lean), `lieD_inNewCoords`, `leavesUnchangedAt_inNewCoords` |
 | **One space-time, written in two ways** | The three theorems above, tested on a case with a known answer. Schwarzschild's length measure, re-written with Eddington's time label, is exactly Eddington's and Finkelstein's. So Eddington's is empty, looks the same from every side, and has the free-falling round orbit of step 1, each time without computing anything in Eddington's coordinates. The direct computations of step 2 agree. Birkhoff's theorem now also reads: an empty round space-time is Schwarzschild's length measure in other coordinates, entry by entry. And Schwarzschild's in any coordinates is empty. | [SameSpacetime.lean](GravityInLean/SameSpacetime.lean), `inNewCoords_toSchw`, `eddington_ricciFlat_from_schwarzschild`, `eddington_isRound_from_schwarzschild`, `eddington_orbit_freeFall`, `birkhoff_general_inNewCoords`, `schwarzschild_ricciFlat_inNewCoords` |
+| **Curved space: the definitions** | The same notions, said on a curved space where no coordinates are singled out: a length measure with exactly one time direction, its connection, its curvature, empty space, a move that leaves all lengths unchanged, and "looks the same from every side". Definitions only, with a proof that "one time direction" really means one. | [Curved/Basic.lean](GravityInLean/Curved/Basic.lean), `IsSpaceTimeOn`, `IsConnectionOf`, `curvatureAt`, `ricciAt`, `IsEmptyOn`, `LeavesUnchangedAt`, `IsRoundOn`, `HasOneTimeDirection.not_orthogonal` |
+| **Curved space: the two languages agree** | On coordinate space the new definitions turn into the coordinate formulas used everywhere else in this project. The textbooks' formula gives the connection of a length measure; its curvature is the formula `ricci`; "unchanged along a field" is Killing's equation; and the full curvature at a point does not depend on how its three steps are continued. | [Curved/Flat.lean](GravityInLean/Curved/Flat.lean), [Curved/Tables.lean](GravityInLean/Curved/Tables.lean), `isConnectionOf_table`, `ricciAt_table`, `leavesUnchangedAt_table_iff`, `curvatureOfFields_flat_eq_curvatureAt` |
+| **Curved space: known answers** | The definitions, tested before anything is built on them. Flat space-time: one time direction, empty. A sphere: no time direction, curvature equal to its own length measure. De Sitter's space-time: one time direction, curvature `3/L²` times its length measure. Schwarzschild's: one time direction outside the rim and inside it (inside, it is the distance label), empty, and it looks the same from every side. | [Curved/KnownAnswers.lean](GravityInLean/Curved/KnownAnswers.lean), `flat_isEmptyOn`, `sphere_noTime`, `sphere_curvature`, `deSitter_curvature`, `schwarzschild_isSpaceTimeOn_inside`, `schwarzschild_isEmptyOn`, `schwarzschild_isRoundOn` |
 | **Probes** | Two tests of the definitions on curvatures that are known and not zero. A sphere: its curvature comes out equal to its own length measure. De Sitter's space-time, an empty universe with a cosmological constant: its curvature comes out as `3/L²` times its own length measure, with the textbooks' sign, in the time direction too. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere`; [Probe/DeSitter.lean](GravityInLean/Probe/DeSitter.lean), `ricci_deSitter` |
 
-In numbers: 375 theorems in about 7,400 lines.
+In numbers: 513 theorems in about 10,000 lines.
+
+## Stated, not yet proved
+
+The next piece of work is Birkhoff's theorem with no coordinates at all
+([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all"). Its targets are
+written down in exact form, so that nobody proving them can quietly change them. **None of these
+is proved.** Each is a definition of a statement. The build checks that the statements are
+well-formed and rest on nothing extra. It does not check that they are true.
+
+| Statement | In plain words | File, and the check that it is not about nothing |
+|---|---|---|
+| `BirkhoffNoCoordinates` | A space-time with four dimensions that is empty and looks the same from every side is, around every point where the size of the spheres is a usable distance, Schwarzschild's in a suitable chart. | [Curved/Goal.lean](GravityInLean/Curved/Goal.lean). Schwarzschild's space-time meets every assumption: `schwarzschild_meets_goal`. |
+| `TurnsCoordinatesStatement` | Three fields of arrows that leave a table unchanged, combine the way turns do and sweep out surfaces are, in suitable coordinates and after one fixed rotation among themselves, exactly the three standard turns. This removes the last shortcut of step 2. | [Goals/Turns.lean](GravityInLean/Goals/Turns.lean). `schwarzschild_turnsOn`, `turnsCoordinates_schwarzschild`. |
+| `SmoothFlowStatement` | Following a smooth field of arrows for a while depends smoothly on where you start. Lean's standard library does not have this yet. | [Goals/Turns.lean](GravityInLean/Goals/Turns.lean). `smoothFlow_const`. |
+| `ConnectionExistsStatement`, `ConnectionUniqueStatement` | A length measure on a curved space has a connection, and only one. The standard library has this only when all lengths are positive. | [Goals/Connection.lean](GravityInLean/Goals/Connection.lean). Holds for every good table: `IsRegularTableOn.isConnectionOf`. |
 
 Every statement with assumptions also has a check that the assumptions can be met. For step 2:
 Schwarzschild's own space-time meets them (`schwarzschild_isEmptyOn`), and so does one whose clock
@@ -87,11 +105,15 @@ of Piece C. Both are now proved. What is left:
 1. **The definitions themselves.** Curvature, free fall and "unchanged by a turn" are written
    down here as the classic textbook formulas in coordinates
    ([Curvature.lean](GravityInLean/Curvature.lean), [Symmetry.lean](GravityInLean/Symmetry.lean)).
-   They are not yet tied to the abstract geometry of Lean's standard library, because that library
-   has no curvature yet. That link cannot be made until it does. What is proved in its place: none
-   of the three formulas depends on the coordinates (`ricci_inNewCoords`,
-   `isFreeFallAt_inNewCoords`, `leavesUnchangedAt_inNewCoords`). That is the property the abstract
-   definitions exist to guarantee, and it was the open point of this item until 23 November 2026.
+   Lean's standard library has curved spaces, but no curvature on them yet. The link to it has
+   begun: the same notions are now defined on a curved space
+   ([Curved/Basic.lean](GravityInLean/Curved/Basic.lean)), and on coordinate space they are proved
+   to be exactly the coordinate formulas ([Curved/Tables.lean](GravityInLean/Curved/Tables.lean)).
+   Still missing is the same agreement in every chart of an arbitrary curved space; that is part
+   of the next piece of work. Proved in the meantime: none of the three formulas depends on the
+   coordinates (`ricci_inNewCoords`, `isFreeFallAt_inNewCoords`,
+   `leavesUnchangedAt_inNewCoords`). That is the property the abstract definitions exist to
+   guarantee.
    Two more things speak for the formulas: the two probes give the textbook answers, and the three
    fields of arrows are shown to be the three turns of ordinary space (`rotX_turns`, `rotY_turns`,
    `rotZ_turns`). What stays on trust is that these are the formulas the textbooks mean. That can
@@ -132,9 +154,12 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and ten lines that end in
-`none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about a
-minute and a half.
+You should see `Build completed successfully` and twelve lines that end in
+`none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about two
+minutes.
+
+If several workers build on the same machine, they call `scripts/queued-build.sh` instead of
+`lake build`. It lets one build run at a time and keeps a log of how long each one waited.
 
 On another computer: install Lean from [lean-lang.org/install](https://lean-lang.org/install/),
 then run `lake exe cache get` in this folder before `lake build`. That downloads the standard
@@ -149,7 +174,7 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 749 declarations in the project rests on (every definition and theorem, plus the helper
+of the 1,076 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
@@ -207,6 +232,15 @@ GravityInLean/NewCoordinates.lean   any coordinates: the curvature formula does 
 GravityInLean/SamePath.lean         any coordinates: nor does free fall
 GravityInLean/SameSymmetry.lean     any coordinates: nor does "unchanged by a move"
 GravityInLean/SameSpacetime.lean    any coordinates: all three, tested on the black hole
+GravityInLean/Curved/Basic.lean     curved space: the definitions, with no coordinates given
+GravityInLean/Curved/Flat.lean      curved space: what they come to on flat space
+GravityInLean/Curved/Tables.lean    curved space: tables of functions read as curved-space objects
+GravityInLean/Curved/KnownAnswers.lean  curved space: tests on flat space-time, a sphere,
+                                    de Sitter's and Schwarzschild's space-time
+GravityInLean/Curved/Goal.lean      the goal, as a statement: Birkhoff with no coordinates
+GravityInLean/Goals/Turns.lean      statements to prove: coordinates that fit the turns
+GravityInLean/Goals/Connection.lean statements to prove: a length measure has one connection
+scripts/queued-build.sh             one build at a time, for several workers on one machine
 GravityInLean/Probe/Sphere.lean     probe: a sphere
 GravityInLean/Probe/DeSitter.lean   probe: de Sitter's space-time
 pages/                              the interactive pages

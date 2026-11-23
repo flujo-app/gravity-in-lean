@@ -20,8 +20,12 @@ starting shape showed" below.
 free fall and "unchanged by a turn" are each proved to give the same answer in any coordinates.
 That took about an hour. See "What the coordinate question showed" below.
 
-**Next, before step 3:** Birkhoff's theorem with no coordinates at all, as the first trial of a
-small swarm. See "Next: Birkhoff's theorem with no coordinates at all" below.
+**The definitions for "Birkhoff with no coordinates" are written and tested** (also 23 November
+2026): stream 0 of the work described under "Next" below, and the statements of stream 1. That
+took about an hour. See "What the definitions showed" below. A build queue is in place.
+
+**Next, before step 3:** the trial of a small swarm on stream 1 of Birkhoff's theorem with no
+coordinates at all. See "Next: Birkhoff's theorem with no coordinates at all" below.
 
 ## The short answer
 
@@ -135,6 +139,41 @@ Birkhoff's theorem ("empty and round, so Schwarzschild's in other coordinates" a
 "exactly when" needs the new time label to be shown three times differentiable, which asks for
 one more degree of smoothness in the setting, and a version of step 1 inside the rim.
 
+## What the definitions showed
+
+Stream 0 of "Birkhoff with no coordinates": say on a curved space, with no coordinates given,
+what a space-time, its connection, its curvature, empty space, and "looks the same from every
+side" are. Nothing may be built on such definitions before they are tested, so each was applied
+to cases with known answers.
+
+| | | Mark |
+|---|---|---|
+| From the request to a green build of everything | 57 minutes: 27 of reading the library and designing, 30 of writing and testing | Measured |
+| Size now | 513 theorems, about 10,000 lines; all 1,076 declarations audited | Measured |
+| New for this | about 2,600 lines, 138 theorems, in seven files | Measured |
+| Tries needed | the definitions compiled at once; the errors were in the glue to the library's flat space, where a step and a plain vector are two types that happen to be equal | Measured |
+| Known answers that passed | flat space-time, a sphere, de Sitter's and Schwarzschild's space-time: time direction, connection, curvature, emptiness, roundness | Measured |
+| Second reading | two independent readers, one for the definitions and one for the statements | see below |
+
+**How the tests work.** On coordinate space every new definition was shown to equal the
+coordinate formula this project already uses (`Tables.lean`). The known answers computed in
+steps 1 and 2 and in the two probes then carry over as they are. So the signs and the order of
+the slots in the new definitions are pinned to curvatures that are known and not zero.
+
+**One decision worth knowing.** The full curvature at a point is defined by continuing its three
+steps to fields in the standard library's way, and computing with those. The textbooks prove that
+any other way of continuing gives the same answer. Here that is proved on coordinate space
+(`curvatureOfFields_flat_eq_curvatureAt`), not yet on an arbitrary curved space; the library has
+no tool for it yet. It is part of stream 2.
+
+**Why regions.** Every definition is stated on a region of the curved space, not on all of it:
+the known answers come in coordinates that fail somewhere, and Birkhoff's theorem is about the
+neighbourhood of a point. For a whole space the region is everything.
+
+**What was written but not proved.** The goal (`BirkhoffNoCoordinates`), the two statements of
+stream 1 (`SmoothFlowStatement`, `TurnsCoordinatesStatement`) and the first two of stream 2. Each
+has a check that its assumptions can be met. They live in files that workers may not change.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -193,9 +232,13 @@ one head, read twice, and tested on known answers before any worker starts.
 
 **Order.**
 
-1. Stream 0, and the statements of stream 1: one worker.
-2. A build queue for the fleet: one Lean build at a time on this PC.
+1. Stream 0, and the statements of stream 1: one worker. **Done** (see "What the definitions
+   showed").
+2. A build queue for the fleet: one Lean build at a time on this PC. **Done:**
+   `scripts/queued-build.sh`. Tested with three overlapping jobs: they ran one after another, and
+   the log shows how long each waited. It is not strictly first come, first served.
 3. A trial: one team on stream 1. Measure jobs finished per hour and allowance used per hour.
+   **Next.**
 4. Then decide how many teams, and whether any run in the cloud.
 
 ## The steps
@@ -284,20 +327,20 @@ once its statements are fixed.
 | | | Mark |
 |---|---|---|
 | Checking one file | 1.2 to 1.3 GB of memory, 7 to 12 seconds | Measured |
-| Rebuilding the whole project (not the standard library) | 81 seconds; at the peak 4.3 GB for all Lean processes together, up to four at once. (Before the files about other coordinates: 46 seconds, 3.1 GB, three at once.) | Measured |
+| Rebuilding the whole project (not the standard library) | 107 seconds; at the peak 4.8 GB for all Lean processes together, up to six at once. (Before the curved-space files: 81 seconds, 4.3 GB, four at once. Before the files about other coordinates: 46 seconds, 3.1 GB, three at once.) | Measured |
 | The ready-built standard library | about 3.4 GB on disk; workers can share one copy, because they only read it | Measured (size), Worked out (sharing) |
 
 So Lean is not the memory problem the first version of this plan assumed. A build is short, and
 Lean already checks independent files side by side. Several *builds* at the same time only happen
 when several workers each changed something and each want it checked. The usual build after a
 change re-checks one or two files and stays near 1.3 GB. A full rebuild is the expensive case: ten
-of those at once would now need about 43 GB, more than this PC has. A simple queue (one build at
+of those at once would now need about 48 GB, more than this PC has. A simple queue (one build at
 a time per machine) avoids the question and costs little, because each build takes seconds.
 
 **Decided for step 3 (23 November 2026): builds are queued, one at a time per machine.** No
 cloud machine and no extra memory are needed for that. A queue costs little, because a build
-takes seconds, and it keeps memory use at the level of a single build (about 4 GB at the peak,
-as the project stands now).
+takes seconds, and it keeps memory use at the level of a single build (about 5 GB at the peak,
+as the project stands now). The queue exists since 23 November: `scripts/queued-build.sh`.
 Several builds side by side stay possible later, if waiting for the queue ever becomes the slow
 part.
 

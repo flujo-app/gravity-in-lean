@@ -24,9 +24,10 @@ A definition that nobody has tested is a guess. Before anything is built on the 
 **A sphere.** All lengths are positive, so it has no time direction (`sphere_noTime`). Its
 curvature is its own length measure (`sphere_curvature`): positive, with the textbooks' sign.
 
-**De Sitter's space-time,** an empty universe with a cosmological constant. It has exactly one
-time direction (`deSitter_isSpaceTimeOn`). Its curvature is `3 / L²` times its length measure
-(`deSitter_curvature`). It is curved, and not empty in the sense used here.
+**De Sitter's space-time,** a universe with nothing in it but a cosmological constant. It has
+exactly one time direction (`deSitter_isSpaceTimeOn`). Its curvature is `3 / L²` times its length
+measure (`deSitter_curvature`). So it is not empty in the sense used here
+(`deSitter_not_isEmptyOn`): "empty" is a condition that can fail.
 
 **Schwarzschild's space-time,** around one mass. It has one time direction outside the rim, and
 one inside as well, where the distance label is the time direction
@@ -355,6 +356,27 @@ theorem deSitter_curvature {L : ℝ} {x : Coords 4} (hx : x ∈ deSitterRegion L
     rw [ricci_deSitter hx.1 hx.2.1 hx.2.2 c b, roundG_symm (dsA L) (dsB L) c b x]
   rw [e, formOf_const_mul]
   rfl
+
+/-- **De Sitter's space-time is not empty.** So "empty" in the sense of `Basic.lean` is a real
+condition: there is a space-time that fails it. No choice of connection can rescue it, because a
+length measure has only one. -/
+theorem deSitter_not_isEmptyOn {L : ℝ} (hL : 0 < L) :
+    ¬ IsEmptyOn (flatMeasure (tableMeasure (roundG (dsA L) (dsB L)))) (deSitterRegion L) := by
+  intro h
+  have hflat := (deSitter_regularTable L).isEmptyOn_iff.mp h
+  have hL0 : L ≠ 0 := hL.ne'
+  have hx : (![0, L / 2, π / 2, 0] : Coords 4) ∈ deSitterRegion L := by
+    refine ⟨?_, ?_, ?_⟩
+    · simpa using hL
+    · simpa using hL
+    · simp
+  have h1 := hflat _ hx 2 2
+  rw [ricci_deSitter hx.1 hx.2.1 hx.2.2] at h1
+  have hval : roundG (dsA L) (dsB L) 2 2 (![0, L / 2, π / 2, 0] : Coords 4) = (L / 2) ^ 2 := by
+    simp [roundG, diag, roundDiag, sep, gr, gθ, sqF, constOne]
+  rw [hval] at h1
+  exact mul_ne_zero (div_ne_zero three_ne_zero (pow_ne_zero 2 hL0))
+    (pow_ne_zero 2 (div_ne_zero hL0 two_ne_zero)) h1
 
 end DeSitter
 
@@ -697,6 +719,7 @@ measure unchanged, combine the way turns do, and sweep out surfaces on which all
 positive. -/
 theorem schwarzschild_isRoundOn (M : ℝ) :
     IsRoundOn (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) turns (outside M) where
+  isOpen := isOpen_outside M
   smooth := by
     intro i
     fin_cases i

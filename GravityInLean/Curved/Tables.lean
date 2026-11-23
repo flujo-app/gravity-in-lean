@@ -284,6 +284,7 @@ theorem isConnectionOf_table {s : Set (Coords n)} (hs : IsOpen s)
     (hinv : ∀ x ∈ s, ∀ a c, ∑ b, g a b x * ginv b c x = if a = c then 1 else 0) :
     IsConnectionOf (flatMeasure (tableMeasure g))
       (flatTransport (tableCorr (christoffel g ginv))) s where
+  isOpen := hs
   isConnection := (isCovariantDerivativeOn_flatTransport _).mono (Set.subset_univ s)
   noTwist := fun x hx X Y _ _ ↦ by
     have hnear : ∀ᶠ y in 𝓝 x, ∀ a b, g a b y = g b a y :=
@@ -395,7 +396,7 @@ theorem leavesUnchangedAt_table_iff (hg : ∀ a b, DifferentiableAt ℝ (g a b) 
     (hξ : ∀ k, DifferentiableAt ℝ (ξ k) x) :
     Curved.LeavesUnchangedAt (flatMeasure (tableMeasure g)) (fieldOf ξ) x
       ↔ GravityInLean.LeavesUnchangedAt g ξ x := by
-  rw [leavesUnchangedAt_flat_iff (differentiableAt_tableMeasure hg)]
+  rw [leavesUnchangedAt_flat_iff (differentiableAt_tableMeasure hg) (differentiableAt_fieldOf hξ)]
   -- The two-slot expression in Killing's equation is the table `lieD`.
   have key : ∀ y z : Coords n, formOf (fun a b ↦ lieD g ξ a b x) y z
       = fderiv ℝ (tableMeasure g) x (plain (fieldOf ξ) x) y z
@@ -564,6 +565,29 @@ theorem isEmptyOn (h : IsRegularTableOn g ginv s) (hflat : ∀ x ∈ s, IsRicciF
     rw [h.ricciAt hx, formOf_apply]
     exact Finset.sum_eq_zero fun b _ ↦ Finset.sum_eq_zero fun c _ ↦ by
       rw [hflat x hx c b, zero_mul, zero_mul]⟩
+
+/-- The curvature of ANY connection of a good table's length measure is the coordinate formula:
+the connection is not a matter of choice. -/
+theorem ricciAt_of_isConnectionOf (h : IsRegularTableOn g ginv s)
+    {cov : Transport 𝓘(ℝ, Coords n) (Coords n)}
+    (hcov : IsConnectionOf (flatMeasure (tableMeasure g)) cov s) (hx : x ∈ s)
+    (v w : TangentSpace 𝓘(ℝ, Coords n) x) :
+    Curved.ricciAt cov x v w = formOf (fun b c ↦ ricci (christoffel g ginv) c b x) v w := by
+  rw [ricciAt_eq_of_isConnectionOf h.isLengthMeasureOn h.isConnectionOf hcov hx
+    (differentiableAt_tableCorr fun a b c ↦ h.differentiableAt_christoffel hx a b c),
+    h.ricciAt hx]
+
+/-- **Empty in the sense of `Basic.lean` is empty in coordinates, and the other way round.** For a
+good table, space is empty on the region exactly when the coordinate formula for the curvature
+vanishes at every point of it. -/
+theorem isEmptyOn_iff (h : IsRegularTableOn g ginv s) :
+    IsEmptyOn (flatMeasure (tableMeasure g)) s ↔ ∀ x ∈ s, IsRicciFlatAt g ginv x := by
+  constructor
+  · rintro ⟨cov, hcov, hric⟩ x hx i j
+    have h1 := hric x hx (Pi.single j 1 : Coords n) (Pi.single i 1 : Coords n)
+    rw [h.ricciAt_of_isConnectionOf hcov hx, formOf_single_single] at h1
+    exact h1
+  · exact h.isEmptyOn
 
 end IsRegularTableOn
 

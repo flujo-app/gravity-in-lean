@@ -22,6 +22,7 @@ import GravityInLean.SamePath
 import GravityInLean.SameSymmetry
 import GravityInLean.SameSpacetime
 import GravityInLean.Curved.Basic
+import GravityInLean.Curved.Unique
 import GravityInLean.Curved.Flat
 import GravityInLean.Curved.Tables
 import GravityInLean.Curved.KnownAnswers
