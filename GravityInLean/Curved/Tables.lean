@@ -445,4 +445,128 @@ theorem mlieBracket_fieldOf {X Y : Fin n → Coords n → ℝ}
 
 end Symmetry
 
+/-! ## A table that is good on a region -/
+
+section Regular
+
+variable {g ginv : Fin n → Fin n → Coords n → ℝ} {s : Set (Coords n)}
+
+/-- **A table of functions that is good on a region,** together with a second table: the region
+is open, the entries are smooth there, the table is symmetric there, and the second table is its
+inverse there. This is what every coordinate description of a space-time in this project
+provides, away from the places where its coordinates fail. -/
+structure IsRegularTableOn (g ginv : Fin n → Fin n → Coords n → ℝ) (s : Set (Coords n)) :
+    Prop where
+  /-- The region is open. -/
+  isOpen : IsOpen s
+  /-- The entries are smooth on the region. -/
+  smooth : ∀ a b, ContDiffOn ℝ ∞ (g a b) s
+  /-- The table is symmetric on the region. -/
+  symm : ∀ x ∈ s, ∀ a b, g a b x = g b a x
+  /-- The second table is the inverse of the first on the region. -/
+  inverse : ∀ x ∈ s, ∀ a c, ∑ b, g a b x * ginv b c x = if a = c then 1 else 0
+
+namespace IsRegularTableOn
+
+variable {x : Coords n}
+
+theorem contDiffAt (h : IsRegularTableOn g ginv s) (hx : x ∈ s) (a b : Fin n) :
+    ContDiffAt ℝ ∞ (g a b) x :=
+  (h.smooth a b).contDiffAt (h.isOpen.mem_nhds hx)
+
+theorem differentiableAt (h : IsRegularTableOn g ginv s) (hx : x ∈ s) (a b : Fin n) :
+    DifferentiableAt ℝ (g a b) x :=
+  (h.contDiffAt hx a b).differentiableAt (by simp)
+
+theorem eventually_symm (h : IsRegularTableOn g ginv s) (hx : x ∈ s) :
+    ∀ᶠ y in 𝓝 x, ∀ a b, g a b y = g b a y :=
+  Filter.eventually_of_mem (h.isOpen.mem_nhds hx) fun y hy ↦ h.symm y hy
+
+theorem eventually_inverse (h : IsRegularTableOn g ginv s) (hx : x ∈ s) :
+    ∀ᶠ y in 𝓝 x, ∀ a c, ∑ b, g a b y * ginv b c y = if a = c then 1 else 0 :=
+  Filter.eventually_of_mem (h.isOpen.mem_nhds hx) fun y hy ↦ h.inverse y hy
+
+/-- The connection of a good table can be differentiated. That the inverse table is smooth is
+not assumed: it follows (`contDiffAt_of_inverse`). -/
+theorem differentiableAt_christoffel (h : IsRegularTableOn g ginv s) (hx : x ∈ s)
+    (a b c : Fin n) : DifferentiableAt ℝ (christoffel g ginv a b c) x :=
+  GravityInLean.differentiableAt_christoffel
+    (fun α β ↦ (h.contDiffAt hx α β).of_le (by simp))
+    (fun α β ↦ (contDiffAt_of_inverse (k := 1)
+      (fun a b ↦ (h.contDiffAt hx a b).of_le (by simp)) (h.eventually_inverse hx)
+      α β).differentiableAt (by simp)) a b c
+
+theorem eventually_christoffel_symm (h : IsRegularTableOn g ginv s) (hx : x ∈ s) :
+    ∀ᶠ y in 𝓝 x, ∀ a b c, christoffel g ginv a b c y = christoffel g ginv a c b y :=
+  (h.eventually_symm hx).eventually_nhds.mono fun _ hz a b c ↦ christoffel_symm hz a b c
+
+/-- The length measure of a good table does not depend on the order of its two steps. -/
+theorem measure_symm (h : IsRegularTableOn g ginv s) (hx : x ∈ s) (v w : Coords n) :
+    tableMeasure g x v w = tableMeasure g x w v := by
+  simp only [tableMeasure, formOf_apply]
+  rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl fun b _ ↦ Finset.sum_congr rfl fun a _ ↦ by
+    rw [h.symm x hx a b]
+    ring
+
+/-- For the length measure of a good table, no step is at right angles to all steps. -/
+theorem nondegenerate (h : IsRegularTableOn g ginv s) (hx : x ∈ s) :
+    Nondegenerate fun v w : Coords n ↦ tableMeasure g x v w := by
+  intro v hv
+  have h1 : ∀ b, ∑ a, g a b x * v a = 0 := fun b ↦ by
+    have h0 := hv (Pi.single b 1)
+    simp only [tableMeasure] at h0
+    rwa [formOf_single_right] at h0
+  funext c
+  have h2 : v c = ∑ b, (∑ a, g a b x * v a) * ginv b c x := by
+    calc v c = ∑ a, v a * (if a = c then 1 else 0) := by simp
+      _ = ∑ a, v a * ∑ b, g a b x * ginv b c x := by simp only [h.inverse x hx]
+      _ = ∑ b, (∑ a, g a b x * v a) * ginv b c x := by
+          simp only [Finset.mul_sum, Finset.sum_mul]
+          rw [Finset.sum_comm]
+          exact Finset.sum_congr rfl fun b _ ↦ Finset.sum_congr rfl fun a _ ↦ by ring
+  rw [h2]
+  simp [h1]
+
+/-- The length measure of a good table is smooth in the sense of curved spaces. -/
+theorem isSmoothOn (h : IsRegularTableOn g ginv s) :
+    IsSmoothOn (flatMeasure (tableMeasure g)) s := by
+  rw [isSmoothOn_flat_iff]
+  change ContDiffOn ℝ ∞ (fun x ↦ ∑ p : Fin n × Fin n, g p.1 p.2 x • unitForm p) s
+  exact ContDiffOn.sum fun p _ ↦ (h.smooth p.1 p.2).smul contDiffOn_const
+
+/-- **A good table is a length measure in the sense of `Basic.lean`.** -/
+theorem isLengthMeasureOn (h : IsRegularTableOn g ginv s) :
+    IsLengthMeasureOn (flatMeasure (tableMeasure g)) s where
+  symm := fun _ hx v w ↦ h.measure_symm hx v w
+  nondegenerate := fun _ hx ↦ h.nondegenerate hx
+  smooth := h.isSmoothOn
+
+/-- **The textbooks' formula gives its connection.** -/
+theorem isConnectionOf (h : IsRegularTableOn g ginv s) :
+    IsConnectionOf (flatMeasure (tableMeasure g))
+      (flatTransport (tableCorr (christoffel g ginv))) s :=
+  isConnectionOf_table h.isOpen (fun _ hx a b ↦ h.differentiableAt hx a b) h.symm h.inverse
+
+/-- **Its curvature in the sense of `Basic.lean` is the coordinate formula.** -/
+theorem ricciAt (h : IsRegularTableOn g ginv s) (hx : x ∈ s)
+    (v w : TangentSpace 𝓘(ℝ, Coords n) x) :
+    ricciAt (flatTransport (tableCorr (christoffel g ginv))) x v w
+      = formOf (fun b c ↦ ricci (christoffel g ginv) c b x) v w :=
+  ricciAt_table (fun a b c ↦ h.differentiableAt_christoffel hx a b c)
+    (h.eventually_christoffel_symm hx) v w
+
+/-- **Empty in coordinates is empty in the sense of `Basic.lean`.** If the coordinate formula for
+the curvature vanishes on the region, space is empty there. -/
+theorem isEmptyOn (h : IsRegularTableOn g ginv s) (hflat : ∀ x ∈ s, IsRicciFlatAt g ginv x) :
+    IsEmptyOn (flatMeasure (tableMeasure g)) s :=
+  ⟨flatTransport (tableCorr (christoffel g ginv)), h.isConnectionOf, fun x hx v w ↦ by
+    rw [h.ricciAt hx, formOf_apply]
+    exact Finset.sum_eq_zero fun b _ ↦ Finset.sum_eq_zero fun c _ ↦ by
+      rw [hflat x hx c b, zero_mul, zero_mul]⟩
+
+end IsRegularTableOn
+
+end Regular
+
 end GravityInLean.Curved
