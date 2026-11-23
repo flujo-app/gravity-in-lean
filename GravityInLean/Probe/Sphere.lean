@@ -10,15 +10,16 @@ public import Mathlib.Analysis.Calculus.Deriv.Inv
 public import Mathlib.Analysis.Calculus.Deriv.Pow
 public import Mathlib.Analysis.Calculus.Deriv.Mul
 public import Mathlib.Algebra.BigOperators.Fin
+public import GravityInLean.Curvature
 
 import Mathlib.Tactic
 
 /-!
 # Probe: curvature from the general formulas, tried on a sphere
 
-Pieces B and C start from formulas taken out of textbooks. To close that gap one has to compute
-curvature *from its general definition*. The standard library has no curvature yet, so this file
-tries the most direct route: the classic coordinate formulas.
+This was the first test of the general definitions in `Curvature.lean` (`slope`, `christoffel`,
+`ricci`): compute curvature *from its general definition* for the simplest curved thing there is.
+It worked, and the same method then closed the gap in Pieces B and C (see `RoundSpacetime.lean`).
 
 * `slope i f x`: how fast `f` changes when only coordinate `i` moves.
 * `christoffel g ginv`: the "connection" belonging to a way of measuring lengths `g`
@@ -39,40 +40,6 @@ That is the same kind of computation the one-mass solution needs, only smaller.
 namespace GravityInLean
 
 open Real
-
-/-- A point described by `n` coordinates. -/
-abbrev Coords (n : ℕ) := Fin n → ℝ
-
-/-- How fast `f` changes at `x` when only coordinate `i` moves. -/
-noncomputable def slope {n : ℕ} (i : Fin n) (f : Coords n → ℝ) (x : Coords n) : ℝ :=
-  deriv (fun s => f (Function.update x i s)) (x i)
-
-/-- If `f` only looks at coordinate `i`, its slope along `i` is the ordinary slope. -/
-theorem slope_along {n : ℕ} (i : Fin n) (F : ℝ → ℝ) (x : Coords n) :
-    slope i (fun y => F (y i)) x = deriv F (x i) := by
-  simp [slope]
-
-/-- If `f` only looks at another coordinate `j`, it does not change along `i`. -/
-theorem slope_across {n : ℕ} {i j : Fin n} (h : j ≠ i) (F : ℝ → ℝ) (x : Coords n) :
-    slope i (fun y => F (y j)) x = 0 := by
-  simp [slope, Function.update_of_ne h]
-
-/-- Something that is the same everywhere has no slope. -/
-theorem slope_const {n : ℕ} (i : Fin n) (c : ℝ) (x : Coords n) :
-    slope i (fun _ => c) x = 0 := by
-  simp [slope]
-
-/-- The connection belonging to a length measure `g` with inverse `ginv`
-(the Christoffel symbols of the textbooks). -/
-noncomputable def christoffel {n : ℕ} (g ginv : Fin n → Fin n → Coords n → ℝ)
-    (a b c : Fin n) : Coords n → ℝ := fun x =>
-  (1 / 2) * ∑ d, ginv a d x * (slope b (g d c) x + slope c (g d b) x - slope d (g b c) x)
-
-/-- The curvature built from a connection `Γ` (the Ricci tensor of the textbooks). -/
-noncomputable def ricci {n : ℕ} (Γ : Fin n → Fin n → Fin n → Coords n → ℝ)
-    (b c : Fin n) (x : Coords n) : ℝ :=
-  ∑ a, slope a (Γ a b c) x - ∑ a, slope c (Γ a b a) x
-    + ∑ a, ∑ d, Γ a a d x * Γ d b c x - ∑ a, ∑ d, Γ a c d x * Γ d b a x
 
 /-! ## The sphere of radius 1 -/
 

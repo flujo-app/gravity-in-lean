@@ -1,4 +1,7 @@
 import GravityInLean.ClockRate
 import GravityInLean.OneMass
 import GravityInLean.RoundOrbit
+import GravityInLean.Curvature
 import GravityInLean.Probe.Sphere
+import GravityInLean.RoundSpacetime
+import GravityInLean.FreeFall
