@@ -15,7 +15,7 @@ the owner of the pages.
 | **The Dome and the Horn** | Two curved pictures of the motion budget: a dome without gravity, a horn with it. | [dome-and-horn.html](dome-and-horn.html) | [link](https://claude.ai/artifact/S2gKfWkXfZzuVRx5wYPt7N) |
 | **Light Clock &amp; Falling Wave** | A light clock that shows why moving clocks run slow, and a matter wave that falls. | [light-clock-falling-wave.html](light-clock-falling-wave.html) | [link](https://claude.ai/artifact/LkjgXTXey6h4KdqT2KJJoT) |
 | **Spacetime Speedometer** | The motion budget as a dial: what you spend on moving through space is missing from your moving through time. | [spacetime-speedometer.html](spacetime-speedometer.html) | [link](https://claude.ai/artifact/BQqHnP8uEtzvEeuhVgudz9) |
-| **Arrows to Amplitudes** | Five short chapters on the maths behind quantum physics: arrows, adding, stretching, matrices, and arrows that cancel to make the double-slit stripes. Each chapter asks questions you answer before you check. | [arrows-to-amplitudes.html](arrows-to-amplitudes.html) | [link](https://claude.ai/artifact/3f78qtBv2vFQXCV4V9PSv7) |
+| **Arrows to Amplitudes** | Six short chapters on the maths behind quantum physics: arrows, adding, stretching, matrices, arrows that cancel to make the double-slit stripes, and paths and clocks, where every path of a thrown ball gets an arrow that its own clock turns and only the paths near the one with the most clock time survive. Each chapter asks questions you answer before you check. | [arrows-to-amplitudes.html](arrows-to-amplitudes.html) | [link](https://claude.ai/artifact/3f78qtBv2vFQXCV4V9PSv7) |
 | **Turns and a Mirror** | One picture of a quarter turn, a half turn and a mirror, with a letter F so you can see which way things face. | [turns-explainer.svg](turns-explainer.svg) | not published |
 
 ## Good to know
@@ -25,8 +25,12 @@ the owner of the pages.
 - **The last two are a separate maths lesson.** Arrows to Amplitudes teaches vectors and
   matrices from zero, as a first step towards quantum physics. The turns picture is a plain image
   that goes with its matrices chapter, shown in a chat rather than published. Neither is part of
-  the gravity work. The lesson was tested in a browser (dragging, answer checks, phone layout);
-  its double-slit pattern is a simple model that shows the idea, not real measurements.
+  the gravity work, except that the lesson's last chapter, paths and clocks, is where the two
+  meet: the clock it uses is the same slow-clock rule as the gravity pages. The lesson was tested
+  in a browser (dragging, sliders, answer checks, phone layout, light and dark). Its double-slit
+  pattern is a simple model that shows the idea, not real measurements. Its paths chapter uses
+  smooth arcs only, made-up units, and weak gravity; the best arc it finds is the real flight of a
+  thrown ball.
 - **How sure is this?** The first page was tested with numbers against the textbook formulas, and
   several of its formulas are now proved by machine in this repository (see the main README).
   The earlier pages are pictures: good for the idea, not tested the same way.
