@@ -24,8 +24,12 @@ That took about an hour. See "What the coordinate question showed" below.
 2026): stream 0 of the work described under "Next" below, and the statements of stream 1. That
 took about an hour. See "What the definitions showed" below. A build queue is in place.
 
-**Next, before step 3:** the trial of a small swarm on stream 1 of Birkhoff's theorem with no
-coordinates at all. See "Next: Birkhoff's theorem with no coordinates at all" below.
+**The first team of workers has run** (also 23 November 2026). One lead and nine workers, in one
+container on this PC, proved the first statement of stream 1 (paths along a field depend
+smoothly on where they start) in 14 minutes. See "What the first team trial showed" below.
+
+**Next, before step 3:** the second statement of stream 1 (coordinates that fit the turns), with
+the same kind of team. See "Next: Birkhoff's theorem with no coordinates at all" below.
 
 ## The short answer
 
@@ -195,6 +199,57 @@ There is no test that "looks the same from every side" or "usable distance" can 
 check of the turns statement on Schwarzschild's own coordinates would not notice a table of
 slopes written the wrong way round; that direction was checked by hand by the second reader.
 
+## What the first team trial showed
+
+The job: prove `SmoothFlowStatement`, fixed beforehand in `Goals/Turns.lean`. The team: one lead
+and nine workers, all Claude Fable 5.2 at effort "high", in one Docker container on this PC, run
+by FACTORY 0.11.0. One Lean run at a time for the whole team.
+
+| | | |
+|---|---|---|
+| Result | proved: `smoothFlow`, 11 files, about 980 lines, 24 theorems and 5 definitions | Measured |
+| Time, from "all ten are ready" to "the whole project builds with the proof in it" | 14 minutes 11 seconds (22:36:03 to 22:50:14 UTC) | Measured |
+| Of that, the lead alone: reading the library, choosing the route, writing every lemma's statement | about 8 minutes | Measured |
+| Of that, the nine workers proving their lemmas | 4 minutes, side by side (given out 22:45, last one built 22:49) | Measured |
+| Jobs | 11 pieces: 9 by workers, 2 by the lead. Every worker's proof passed its first Lean run. No statement had to be changed. | Measured |
+| The queue | 20 Lean runs, 1 failed (the lead's own first try). Waiting: 50 seconds on average, 3 minutes 22 seconds at most, 17 minutes in all, against 6 minutes of running. | Measured |
+| Memory | 0.2 GB with all ten idle; about 8 GB at the busiest moment seen; the limit was 18 GB | Measured |
+| Model use | 9.4 million tokens read (8.9 million of them from the cache), 178,000 written. The lead: half of it. | Measured |
+| Weekly allowance | "all models" went from 37% to 39%, "Fable" from 28% to 31%, between the start of the trial and its end. That includes this chat's own use and the small check before. So: at most 2 and 3 points. | Measured |
+| Getting ready | worker image 12 minutes to build, once; FACTORY's own layer on top 4 minutes, once; after that the ten were ready 6 seconds after the start | Measured |
+| Checked afterwards on this PC | only `GravityInLean/Flows/` and eleven import lines changed; whole project rebuilt through the queue; all declarations pass the audit; `Audit.lean` now checks that `smoothFlow` proves the statement as it was fixed | Measured |
+
+**What went wrong first.** A small check before the trial (one container, one short job) found
+three faults in the set-up: the two scripts were not marked runnable, Lean was downloaded a
+second time, and the shared standard library was not found and was downloaded too (20 minutes).
+The cause of the last two: an agent's commands get only the search path and the home folder
+from the image, no other setting. All three were fixed and re-tested before the trial (pull
+request 25). Without the small check, ten workers would each have spent their first 20 minutes
+downloading.
+
+**What the supervisor changed afterwards.** Three of the team's files loaded the whole standard
+library. That made a full rebuild take 7 minutes 35 seconds instead of under 2. They now load
+only the parts they need, all eleven files have the project's usual form, and an assumption that
+two files did not use is gone. Full rebuild now: 102 seconds, no warnings.
+
+**What this says, and what it does not.**
+
+- The fleet works on this PC, and nothing had to be taken on the team's word.
+- The estimate was wrong again, in the same direction. This was to be "the smallest missing
+  piece, to measure how long this kind of work takes". It took 14 minutes.
+- The job was too small for the team. Nine workers were busy for 4 minutes. "Jobs per hour"
+  from this run would be a made-up number: the run says how long this job took, not how much a
+  team gets through in an hour of steady work. That needs a job that lasts an hour.
+- Waiting for the queue was the only waiting, and it was nearly three times the running time while all
+  nine built at once. Over the whole run it cost two or three minutes. One run at a time stays.
+- The slow part of the whole undertaking was not the team. Writing and testing the definitions
+  and the statements took one head 80 minutes; proving a statement took the team 14.
+
+**Decided from this (step 4 of the order below).** One team at a time, on this PC. No cloud
+machines: nothing here was short of memory or processors. A second team only makes sense when
+there is a second goal that does not touch the first one's files, and the cost that matters is
+the weekly allowance, not machines.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -262,8 +317,12 @@ one head, read twice, and tested on known answers before any worker starts.
    standard library inside). Tested: a fresh copy of the repository inside a container built the
    whole project through the queue in 82 seconds, with every declaration passing the audit.
 3. A trial: one team on stream 1. Measure jobs finished per hour and allowance used per hour.
-   **Next.**
-4. Then decide how many teams, and whether any run in the cloud.
+   **Done** (see "What the first team trial showed"): the first statement of stream 1 is proved.
+4. Then decide how many teams, and whether any run in the cloud. **Decided:** one team at a
+   time on this PC, no cloud machines.
+5. **Next:** the second statement of stream 1, `TurnsCoordinatesStatement`, with the same kind
+   of team. It is a much larger job, so it will also give the figure that the first trial could
+   not: how much a team gets through in an hour.
 
 ## The steps
 
@@ -351,7 +410,7 @@ once its statements are fixed.
 | | | Mark |
 |---|---|---|
 | Checking one file | 1.2 to 1.3 GB of memory, 7 to 12 seconds | Measured |
-| Rebuilding the whole project (not the standard library) | 107 seconds; at the peak 4.8 GB for all Lean processes together, up to six at once. (Before the curved-space files: 81 seconds, 4.3 GB, four at once. Before the files about other coordinates: 46 seconds, 3.1 GB, three at once.) | Measured |
+| Rebuilding the whole project (not the standard library) | 102 seconds; at the peak 7.2 GB for all Lean processes together, up to seven at once. (Before the files on paths along a field: 107 seconds, 4.8 GB, six at once. Before the curved-space files: 81 seconds, 4.3 GB, four at once. Before the files about other coordinates: 46 seconds, 3.1 GB, three at once.) | Measured |
 | The ready-built standard library | about 3.4 GB on disk; workers can share one copy, because they only read it | Measured (size), Worked out (sharing) |
 
 So Lean is not the memory problem the first version of this plan assumed. A build is short, and

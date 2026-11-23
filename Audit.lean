@@ -159,6 +159,16 @@ quietly go stale. -/
   GravityInLean.Curved.ConnectionUniqueStatement GravityInLean.smoothFlow_const
   GravityInLean.schwarzschild_turnsOn GravityInLean.turnsCoordinates_schwarzschild
 
+-- Proved by a team of workers (the first fleet trial): paths along a field depend smoothly on
+-- where they start. The first line checks that what was proved is the statement as it was fixed
+-- beforehand in `Goals/Turns.lean`, and not a statement of the team's own.
+example : GravityInLean.SmoothFlowStatement := GravityInLean.smoothFlow
+
+#audit GravityInLean.smoothFlow GravityInLean.Flows.exists_smooth_paths
+  GravityInLean.Flows.exists_local_flow GravityInLean.Flows.exists_rescaled_path
+  GravityInLean.Flows.exists_implicit_smooth GravityInLean.Flows.exists_primL
+  GravityInLean.Flows.exists_appL
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

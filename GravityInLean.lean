@@ -29,3 +29,14 @@ import GravityInLean.Curved.KnownAnswers
 import GravityInLean.Curved.Goal
 import GravityInLean.Goals.Turns
 import GravityInLean.Goals.Connection
+import GravityInLean.Flows.PathSpace
+import GravityInLean.Flows.Apply
+import GravityInLean.Flows.Integrate
+import GravityInLean.Flows.ComposeDeriv
+import GravityInLean.Flows.ComposeSmooth
+import GravityInLean.Flows.Implicit
+import GravityInLean.Flows.PathMap
+import GravityInLean.Flows.PathEquation
+import GravityInLean.Flows.LocalFlow
+import GravityInLean.Flows.Rescale
+import GravityInLean.Flows.SmoothFlow
