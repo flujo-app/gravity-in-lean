@@ -187,6 +187,12 @@ when several workers each changed something and each want it checked. Even then,
 once fit into about 30 GB, and a simple queue (one build at a time per machine) costs little,
 because each build takes seconds.
 
+**Decided for step 3 (23 November 2026): builds are queued, one at a time per machine.** No
+cloud machine and no extra memory are needed for that. A queue costs little, because a build
+takes seconds, and it keeps memory use at the level of a single build (about 3 GB at the peak).
+Several builds side by side stay possible later, if waiting for the queue ever becomes the slow
+part.
+
 Since 23 November FACTORY can run a small fleet on this PC's Docker (0.11.0, teams of one lead
 and nine workers). Docker has about 19.5 GB of memory here: enough for a handful of builds at
 once, and enough for a whole team if the builds queue. A cloud machine, for example on Azure,
