@@ -125,6 +125,13 @@ quietly go stale. -/
   GravityInLean.eddington_ricciFlat_from_schwarzschild GravityInLean.stepLength_inNewCoords
   GravityInLean.birkhoff_general_inNewCoords
 
+-- Free fall and "unchanged by a turn" do not depend on the coordinates either
+#audit GravityInLean.hasDerivAt_along_path GravityInLean.freeFallExpr_inNewCoords
+  GravityInLean.isFreeFallAt_inNewCoords GravityInLean.keepsOwnTimeAt_inNewCoords
+  GravityInLean.eddington_orbit_freeFall GravityInLean.lieD_inNewCoords
+  GravityInLean.leavesUnchangedAt_inNewCoords GravityInLean.schwarzschild_isRound
+  GravityInLean.eddington_isRound_from_schwarzschild
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

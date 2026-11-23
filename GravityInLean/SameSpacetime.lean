@@ -6,7 +6,9 @@ Authors: flujo-app
 module
 
 public import GravityInLean.Eddington
-public import GravityInLean.NewCoordinates
+public import GravityInLean.FreeFall
+public import GravityInLean.SamePath
+public import GravityInLean.SameSymmetry
 public import Mathlib.Analysis.SpecialFunctions.Log.Deriv
 
 import Mathlib.Tactic
@@ -35,6 +37,15 @@ time label only: Eddington's time is Schwarzschild's time plus a function of the
 
 `Eddington.lean` proves the same emptiness by computing the curvature directly. The two routes
 share nothing but the definitions, and they agree.
+
+* `birkhoff_general_inNewCoords`: Birkhoff's theorem, said in the language of this file: an empty
+  round space-time is Schwarzschild's length measure in other coordinates, entry by entry.
+* `eddington_orbit_freeFall`: the free-falling round orbit of step 1, written with Eddington's
+  time label, falls freely in Eddington's coordinates too. No connection is computed for this:
+  free fall does not depend on the coordinates (`SamePath.lean`).
+* `eddington_isRound_from_schwarzschild`: Eddington's space-time looks the same from every side,
+  because Schwarzschild's does and "unchanged by a turn" does not depend on the coordinates
+  (`SameSymmetry.lean`). `genG_isRound` reaches the same conclusion by direct computation.
 -/
 
 @[expose] public section
@@ -236,36 +247,14 @@ theorem eddington_ricciFlat_from_schwarzschild (M : ℝ) {x : Coords 4} (hr : 0 
 
 /-! ## Re-writing does not change lengths -/
 
-theorem sum4_swap (F : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) :
-    ∑ a, ∑ b, ∑ c, ∑ d, F a b c d = ∑ c, ∑ d, ∑ a, ∑ b, F a b c d := by
-  calc ∑ a, ∑ b, ∑ c, ∑ d, F a b c d = ∑ a, ∑ c, ∑ b, ∑ d, F a b c d :=
-        Finset.sum_congr rfl fun a _ => Finset.sum_comm
-    _ = ∑ c, ∑ a, ∑ b, ∑ d, F a b c d := Finset.sum_comm
-    _ = ∑ c, ∑ a, ∑ d, ∑ b, F a b c d :=
-        Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun a _ => Finset.sum_comm
-    _ = ∑ c, ∑ d, ∑ a, ∑ b, F a b c d := Finset.sum_congr rfl fun c _ => Finset.sum_comm
-
 /-- **Re-writing a length measure does not change the length of any step.** A step `v` taken at
 `x` in the new coordinates is, in the old coordinates, the step with the parts
 `∑ μ, jac Φ α μ x * v μ`. Its length is the same in both. This is what `inNewCoords` means. -/
 theorem stepLength_inNewCoords (Φ : Coords 4 → Coords 4) (g : Fin 4 → Fin 4 → Coords 4 → ℝ)
     (x v : Coords 4) :
     stepLength (inNewCoords Φ g) x v
-      = stepLength g (Φ x) (fun α => ∑ μ, jac Φ α μ x * v μ) := by
-  have e1 : stepLength (inNewCoords Φ g) x v
-      = ∑ μ, ∑ ν, ∑ α, ∑ β, jac Φ α μ x * jac Φ β ν x * g α β (Φ x) * v μ * v ν := by
-    simp only [stepLength, inNewCoords, Finset.sum_mul]
-  have e2 : stepLength g (Φ x) (fun α => ∑ μ, jac Φ α μ x * v μ)
-      = ∑ α, ∑ β, ∑ μ, ∑ ν, g α β (Φ x) * (jac Φ α μ x * v μ) * (jac Φ β ν x * v ν) := by
-    simp only [stepLength]
-    refine Finset.sum_congr rfl fun α _ => Finset.sum_congr rfl fun β _ => ?_
-    rw [mul_assoc, Finset.sum_mul_sum, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun μ _ => ?_
-    rw [Finset.mul_sum]
-    exact Finset.sum_congr rfl fun ν _ => by ring
-  rw [e1, e2, sum4_swap]
-  exact Finset.sum_congr rfl fun α _ => Finset.sum_congr rfl fun β _ =>
-    Finset.sum_congr rfl fun μ _ => Finset.sum_congr rfl fun ν _ => by ring
+      = stepLength g (Φ x) (fun α => ∑ μ, jac Φ α μ x * v μ) :=
+  length_inNewCoords Φ g x v
 
 /-- "The same step in new labels" of `BirkhoffGeneral.lean` is the step re-written with the table
 of slopes of the change of labels. -/
@@ -335,5 +324,248 @@ theorem birkhoff_general_inNewCoords {A B C S : ℝ → ℝ → ℝ} {J I : Set 
   obtain ⟨M, T, hT⟩ := birkhoff_general_stepLength h hE hn
   exact ⟨M, T, fun x ht hρ μ ν => eq_of_stepLength_eq (fun i j => genG_symm A B C S i j x)
     (fun i j => inNewCoords_symm (fun α β => roundG_symm _ _ α β _) i j) (hT x ht hρ) μ ν⟩
+
+/-! ## A free-falling orbit, written in two ways -/
+
+/-- The round orbit of step 1, written with Eddington's time label. -/
+noncomputable def eddOrbit (M r tdot φdot τ : ℝ) : Coords 4 :=
+  ![tdot * τ + tortoise M r, r, π / 2, φdot * τ]
+
+/-- Changing the time label back gives the round orbit of step 1. -/
+theorem toSchw_eddOrbit (M r tdot φdot τ : ℝ) :
+    toSchw M (eddOrbit M r tdot φdot τ) = roundOrbit r tdot φdot τ := by
+  funext i
+  fin_cases i <;> simp [toSchw, eddOrbit, roundOrbit]
+
+/-- **The round orbit falls freely in Eddington's coordinates as well.** At every distance outside
+`r = 3M` there is a round orbit that falls freely and is timed by its own clock, when both are
+computed from Eddington's and Finkelstein's length measure. No connection is computed for this:
+it follows from step 1 (`roundOrbit_freeFall_exists`), because free fall and a path's own time do
+not depend on the coordinates. -/
+theorem eddington_orbit_freeFall {M r : ℝ} (hM : 0 < M) (hr : 3 * M < r) :
+    ∃ tdot φdot : ℝ, 0 < tdot ∧
+      (∀ τ, IsFreeFallAt
+        (christoffel (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF))
+          (genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF)))
+        (eddOrbit M r tdot φdot) τ) ∧
+      (∀ τ, KeepsOwnTimeAt (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF))
+        (eddOrbit M r tdot φdot) τ) := by
+  obtain ⟨tdot, φdot, ht, hfree, hown⟩ := roundOrbit_freeFall_exists hM hr
+  have hr0 : 0 < r := by linarith
+  have hrim : 2 * M < r := by linarith
+  have hset := eddington_setting M isOpen_Ioi isPreconnected_Ioi
+    (fun ρ (hρ : ρ ∈ Ioi (0 : ℝ)) => hρ)
+  -- The orbit, with its time label changed back, is the orbit of step 1.
+  have hpath : (fun s => toSchw M (eddOrbit M r tdot φdot s)) = roundOrbit r tdot φdot :=
+    funext fun s => toSchw_eddOrbit M r tdot φdot s
+  have hγ : ∀ μ, ContDiff ℝ 2 (fun s => eddOrbit M r tdot φdot s μ) := by
+    intro μ
+    fin_cases μ
+    · exact ((contDiff_const.mul contDiff_id).add contDiff_const :
+        ContDiff ℝ 2 (fun s : ℝ => tdot * s + tortoise M r))
+    · exact (contDiff_const : ContDiff ℝ 2 (fun _ : ℝ => r))
+    · exact (contDiff_const : ContDiff ℝ 2 (fun _ : ℝ => π / 2))
+    · exact (contDiff_const.mul contDiff_id : ContDiff ℝ 2 (fun s : ℝ => φdot * s))
+  have hboth : ∀ τ,
+      IsFreeFallAt
+        (christoffel (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF))
+          (genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF)))
+        (eddOrbit M r tdot φdot) τ ∧
+      KeepsOwnTimeAt (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF))
+        (eddOrbit M r tdot φdot) τ := by
+    intro τ
+    -- Where the orbit is, in both sets of coordinates.
+    have hx1 : eddOrbit M r tdot φdot τ 1 = r := by simp [eddOrbit]
+    have hx2 : eddOrbit M r tdot φdot τ 2 = π / 2 := by simp [eddOrbit]
+    have hxr : 0 < eddOrbit M r tdot φdot τ 1 := by rw [hx1]; exact hr0
+    have hxrim : 2 * M < eddOrbit M r tdot φdot τ 1 := by rw [hx1]; exact hrim
+    have hxs : sin (eddOrbit M r tdot φdot τ 2) ≠ 0 := by rw [hx2]; simp
+    have hp1 : toSchw M (eddOrbit M r tdot φdot τ) 1 = r := by simp [toSchw, eddOrbit]
+    have hp2 : toSchw M (eddOrbit M r tdot φdot τ) 2 = π / 2 := by simp [toSchw, eddOrbit]
+    have hpr : 0 < toSchw M (eddOrbit M r tdot φdot τ) 1 := by rw [hp1]; exact hr0
+    have hprim : 2 * M < toSchw M (eddOrbit M r tdot φdot τ) 1 := by rw [hp1]; exact hrim
+    have hps : sin (toSchw M (eddOrbit M r tdot φdot τ) 2) ≠ 0 := by rw [hp2]; simp
+    have hpos : 0 < 1 - 2 * M / toSchw M (eddOrbit M r tdot φdot τ) 1 := by
+      rw [sub_pos, div_lt_one hpr]
+      exact hprim
+    have hA := contDiffAt_schwA M hpr.ne'
+    have hB := contDiffAt_schwB M hpr.ne' hpos.ne'
+    -- Near the orbit, Eddington's length measure is Schwarzschild's in other coordinates.
+    have hnear := eventually_outside hxr hxrim hxs
+    have heq : ∀ μ ν, inNewCoords (toSchw M) (roundG (schwA M) (schwB M)) μ ν
+        =ᶠ[𝓝 (eddOrbit M r tdot φdot τ)] genG (onlyR (schwA M)) zero2 one2 (onlyR sqF) μ ν :=
+      fun μ ν => hnear.mono fun y hy => inNewCoords_toSchw M hy.1 hy.2.1 μ ν
+    have hval : ∀ μ ν, inNewCoords (toSchw M) (roundG (schwA M) (schwB M)) μ ν
+          (eddOrbit M r tdot φdot τ)
+        = genG (onlyR (schwA M)) zero2 one2 (onlyR sqF) μ ν (eddOrbit M r tdot φdot τ) :=
+      fun μ ν => (heq μ ν).eq_of_nhds
+    have hΦ3 : ∀ α, ContDiffAt ℝ 3 (fun z => toSchw M z α) (eddOrbit M r tdot φdot τ) :=
+      fun α => contDiffAt_toSchw M hxrim α
+    constructor
+    · -- Free fall.
+      have hmain := isFreeFallAt_inNewCoords (Φ := toSchw M) (g := roundG (schwA M) (schwB M))
+        (ginv := roundGinv (schwA M) (schwB M))
+        (ginv' := genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF))
+        (γ := eddOrbit M r tdot φdot) (τ := τ)
+        (fun α => (hΦ3 α).of_le (by norm_num)) (fun μ => (hγ μ).contDiffAt)
+        (fun α β => (contDiffAt_roundG hA hB α β).differentiableAt (by simp))
+        (fun α β => roundG_symm _ _ α β _)
+        (fun α δ => roundG_mul_roundGinv (schwarzschild_regular M hpr hprim hps) α δ)
+        (fun μ κ => by
+          simp only [hval]
+          exact genG_mul_genGinv (hset.spaceTime _ (mem_univ _) _ hxr).ne'
+            (hset.S_pos _ (mem_univ _) _ hxr).ne' hxs μ κ)
+      have h1 : IsFreeFallAt
+          (christoffel (inNewCoords (toSchw M) (roundG (schwA M) (schwB M)))
+            (genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF)))
+          (eddOrbit M r tdot φdot) τ :=
+        hmain.mpr (by rw [hpath]; exact hfree τ)
+      have hΓ : ∀ a b c,
+          christoffel (inNewCoords (toSchw M) (roundG (schwA M) (schwB M)))
+              (genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF)) a b c
+              (eddOrbit M r tdot φdot τ)
+            = christoffel (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF))
+              (genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF)) a b c
+              (eddOrbit M r tdot φdot τ) :=
+        fun a b c => (christoffel_congr heq (fun _ _ => EventuallyEq.rfl) a b c).eq_of_nhds
+      intro a
+      have h2 := h1 a
+      simp only [freeFallExpr, hΓ] at h2 ⊢
+      exact h2
+    · -- Own time.
+      have h1 : KeepsOwnTimeAt (inNewCoords (toSchw M) (roundG (schwA M) (schwB M)))
+          (eddOrbit M r tdot φdot) τ :=
+        (keepsOwnTimeAt_inNewCoords (Φ := toSchw M) (g := roundG (schwA M) (schwB M))
+          (fun α => (hΦ3 α).differentiableAt (by simp))
+          (fun μ => (hγ μ).contDiffAt.differentiableAt (by simp))).mpr
+          (by rw [hpath]; exact hown τ)
+      simp only [KeepsOwnTimeAt, hval] at h1 ⊢
+      exact h1
+  exact ⟨tdot, φdot, ht, fun τ => (hboth τ).1, fun τ => (hboth τ).2⟩
+
+/-! ## Round, written in two ways -/
+
+/-- A function of the form `f(θ) · h(φ)` can be differentiated where both factors can. -/
+theorem differentiableAt_sepA {f h : ℝ → ℝ} {x : Coords 4} (hf : DifferentiableAt ℝ f (x 2))
+    (hh : DifferentiableAt ℝ h (x 3)) : DifferentiableAt ℝ (sepA f h) x := by
+  have p2 : DifferentiableAt ℝ (fun z : Coords 4 => z 2) x := differentiableAt_apply 2 x
+  have p3 : DifferentiableAt ℝ (fun z : Coords 4 => z 3) x := differentiableAt_apply 3 x
+  have h1 : DifferentiableAt ℝ (fun z : Coords 4 => f (z 2) * h (z 3)) x :=
+    (DifferentiableAt.comp x hf p2).mul (DifferentiableAt.comp x hh p3)
+  exact h1
+
+theorem differentiableAt_negCot {θ : ℝ} (hs : sin θ ≠ 0) : DifferentiableAt ℝ negCot θ := by
+  have h : HasDerivAt negCot (-((-sin θ * sin θ - cos θ * cos θ) / sin θ ^ 2)) θ :=
+    ((Real.hasDerivAt_cos θ).div (Real.hasDerivAt_sin θ) hs).neg
+  exact h.differentiableAt
+
+theorem differentiableAt_negSin (φ : ℝ) : DifferentiableAt ℝ negSin φ := by
+  have h : DifferentiableAt ℝ (fun y => -sin y) φ := Real.differentiableAt_sin.neg
+  exact h
+
+theorem differentiableAt_constOne (θ : ℝ) : DifferentiableAt ℝ constOne θ := by
+  have h : DifferentiableAt ℝ (fun _ : ℝ => (1 : ℝ)) θ := differentiableAt_const _
+  exact h
+
+/-- The three turns can be differentiated away from the poles. -/
+theorem differentiableAt_rotX {x : Coords 4} (hs : sin (x 2) ≠ 0) (k : Fin 4) :
+    DifferentiableAt ℝ (rotX k) x := by
+  unfold rotX
+  split_ifs
+  · exact differentiableAt_sepA (differentiableAt_constOne _) (differentiableAt_negSin _)
+  · exact differentiableAt_sepA (differentiableAt_negCot hs) Real.differentiableAt_cos
+  · exact differentiableAt_const _
+
+theorem differentiableAt_rotY {x : Coords 4} (hs : sin (x 2) ≠ 0) (k : Fin 4) :
+    DifferentiableAt ℝ (rotY k) x := by
+  unfold rotY
+  split_ifs
+  · exact differentiableAt_sepA (differentiableAt_constOne _) Real.differentiableAt_cos
+  · exact differentiableAt_sepA (differentiableAt_negCot hs) Real.differentiableAt_sin
+  · exact differentiableAt_const _
+
+theorem differentiableAt_rotZ (x : Coords 4) (k : Fin 4) : DifferentiableAt ℝ (rotZ k) x := by
+  unfold rotZ
+  split_ifs <;> exact differentiableAt_const _
+
+/-- A field of arrows that has no part along the distance, and only looks at the two angles, is
+the same field with Eddington's time label as with Schwarzschild's. -/
+theorem toSchw_keeps_field (M : ℝ) {ξ : Fin 4 → Coords 4 → ℝ} (h1 : ∀ z, ξ 1 z = 0)
+    (hang : ∀ k z, ξ k (toSchw M z) = ξ k z) {y : Coords 4} (hr : 0 < y 1)
+    (hrim : 2 * M < y 1) (α : Fin 4) :
+    ∑ μ, jac (toSchw M) α μ y * ξ μ y = ξ α (toSchw M y) := by
+  rw [hang]
+  simp only [Fin.sum_univ_four, jac_toSchw M hr hrim]
+  fin_cases α <;> simp [h1]
+
+/-- Schwarzschild's space-time looks the same from every side. -/
+theorem schwarzschild_isRound (M : ℝ) {p : Coords 4} (hs : sin (p 2) ≠ 0) :
+    IsRoundAt (roundG (schwA M) (schwB M)) p := by
+  have e : roundG (schwA M) (schwB M)
+      = genG (fun _ r => schwA M r) (fun _ r => schwB M r) zero2 (onlyR sqF) := by
+    rw [genG_diagonal, changingG_static]
+  rw [e]
+  exact genG_isRound _ _ _ _ hs
+
+/-- **Eddington's space-time looks the same from every side, because Schwarzschild's does.** No
+slope of Eddington's length measure is computed for this. It uses three facts: Schwarzschild's
+space-time is round, Eddington's length measure is Schwarzschild's in other coordinates, and
+"unchanged by a turn" does not depend on the coordinates (`leavesUnchangedAt_inNewCoords`).
+`genG_isRound` reaches the same conclusion by computing directly. -/
+theorem eddington_isRound_from_schwarzschild (M : ℝ) {x : Coords 4} (hr : 0 < x 1)
+    (hrim : 2 * M < x 1) (hs : sin (x 2) ≠ 0) :
+    IsRoundAt (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF)) x := by
+  have hnear := eventually_outside hr hrim hs
+  have heq : ∀ μ ν, inNewCoords (toSchw M) (roundG (schwA M) (schwB M)) μ ν
+      =ᶠ[𝓝 x] genG (onlyR (schwA M)) zero2 one2 (onlyR sqF) μ ν :=
+    fun μ ν => hnear.mono fun y hy => inNewCoords_toSchw M hy.1 hy.2.1 μ ν
+  -- Where the point is, with Schwarzschild's labels.
+  have hp1 : toSchw M x 1 = x 1 := by simp [toSchw]
+  have hp2 : toSchw M x 2 = x 2 := by simp [toSchw]
+  have hpr : 0 < toSchw M x 1 := by rw [hp1]; exact hr
+  have hprim : 2 * M < toSchw M x 1 := by rw [hp1]; exact hrim
+  have hps : sin (toSchw M x 2) ≠ 0 := by rw [hp2]; exact hs
+  have hpos : 0 < 1 - 2 * M / toSchw M x 1 := by
+    rw [sub_pos, div_lt_one hpr]
+    exact hprim
+  have hA := contDiffAt_schwA M hpr.ne'
+  have hB := contDiffAt_schwB M hpr.ne' hpos.ne'
+  have hg : ∀ α β, DifferentiableAt ℝ (roundG (schwA M) (schwB M) α β) (toSchw M x) :=
+    fun α β => (contDiffAt_roundG hA hB α β).differentiableAt (by simp)
+  have hΦ : ∀ α, ContDiffAt ℝ 2 (fun z => toSchw M z α) x :=
+    fun α => (contDiffAt_toSchw M hrim α).of_le (by norm_num)
+  -- The change of labels loses no direction.
+  have hset := eddington_setting M isOpen_Ioi isPreconnected_Ioi
+    (fun ρ (hρ : ρ ∈ Ioi (0 : ℝ)) => hρ)
+  have hdet : (tab (jac (toSchw M)) x).det ≠ 0 := by
+    obtain ⟨K, hK⟩ := exists_inverse_jac (Φ := toSchw M) (g := roundG (schwA M) (schwB M))
+      (ginv' := genGinv (onlyR (schwA M)) zero2 one2 (onlyR sqF)) (x := x) (fun μ κ => by
+        simp only [inNewCoords_toSchw M hr hrim]
+        exact genG_mul_genGinv (hset.spaceTime _ (mem_univ _) _ hr).ne'
+          (hset.S_pos _ (mem_univ _) _ hr).ne' hs μ κ)
+    exact Matrix.det_ne_zero_of_right_inverse hK
+  have hround := schwarzschild_isRound M hps
+  -- One field at a time.
+  have transfer : ∀ ξ : Fin 4 → Coords 4 → ℝ, (∀ z, ξ 1 z = 0) →
+      (∀ k z, ξ k (toSchw M z) = ξ k z) → (∀ k, DifferentiableAt ℝ (ξ k) x) →
+      (∀ k, DifferentiableAt ℝ (ξ k) (toSchw M x)) →
+      LeavesUnchangedAt (roundG (schwA M) (schwB M)) ξ (toSchw M x) →
+      LeavesUnchangedAt (genG (onlyR (schwA M)) zero2 one2 (onlyR sqF)) ξ x := by
+    intro ξ h1 hang hd hd' hL
+    have hrel : ∀ᶠ y in 𝓝 x, ∀ α, ∑ μ, jac (toSchw M) α μ y * ξ μ y = ξ α (toSchw M y) :=
+      hnear.mono fun y hy α => toSchw_keeps_field M h1 hang hy.1 hy.2.1 α
+    have h2 := (leavesUnchangedAt_inNewCoords hΦ hg hd' hd hrel hdet).mpr hL
+    intro i j
+    rw [← lieD_congr heq ξ i j]
+    exact h2 i j
+  refine ⟨transfer rotX (fun z => by simp [rotX])
+      (fun k z => by fin_cases k <;> simp [rotX, sepA, toSchw])
+      (differentiableAt_rotX hs) (differentiableAt_rotX hps) hround.1,
+    transfer rotY (fun z => by simp [rotY])
+      (fun k z => by fin_cases k <;> simp [rotY, sepA, toSchw])
+      (differentiableAt_rotY hs) (differentiableAt_rotY hps) hround.2.1,
+    transfer rotZ (fun z => by simp [rotZ])
+      (fun k z => by fin_cases k <;> simp [rotZ])
+      (differentiableAt_rotZ x) (differentiableAt_rotZ _) hround.2.2⟩
 
 end GravityInLean
