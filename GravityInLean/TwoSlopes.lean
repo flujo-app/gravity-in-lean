@@ -44,6 +44,13 @@ noncomputable def dt (F : ℝ → ℝ → ℝ) (t r : ℝ) : ℝ := deriv (fun s
 /-- How fast `F` changes with distance `r`, the time `t` held fixed. -/
 noncomputable def dr (F : ℝ → ℝ → ℝ) (t r : ℝ) : ℝ := deriv (fun s => F t s) r
 
+/-- The constant function 0 of time and distance. -/
+noncomputable def zero2 (_t _r : ℝ) : ℝ := 0
+
+theorem dt_zero2 (t r : ℝ) : dt zero2 t r = 0 := by simp [dt, zero2]
+
+theorem dr_zero2 (t r : ℝ) : dr zero2 t r = 0 := by simp [dr, zero2]
+
 /-- `F` is twice smoothly differentiable around the point `(t, r)`. -/
 def TwiceSmooth (F : ℝ → ℝ → ℝ) (t r : ℝ) : Prop :=
   ContDiffAt ℝ 2 (Function.uncurry F) (t, r)
@@ -141,6 +148,30 @@ theorem hasDerivAt_fderiv_r (h : TwiceSmooth F t r) (v : ℝ × ℝ) :
       (fderiv ℝ (fderiv ℝ (Function.uncurry F)) (t, r) (0, 1) v) r := by
   have := (hasDerivAt_along_r h.differentiableAt_fderiv).clm_apply (hasDerivAt_const r v)
   simpa using this
+
+/-- Near `(t, r)` the function is still twice smoothly differentiable. -/
+theorem eventually (h : TwiceSmooth F t r) : ∀ᶠ q in 𝓝 (t, r), TwiceSmooth F q.1 q.2 :=
+  ContDiffAt.eventually h (by simp)
+
+/-- The time slope, seen as a function of time and distance together, can itself be
+differentiated at `(t, r)`. -/
+theorem differentiableAt_dt (h : TwiceSmooth F t r) :
+    DifferentiableAt ℝ (Function.uncurry (dt F)) (t, r) := by
+  have h1 : DifferentiableAt ℝ (fun q : ℝ × ℝ => fderiv ℝ (Function.uncurry F) q (1, 0)) (t, r) :=
+    h.differentiableAt_fderiv.clm_apply (differentiableAt_const _)
+  refine h1.congr_of_eventuallyEq ?_
+  filter_upwards [h.eventually_differentiableAt] with q hq
+  exact dt_eq_fderiv (t := q.1) (r := q.2) hq
+
+/-- The distance slope, seen as a function of time and distance together, can itself be
+differentiated at `(t, r)`. -/
+theorem differentiableAt_dr (h : TwiceSmooth F t r) :
+    DifferentiableAt ℝ (Function.uncurry (dr F)) (t, r) := by
+  have h1 : DifferentiableAt ℝ (fun q : ℝ × ℝ => fderiv ℝ (Function.uncurry F) q (0, 1)) (t, r) :=
+    h.differentiableAt_fderiv.clm_apply (differentiableAt_const _)
+  refine h1.congr_of_eventuallyEq ?_
+  filter_upwards [h.eventually_differentiableAt] with q hq
+  exact dr_eq_fderiv (t := q.1) (r := q.2) hq
 
 /-! ### The slopes and the slopes of the slopes -/
 
