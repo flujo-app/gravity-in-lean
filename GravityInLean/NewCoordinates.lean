@@ -59,6 +59,15 @@ theorem sum3_rotate (F : Fin n → Fin n → Fin n → ℝ) :
         Finset.sum_congr rfl fun a _ => Finset.sum_comm
     _ = ∑ c, ∑ a, ∑ b, F a b c := Finset.sum_comm
 
+theorem sum4_swap (F : Fin n → Fin n → Fin n → Fin n → ℝ) :
+    ∑ a, ∑ b, ∑ c, ∑ d, F a b c d = ∑ c, ∑ d, ∑ a, ∑ b, F a b c d := by
+  calc ∑ a, ∑ b, ∑ c, ∑ d, F a b c d = ∑ a, ∑ c, ∑ b, ∑ d, F a b c d :=
+        Finset.sum_congr rfl fun a _ => Finset.sum_comm
+    _ = ∑ c, ∑ a, ∑ b, ∑ d, F a b c d := Finset.sum_comm
+    _ = ∑ c, ∑ a, ∑ d, ∑ b, F a b c d :=
+        Finset.sum_congr rfl fun c _ => Finset.sum_congr rfl fun a _ => Finset.sum_comm
+    _ = ∑ c, ∑ d, ∑ a, ∑ b, F a b c d := Finset.sum_congr rfl fun c _ => Finset.sum_comm
+
 /-! ## The algebra behind the change of the connection
 
 In this section everything is a table of plain numbers: the values, at one point, of the slopes
@@ -229,6 +238,27 @@ theorem inNewCoords_symm {Φ : Coords n → Coords n} {g : Fin n → Fin n → C
   exact Finset.sum_congr rfl fun β _ => Finset.sum_congr rfl fun α _ => by
     rw [hsymm α β]
     ring
+
+/-- **Re-writing a length measure does not change the length of any step.** A step `v` taken at
+`x` in the new coordinates is, in the old coordinates, the step with the parts
+`∑ μ, jac Φ α μ x * v μ`. Its length is the same in both. This is what `inNewCoords` means. -/
+theorem length_inNewCoords (Φ : Coords n → Coords n) (g : Fin n → Fin n → Coords n → ℝ)
+    (x v : Coords n) :
+    ∑ μ, ∑ ν, inNewCoords Φ g μ ν x * v μ * v ν
+      = ∑ α, ∑ β, g α β (Φ x) * (∑ μ, jac Φ α μ x * v μ) * (∑ ν, jac Φ β ν x * v ν) := by
+  have e1 : ∑ μ, ∑ ν, inNewCoords Φ g μ ν x * v μ * v ν
+      = ∑ μ, ∑ ν, ∑ α, ∑ β, jac Φ α μ x * jac Φ β ν x * g α β (Φ x) * v μ * v ν := by
+    simp only [inNewCoords, Finset.sum_mul]
+  have e2 : ∑ α, ∑ β, g α β (Φ x) * (∑ μ, jac Φ α μ x * v μ) * (∑ ν, jac Φ β ν x * v ν)
+      = ∑ α, ∑ β, ∑ μ, ∑ ν, g α β (Φ x) * (jac Φ α μ x * v μ) * (jac Φ β ν x * v ν) := by
+    refine Finset.sum_congr rfl fun α _ => Finset.sum_congr rfl fun β _ => ?_
+    rw [mul_assoc, Finset.sum_mul_sum, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun μ _ => ?_
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun ν _ => by ring
+  rw [e1, e2, sum4_swap]
+  exact Finset.sum_congr rfl fun α _ => Finset.sum_congr rfl fun β _ =>
+    Finset.sum_congr rfl fun μ _ => Finset.sum_congr rfl fun ν _ => by ring
 
 /-- The slopes of the new length measure. -/
 theorem slope_inNewCoords {Φ : Coords n → Coords n} {g : Fin n → Fin n → Coords n → ℝ}

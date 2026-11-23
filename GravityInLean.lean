@@ -18,4 +18,6 @@ import GravityInLean.BirkhoffFromSymmetry
 import GravityInLean.Eddington
 import GravityInLean.SlopeRules
 import GravityInLean.NewCoordinates
+import GravityInLean.SamePath
+import GravityInLean.SameSymmetry
 import GravityInLean.SameSpacetime
