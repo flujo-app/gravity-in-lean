@@ -5,3 +5,6 @@ import GravityInLean.Curvature
 import GravityInLean.Probe.Sphere
 import GravityInLean.RoundSpacetime
 import GravityInLean.FreeFall
+import GravityInLean.TwoSlopes
+import GravityInLean.RoundChanging
+import GravityInLean.Birkhoff
