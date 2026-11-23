@@ -38,8 +38,8 @@ Solid arrows are steps worth taking. Dotted arrows are not for now.
 
 ## The pages
 
-The interactive pages this project grew out of are kept in [pages/](pages/): 7 files, each of
-which opens in a browser by itself. Start with *Slow Clocks, Bent Light*.
+The interactive pages this project grew out of are kept in [pages/](pages/): eight pages, each of
+which opens in a browser by itself, and one picture. Start with *Slow Clocks, Bent Light*.
 
 ## What is proved today
 
