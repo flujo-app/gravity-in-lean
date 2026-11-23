@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>Slow Light Town</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<style>
+/* One look only: a world that fills the page, with a few quiet instruments floating over it. */
+:root {
+  color-scheme: dark;
+  --bg: #05070d;
+  --panel: rgba(7, 11, 20, 0.62);
+  --line: rgba(160, 190, 230, 0.24);
+  --ink: #e9eff8;
+  --soft: #a3b4cb;
+  --hot: #ffd27a;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; overflow: hidden; }
+.app { position: relative; width: 100%; height: 100%; min-height: 380px; overflow: hidden; background: var(--bg); }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; cursor: crosshair; }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.45) 100%); }
+.cross { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; background: rgba(255,255,255,0.5); pointer-events: none; }
+
+.read { position: absolute; left: max(14px, env(safe-area-inset-left, 0px)); top: 12px; display: grid; gap: 1px; pointer-events: none; text-shadow: 0 1px 8px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; }
+.read .spd b { font-family: var(--font-display); font-stretch: 118%; font-weight: 800; font-size: 30px; line-height: 1; color: var(--hot); }
+.read span { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+.read .spd span { margin-left: 6px; }
+.read .clk { display: flex; gap: 8px; align-items: baseline; }
+.read .clk span { min-width: 5ch; }
+.read .clk b { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+.tr { position: absolute; right: max(12px, env(safe-area-inset-right, 0px)); top: 12px; display: flex; gap: 8px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--panel); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.seg button { border: 0; background: transparent; padding: 7px 14px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+.seg button[aria-pressed="true"] { background: var(--hot); color: #1b1404; }
+.chip { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%; background: var(--panel); font-weight: 700; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.whisper { position: absolute; left: 50%; bottom: 13%; transform: translateX(-50%); margin: 0; width: min(92%, 640px); text-align: center; font-family: var(--font-display); font-stretch: 108%; font-weight: 600; font-size: clamp(17px, 2.6vw, 24px); line-height: 1.25; text-wrap: balance; color: #fff6e0; text-shadow: 0 2px 14px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9); opacity: 0; transition: opacity 1.4s ease; pointer-events: none; }
+.whisper.on { opacity: 1; }
+.keys { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 5px 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-family: var(--font-mono); font-size: 11.5px; color: var(--soft); white-space: nowrap; pointer-events: none; transition: opacity 1.2s ease; }
+.keys.off { opacity: 0; }
+.pad { position: absolute; right: max(12px, env(safe-area-inset-right, 0px)); bottom: 14px; display: none; gap: 8px; }
+.pad button { width: 54px; height: 54px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); font-family: var(--font-mono); font-size: 12px; font-weight: 700; touch-action: none; }
+@media (pointer: coarse) { .pad { display: flex; } .keys { display: none; } }
+@media (max-width: 640px) { .keys { display: none; } .read .spd b { font-size: 24px; } }
+@media (prefers-reduced-motion: reduce) { .whisper, .keys { transition: none; } }
+
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); background: rgba(3, 5, 10, 0.5); overflow: auto; }
+.sheet { width: min(560px, 100%); background: rgba(8, 12, 22, 0.9); border: 1px solid var(--line); border-radius: 12px; padding: 24px 26px; display: grid; gap: 12px; }
+.sheet h1 { margin: 0; font-family: var(--font-display); font-stretch: 122%; font-weight: 800; font-size: clamp(32px, 7vw, 50px); line-height: 0.98; letter-spacing: -0.01em; }
+.sheet h2 { margin: 6px 0 0; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hot); }
+.sheet p, .sheet li { margin: 0; color: #d3ddec; }
+.sheet ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.sheet .fine { font-size: 13px; color: var(--soft); }
+.go { justify-self: start; padding: 11px 22px; border-radius: 999px; border: 0; background: var(--hot); color: #1b1404; font-weight: 800; font-size: 16px; }
+.go:disabled { opacity: 0.5; cursor: not-allowed; }
+[hidden] { display: none !important; }
+</style>
+
+<div class="app" id="app">
+  <canvas id="view" tabindex="0" aria-label="First-person view of a town where light travels at walking pace"></canvas>
+  <div class="vignette"></div>
+  <div class="cross"></div>
+
+  <div class="read" aria-live="off">
+    <div class="spd"><b id="r-speed">0%</b><span>of light</span></div>
+    <div class="clk"><span>town</span><b id="r-town"></b></div>
+    <div class="clk"><span>you</span><b id="r-watch"></b></div>
+  </div>
+  <div class="tr">
+    <div class="seg" role="group" aria-label="What to show">
+      <button type="button" id="b-eyes" aria-pressed="true">Eyes</button>
+      <button type="button" id="b-now" aria-pressed="false">Now</button>
+    </div>
+    <button type="button" class="chip" id="b-help" aria-label="Controls and notes">?</button>
+  </div>
+  <p class="whisper" id="whisper" aria-live="polite"></p>
+  <p class="keys" id="keys">W A S D · mouse · Shift to sprint · Space to rise · N for now</p>
+  <div class="pad"><button type="button" id="b-run" aria-label="Sprint">run</button><button type="button" id="b-down" aria-label="Down">▼</button><button type="button" id="b-up" aria-label="Up">▲</button></div>
+
+  <div class="overlay" id="start">
+    <div class="sheet">
+      <h1>Slow Light Town</h1>
+      <p>Here light crawls along at walking pace, and a day lasts one minute. Nothing else about the place is unusual.</p>
+      <button type="button" class="go" id="b-start">Walk in</button>
+      <p class="fine" id="start-note">W A S D to move, mouse to look, Shift to sprint, Space to rise. On a phone: left thumb moves, right thumb looks.</p>
+    </div>
+  </div>
+
+  <div class="overlay" id="about" hidden>
+    <div class="sheet">
+      <h2>Getting around</h2>
+      <ul>
+        <li>W A S D or arrows to move, mouse to look (click the view first).</li>
+        <li>Shift to sprint. Mouse wheel changes your pace.</li>
+        <li>Space or E to rise, Q to sink.</li>
+        <li>N switches between Eyes and Now. C turns the colour shift off and on.</li>
+        <li>R takes you back to where you started.</li>
+      </ul>
+      <h2>Eyes and Now</h2>
+      <p>Eyes is what actually reaches you: old light, older the further it has come. Now is where everything is at this instant by your own reckoning, which nobody can see.</p>
+      <h2>What's real</h2>
+      <p class="fine">The bending and bunching of the town when you move, the direction of the colour shift, your slow watch, the oval ripples of the beacon's light, the hole bending the view and slowing clocks, and the visitor as a slice of a four-dimensional cube all follow the real rules. Invented: light at walking pace, the one-minute day, the hole's size and its pull on the towers, and the colours beyond red and violet.</p>
+      <button type="button" class="go" id="b-close">Back</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+const DAY = 60, PULSE = 8, EYE = 1.7, LOOP = 1200, T_START = DAY * 3.6, C = 6, RS = 7;
+const PACES = [0.2, 0.4, 0.6, 0.8, 0.9, 0.95, 0.98];
+const HOLE = new THREE.Vector3(25, 62, -205);        // the hole hangs over the far end of the street of gates
+const VISIT = new THREE.Vector3(0, 66, 0), VA = 12;  // the visitor drifts above the plaza
+const app = document.getElementById('app'), canvas = document.getElementById('view');
+const $ = id => document.getElementById(id);
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ---------- the rules, applied to every corner of the town ---------- */
+const VERT_COMMON = `
+uniform vec3 uO; uniform vec3 uVhat; uniform float uBeta; uniform float uGamma; uniform float uC; uniform float uT0; uniform float uNow;
+uniform vec3 uHole; uniform float uRs;
+varying vec3 vW; varying float vT; varying float vTl; varying float vDop; varying float vR; varying vec3 vN;
+// near the hole everything is drawn out towards it
+vec3 tide(vec3 P) { vec3 d = uHole - P; return P + d * 0.5 * (1.0 - smoothstep(16.0, 78.0, length(d))); }
+// clocks run slow near the hole
+float clockRate(vec3 P) { float r = distance(P, uHole); float phi = uRs / max(r, 1.2 * uRs) * (1.0 - smoothstep(70.0, 150.0, r)); return sqrt(1.0 - min(phi, 0.85)); }
+// Where a point of the town appears to you, and which moment of it you are looking at.
+vec3 warp(vec3 P, out float T, out float dop, out float r) {
+  vec3 R = P - uO;
+  r = length(R);
+  float par = dot(R, uVhat);
+  vec3 perp = R - par * uVhat;
+  float seen = uGamma * (par + uBeta * r);     // eyes: old light, swept forward by your motion
+  float sliced = par / uGamma;                 // now: this instant by your reckoning, squashed along your path
+  T = mix(uT0 - r / uC, uT0 + uBeta * par / uC, uNow);
+  dop = mix(uGamma * (1.0 + uBeta * par / max(r, 0.001)), 1.0, uNow);
+  return uO + perp + mix(seen, sliced, uNow) * uVhat;
+}
+// keep very distant things inside the camera's range without changing the direction they appear in
+vec4 place(vec3 A) {
+  vec3 D = A - uO; float d = length(D);
+  if (d > 1500.0) D *= (1500.0 + 2500.0 * (1.0 - exp(-(d - 1500.0) / 2500.0))) / d;
+  return projectionMatrix * viewMatrix * vec4(uO + D, 1.0);
+}`;
+const VERT_SOLID = VERT_COMMON + `
+attribute vec3 aCol; attribute vec2 aUv; attribute vec4 aMisc;
+varying vec3 vCol; varying vec2 vUv; varying vec4 vMisc;
+void main() {
+  vW = position; vN = normal; vCol = aCol; vUv = aUv; vMisc = aMisc;
+  vec3 Q = aMisc.w > 0.5 ? position : tide(position);
+  gl_Position = place(warp(Q, vT, vDop, vR));
+  vTl = vT * clockRate(position);
+}`;
+const VERT_FLAT = VERT_COMMON + `
+uniform vec3 uShift;
+void main() {
+  vec3 P = position + uShift;
+  vW = P; vN = vec3(0.0, 1.0, 0.0);
+  gl_Position = place(warp(tide(P), vT, vDop, vR));
+  vTl = vT * clockRate(P);
+}`;
+// things that move: find the moment whose light reaches you now (or which lies on your "now"), then draw them there
+const VERT_TRAM = VERT_COMMON + `
+attribute vec3 aCol; attribute vec2 aUv; attribute vec4 aMisc; attribute vec3 aBase; attribute vec4 aTrack;
+uniform float uLoop;
+varying vec3 vCol; varying vec2 vUv; varying vec4 vMisc;
+vec3 at(float T) { float s = mod(aTrack.z * T + aTrack.w, uLoop) - 0.5 * uLoop; return aBase + position + vec3(aTrack.x, 0.0, aTrack.y) * s; }
+void main() {
+  float T = uT0; vec3 P = at(T);
+  for (int i = 0; i < 4; i++) { vec3 R = P - uO; T = mix(uT0 - length(R) / uC, uT0 + uBeta * dot(R, uVhat) / uC, uNow); P = at(T); }
+  vW = P; vN = normal; vCol = aCol; vUv = aUv; vMisc = aMisc;
+  gl_Position = place(warp(P, vT, vDop, vR));
+  vTl = vT * clockRate(P);
+}`;
+
+const FRAG_COMMON = `
+uniform vec3 uO; uniform float uT0; uniform float uNow; uniform float uDay; uniform float uDoppler; uniform float uFog; uniform float uC; uniform vec3 uBeacon; uniform float uPulse;
+varying vec3 vW; varying float vT; varying float vTl; varying float vDop; varying float vR; varying vec3 vN;
+float hash1(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float hash2(vec2 p) { return fract(sin(dot(p, vec2(269.5, 183.3))) * 24634.6345); }
+float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash1(i), hash1(i + vec2(1.0, 0.0)), f.x), mix(hash1(i + vec2(0.0, 1.0)), hash1(i + vec2(1.0, 1.0)), f.x), f.y); }
+
+// the town's day, as a function of the moment you are looking at
+float phaseOf(float T) { return fract(T / uDay); }                    // 0 midnight, 0.25 sunrise, 0.5 noon, 0.75 sunset
+float sunH(float ph) { return sin(6.2831853 * (ph - 0.25)); }
+vec3 sunDir(float ph) { float a = 6.2831853 * (ph - 0.25); return normalize(vec3(cos(a), sin(a), 0.35)); }
+float dayAmt(float ph) { return smoothstep(-0.14, 0.22, sunH(ph)); }
+float twiAmt(float ph) { float h = sunH(ph); return exp(-h * h / 0.05); }
+float nightAmt(float ph) { return 1.0 - smoothstep(-0.05, 0.12, sunH(ph)); }
+vec3 horizonCol(float ph) { vec3 c = mix(vec3(0.020, 0.030, 0.075), vec3(0.62, 0.78, 0.95), dayAmt(ph)); return mix(c, vec3(1.0, 0.48, 0.22), twiAmt(ph) * 0.8); }
+vec3 zenithCol(float ph) { vec3 c = mix(vec3(0.004, 0.008, 0.030), vec3(0.16, 0.38, 0.80), dayAmt(ph)); return mix(c, vec3(0.30, 0.22, 0.45), twiAmt(ph) * 0.6); }
+vec3 ambientCol(float ph) { return mix(vec3(0.030, 0.045, 0.10), vec3(0.50, 0.58, 0.70), dayAmt(ph)) + vec3(0.25, 0.10, 0.06) * twiAmt(ph); }
+vec3 sunCol(float ph) { float h = sunH(ph); return mix(vec3(1.0, 0.45, 0.18), vec3(1.0, 0.96, 0.88), smoothstep(0.0, 0.45, h)) * smoothstep(-0.05, 0.12, h) * 1.25; }
+vec3 lit(vec3 albedo, vec3 N, float ph) { return albedo * (ambientCol(ph) + sunCol(ph) * max(dot(normalize(N), sunDir(ph)), 0.0)); }
+
+// the beacon's flashes: shells of light spreading at light speed, drawn where they cross a surface
+float pulseAt(vec3 P, float T) { float d = distance(P, uBeacon); float w = fract((T - d / uC) / uPulse); return exp(-w * 16.0) / (1.0 + d / 45.0); }
+
+// a rough spectrum through five anchors (ultraviolet, blue, green, red, infrared), slid along by your motion
+float bandAt(float x, float uvv, vec3 c, float ir) {
+  if (x < 0.0) return uvv * exp(x * 1.2);
+  if (x < 1.0) return mix(uvv, c.b, x);
+  if (x < 2.0) return mix(c.b, c.g, x - 1.0);
+  if (x < 3.0) return mix(c.g, c.r, x - 2.0);
+  if (x < 4.0) return mix(c.r, ir, x - 3.0);
+  return ir * exp(-(x - 4.0) * 0.6);
+}
+vec3 dopplerShift(vec3 c, float ir, float uvv, float D) {
+  float s = log2(max(D, 0.02)) * 2.6;
+  vec3 o = vec3(bandAt(3.0 + s, uvv, c, ir), bandAt(2.0 + s, uvv, c, ir), bandAt(1.0 + s, uvv, c, ir));
+  return o * pow(D, 1.15);
+}
+// haze with distance, colour shift from your motion, and a gentle blur where whole days are packed into a pixel
+void finish(vec3 col, float kIR, float kUV, float Tday) {
+  float ph = phaseOf(Tday);
+  col = mix(col, horizonCol(ph), 1.0 - exp(-pow(vR * uFog, 1.7)));
+  col = mix(col, vec3(0.30, 0.34, 0.44), smoothstep(0.10, 0.45, fwidth(Tday / uDay)));
+  vec3 shifted = dopplerShift(col, (col.r * 0.55 + col.g * 0.25) * kIR, col.b * kUV, vDop);
+  col = mix(col, shifted, uDoppler);
+  col = 1.0 - exp(-col * 1.4);
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+const FRAG_GROUND = FRAG_COMMON + `
+uniform vec4 uHole4;      // x, z, half-size of a square cut out of this sheet (0 = none)
+void main() {
+  vec2 p = vW.xz;
+  if (uHole4.z > 0.0 && max(abs(p.x - uHole4.x), abs(p.y - uHole4.y)) < uHole4.z) discard;
+  float ph = phaseOf(vTl);
+  vec2 q = abs(mod(p + 25.0, 50.0) - 25.0);          // 0 at the middle of a block, 25 at the middle of a street
+  vec2 cell = floor((p + 25.0) / 50.0);
+  bool sx = q.x > 20.0, sy = q.y > 20.0;
+  vec3 alb; float kIR = 1.0;
+  if (sx || sy) {
+    alb = vec3(0.070, 0.073, 0.080) + 0.018 * vnoise(p * 1.7);
+    if (sx != sy) {
+      float across = sx ? 25.0 - q.x : 25.0 - q.y;
+      float along = sx ? p.y : p.x;
+      float dash = (1.0 - smoothstep(0.09, 0.15, across)) * step(0.5, fract(along / 5.0));
+      alb = mix(alb, vec3(0.70, 0.62, 0.30), dash);
+      float edge = smoothstep(4.45, 4.55, across) * (1.0 - smoothstep(4.70, 4.80, across));
+      alb = mix(alb, vec3(0.45), edge * 0.7);
+    } else {
+      vec2 d2 = 25.0 - q;
+      float m = max(d2.x, d2.y);
+      float zebra = step(3.4, m) * step(m, 4.6) * step(0.5, fract(min(d2.x, d2.y) / 0.9));
+      alb = mix(alb, vec3(0.62), zebra * 0.8);
+    }
+  } else if (cell == vec2(0.0)) {
+    float rc = length(p);
+    alb = vec3(0.40, 0.38, 0.35) * (0.86 + 0.14 * vnoise(p * 0.9));
+    float rings = smoothstep(0.90, 0.96, fract(rc / 4.0));
+    float spokes = smoothstep(0.90, 0.97, abs(cos(atan(p.y, p.x) * 8.0))) * step(4.0, rc);
+    alb *= 1.0 - 0.35 * max(rings, spokes);
+  } else {
+    bool park = mod(cell.x * 3.0 + cell.y * 5.0, 7.0) < 0.5;
+    float pave = max(smoothstep(16.6, 17.0, q.x), smoothstep(16.6, 17.0, q.y));
+    vec3 inner;
+    if (park) { inner = mix(vec3(0.07, 0.22, 0.06), vec3(0.13, 0.30, 0.08), vnoise(p * 0.3)) * (0.9 + 0.1 * vnoise(p * 3.0)); kIR = mix(2.4, 1.0, pave); }
+    else inner = vec3(0.24, 0.23, 0.22) * (0.9 + 0.1 * vnoise(p * 0.6));
+    vec2 tile = fract(p / 1.2);
+    vec3 paving = vec3(0.36, 0.35, 0.33) * (0.93 + 0.07 * step(0.06, tile.x) * step(0.06, tile.y));
+    alb = mix(inner, paving, pave);
+  }
+  float g1 = length(mod(p - vec2(31.2, 31.2) + 25.0, 50.0) - 25.0);
+  float g2 = length(mod(p - vec2(0.0, 31.2) + 25.0, 50.0) - 25.0);
+  float g3 = length(mod(p - vec2(31.2, 0.0) + 25.0, 50.0) - 25.0);
+  float glow = exp(-g1 * g1 / 36.0) + exp(-g2 * g2 / 36.0) + exp(-g3 * g3 / 36.0);
+  vec3 col = lit(alb, vec3(0.0, 1.0, 0.0), ph);
+  col += alb * vec3(1.0, 0.70, 0.36) * glow * nightAmt(ph) * 2.2;
+  col += (alb + 0.04) * vec3(1.0, 0.88, 0.60) * pulseAt(vW, vT) * 3.2;
+  finish(col, kIR, 0.3, vTl);
+  #include <colorspace_fragment>
+}`;
+
+const FRAG_CITY = FRAG_COMMON + `
+varying vec3 vCol; varying vec2 vUv; varying vec4 vMisc;     // misc: seed, 0 wall / 1 roof
+void main() {
+  float ph = phaseOf(vTl), seed = floor(vMisc.x + 0.5);
+  vec3 alb = vCol, emis = vec3(0.0);
+  if (vMisc.y < 0.5) {
+    vec2 g = vUv / vec2(3.0, 3.2), id = floor(g), f = fract(g);
+    float win = step(0.22, f.x) * step(f.x, 0.78) * step(0.28, f.y) * step(f.y, 0.80) * step(1.0, vUv.y);
+    float h = hash1(id + seed * 17.0), h2 = hash2(id + seed * 31.0);
+    float lamp = (h < 0.72 && (ph > 0.735 + 0.07 * h2 || ph < 0.06 + 0.22 * h)) ? 1.0 : 0.0;
+    vec3 glass = vec3(0.05, 0.08, 0.12) + 0.22 * horizonCol(ph);
+    alb = mix(alb * (0.90 + 0.10 * hash1(vec2(id.y, seed))), glass, win);
+    emis = win * lamp * mix(vec3(1.0, 0.62, 0.26), vec3(1.0, 0.86, 0.60), h2) * 1.7;
+  }
+  vec3 col = lit(alb, vN, ph) + emis + alb * vec3(1.0, 0.88, 0.60) * pulseAt(vW, vT) * 2.5;
+  finish(col, 1.2, 0.3, vTl);
+  #include <colorspace_fragment>
+}`;
+
+const FRAG_PROP = FRAG_COMMON + `
+varying vec3 vCol; varying vec2 vUv; varying vec4 vMisc;     // misc.x: 0 plain, 1 street lamp, 2 beacon lamp, 3 tram, 4 visitor, 5 visitor edge; misc.y: brightness in infrared
+void main() {
+  float ph = phaseOf(vTl), night = nightAmt(ph);
+  vec3 alb = vCol, emis = vec3(0.0);
+  if (vMisc.x > 4.5) { emis = alb * 1.8; alb *= 0.0; }
+  else if (vMisc.x > 3.5) { emis = alb * (0.42 + 0.22 * sin(vT * 1.3 + vMisc.z)); alb *= 0.6; }
+  else if (vMisc.x > 2.5) {
+    float win = step(0.95, vUv.y) * step(vUv.y, 1.95) * step(0.14, fract(vUv.x / 1.5));
+    alb = mix(alb, vec3(0.05, 0.07, 0.10), win);
+    emis = win * vec3(1.0, 0.85, 0.55) * night * 1.5;
+  } else if (vMisc.x > 1.5) {
+    emis = vec3(1.0, 0.92, 0.72) * (0.2 + 7.0 * exp(-fract(vT / uPulse) * 10.0));
+  } else if (vMisc.x > 0.5) {
+    emis = vec3(1.0, 0.72, 0.36) * night * 3.5;
+  }
+  vec3 col = lit(alb, vN, ph) + emis + alb * vec3(1.0, 0.88, 0.60) * pulseAt(vW, vT) * 2.5;
+  finish(col, max(vMisc.y, 0.2), 0.3, vTl);
+  #include <colorspace_fragment>
+}`;
+
+const FRAG_CLOCK = FRAG_COMMON + `
+varying vec3 vCol; varying vec2 vUv; varying vec4 vMisc;
+float hand(vec2 p, float a, float len, float wid) { vec2 d = vec2(sin(a), cos(a)); float along = dot(p, d), across = abs(dot(p, vec2(d.y, -d.x))); return step(-0.10, along) * step(along, len) * step(across, wid); }
+void main() {
+  float r = length(vUv);
+  if (r > 1.0) discard;
+  float ph = phaseOf(vTl);
+  float ang = atan(vUv.x, vUv.y);
+  vec3 col = vec3(0.93, 0.91, 0.84);
+  col = mix(col, vec3(0.10), step(0.78, r) * step(r, 0.92) * step(0.93, cos(ang * 12.0)));
+  col = mix(col, vec3(0.08), hand(vUv, 6.2831853 * ph, 0.60, 0.07));                              // once a day, straight up at midnight
+  col = mix(col, vec3(0.85, 0.10, 0.06), hand(vUv, 6.2831853 * fract(vTl / (uDay / 24.0)), 0.84, 0.035));   // once an hour
+  col = mix(col, vec3(0.10), step(0.94, r));
+  vec3 lighted = col * (ambientCol(ph) + sunCol(ph) * max(dot(vN, sunDir(ph)), 0.0)) + col * 0.6 * nightAmt(ph);
+  finish(lighted + col * vec3(1.0, 0.88, 0.60) * pulseAt(vW, vT) * 1.5, 1.0, 0.3, vTl);
+  #include <colorspace_fragment>
+}`;
+
+const FRAG_SKY = FRAG_COMMON + `
+void main() {
+  float flat_ = length(vW.xz - uO.xz);
+  float Ts = mix(uT0 - flat_ / uC, vT, uNow);          // the sky straight above you is your own moment; further out it is older
+  float ph = phaseOf(Ts), d = dayAmt(ph);
+  vec3 col = mix(zenithCol(ph), horizonCol(ph), smoothstep(120.0, 1500.0, flat_));
+  float cl = smoothstep(0.50, 0.78, 0.55 * vnoise(vW.xz / 120.0) + 0.30 * vnoise(vW.xz / 43.0) + 0.15 * vnoise(vW.xz / 17.0));
+  col = mix(col, ambientCol(ph) * 1.15 + sunCol(ph) * 0.55, cl * 0.7);
+  vec2 sg = floor(vW.xz / 7.0), sf = fract(vW.xz / 7.0) - 0.5;
+  float star = step(0.90, hash1(sg)) * (1.0 - smoothstep(0.0, 0.11, length(sf - (vec2(hash2(sg), hash1(sg + 3.1)) - 0.5) * 0.6)));
+  col += vec3(0.9, 0.95, 1.0) * star * (1.0 - d) * (1.0 - cl) * 1.6;
+  finish(col, 0.4, 1.2, Ts);
+  #include <colorspace_fragment>
+}`;
+
+// the glowing ring of stuff circling the hole
+const FRAG_DISC = FRAG_COMMON + `
+varying vec3 vCol; varying vec2 vUv; varying vec4 vMisc;     // uv: distance from the hole in hole-radii, angle around it
+void main() {
+  float r = vUv.x, spin = 2.4 / pow(r, 1.5), a = vUv.y - vT * spin;          // inner lanes circle faster
+  vec2 p = vec2(cos(a), sin(a)) * r;
+  float n = 0.5 * vnoise(p * 1.4) + 0.3 * vnoise(p * 3.7) + 0.2 * vnoise(p * 9.1);
+  float lanes = 0.62 + 0.38 * sin(r * 9.0 + 3.0 * vnoise(p * 0.8));
+  float dens = smoothstep(2.95, 3.4, r) * (1.0 - smoothstep(5.8, 7.6, r)) * (0.10 + 1.6 * n * n) * lanes;
+  if (dens < 0.07) discard;
+  vec3 hot = mix(vec3(1.0, 0.95, 0.85), vec3(1.0, 0.36, 0.06), smoothstep(3.0, 6.6, r));
+  hot = mix(hot, vec3(0.55, 0.08, 0.02), smoothstep(6.0, 7.6, r));
+  vec3 col = hot * dens * (45.0 / (r * r)) * (0.6 + 0.4 * sin(vUv.y + 0.6));  // hottest near the hole; the side swinging towards you is brighter
+  finish(col, 1.4, 0.4, vT);
+  #include <colorspace_fragment>
+}`;
+
+// the hole itself is drawn afterwards, by bending the finished picture around it
+const VERT_LENS = `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+const FRAG_LENS = `
+uniform sampler2D tScene; uniform sampler2D tDepth;
+uniform vec3 uHoleDir; uniform float uHoleDist; uniform float uRs; uniform vec2 uTan; uniform float uNear; uniform float uFar;
+varying vec2 vUv;
+vec3 rayAt(vec2 uv) { return normalize(vec3((uv * 2.0 - 1.0) * uTan, -1.0)); }
+vec2 uvOf(vec3 d) { return (d.xy / (-d.z)) / uTan * 0.5 + 0.5; }
+float distAt(vec2 uv, float cz) { float ndc = texture2D(tDepth, uv).x * 2.0 - 1.0; return 2.0 * uNear * uFar / (uFar + uNear - ndc * (uFar - uNear)) / cz; }
+void main() {
+  vec3 dir = rayAt(vUv);
+  float ct = clamp(dot(dir, uHoleDir), -1.0, 1.0), th = acos(ct);
+  float ring0 = sqrt(2.0 * uRs / uHoleDist);                       // how far out the bending reaches, for things far behind the hole
+  float win = 1.0 - smoothstep(2.2 * ring0, 4.5 * ring0, th);
+  if (win <= 0.0) discard;
+  if (distAt(vUv, -dir.z) < uHoleDist - 2.6 * uRs) discard;         // this pixel shows something in front of the hole
+  vec3 e = normalize(dir - uHoleDir * ct + vec3(1e-6));
+  float q = 1.0 / uHoleDist; vec2 suv = vUv;                      // q: how strongly this ray is bent; it depends on how far behind the hole its source lies
+  for (int i = 0; i < 6; i++) {
+    float b = max(th - win * 2.0 * uRs * q / max(th, 1.0e-4), -2.6);        // the direction the light really came from
+    vec3 src = uHoleDir * cos(b) + e * sin(b);
+    if (src.z > -0.03) { suv = vUv; break; }
+    suv = clamp(uvOf(src), 0.001, 0.999);
+    float Ds = distAt(suv, -src.z);
+    q = mix(q, max(Ds - uHoleDist, 0.0) / (uHoleDist * Ds), 0.55);
+  }
+  vec3 col = texture2D(tScene, suv).rgb;
+  float shadow = min(2.6 * uRs / uHoleDist, 1.25);
+  col *= smoothstep(shadow * 0.96, shadow * 1.04, th);
+  float x = (th - shadow * 1.07) / (shadow * 0.10);
+  col += vec3(1.0, 0.86, 0.62) * exp(-x * x) * 0.6;                 // the thin bright ring where light circles the hole
+  gl_FragColor = vec4(col, 1.0);
+  #include <colorspace_fragment>
+}`;
+
+/* ---------- geometry builder ---------- */
+class Geo {
+  constructor() { this.p = []; this.n = []; this.c = []; this.u = []; this.m = []; this.i = []; this.count = 0; }
+  // a sheet of squares: corner o, edges eu and ev, su by sv squares. eu x ev points out of the surface.
+  grid(o, eu, ev, su, sv, nn, col, uv0, uvs, misc) {
+    const base = this.count;
+    for (let a = 0; a <= sv; a++) for (let b = 0; b <= su; b++) {
+      const fu = b / su, fv = a / sv;
+      this.p.push(o[0] + eu[0] * fu + ev[0] * fv, o[1] + eu[1] * fu + ev[1] * fv, o[2] + eu[2] * fu + ev[2] * fv);
+      this.n.push(nn[0], nn[1], nn[2]); this.c.push(col[0], col[1], col[2]);
+      this.u.push(uv0[0] + uvs[0] * fu, uv0[1] + uvs[1] * fv); this.m.push(misc[0], misc[1], misc[2], misc[3]);
+    }
+    for (let a = 0; a < sv; a++) for (let b = 0; b < su; b++) { const i0 = base + a * (su + 1) + b, i1 = i0 + 1, i2 = i0 + su + 1, i3 = i2 + 1; this.i.push(i0, i1, i2, i1, i3, i2); }
+    this.count += (su + 1) * (sv + 1);
+  }
+  // an upright box, cut into small squares so it can bend smoothly
+  box(cx, cz, hx, hz, y0, y1, col, misc, o = {}) {
+    const H = y1 - y0, seg = o.seg || 4;
+    const sx = Math.max(1, Math.min(12, Math.ceil(2 * hx / seg))), sz = Math.max(1, Math.min(12, Math.ceil(2 * hz / seg))), sy = Math.max(1, Math.min(14, Math.ceil(H / seg)));
+    const rc = o.roofCol || col, rm = o.roofMisc || misc;
+    this.grid([cx + hx, y0, cz + hz], [0, 0, -2 * hz], [0, H, 0], sz, sy, [1, 0, 0], col, [0, 0], [2 * hz, H], misc);
+    this.grid([cx - hx, y0, cz - hz], [0, 0, 2 * hz], [0, H, 0], sz, sy, [-1, 0, 0], col, [0, 0], [2 * hz, H], misc);
+    this.grid([cx - hx, y0, cz + hz], [2 * hx, 0, 0], [0, H, 0], sx, sy, [0, 0, 1], col, [0, 0], [2 * hx, H], misc);
+    this.grid([cx + hx, y0, cz - hz], [-2 * hx, 0, 0], [0, H, 0], sx, sy, [0, 0, -1], col, [0, 0], [2 * hx, H], misc);
+    this.grid([cx - hx, y1, cz + hz], [2 * hx, 0, 0], [0, 0, -2 * hz], sx, sz, [0, 1, 0], rc, [0, 0], [2 * hx, 2 * hz], rm);
+    if (o.bottom) this.grid([cx - hx, y0, cz - hz], [2 * hx, 0, 0], [0, 0, 2 * hz], sx, sz, [0, -1, 0], col, [0, 0], [2 * hx, 2 * hz], rm);
+  }
+  // a round column or cone
+  round(cx, cz, y0, y1, r0, r1, sides, levels, colour, misc) {
+    const base = this.count, slope = (r0 - r1) / (y1 - y0), nl = Math.hypot(1, slope);
+    for (let k = 0; k <= levels; k++) {
+      const f = k / levels, y = y0 + (y1 - y0) * f, r = r0 + (r1 - r0) * f, col = typeof colour === 'function' ? colour(f) : colour;
+      for (let s = 0; s <= sides; s++) {
+        const a = s / sides * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+        this.p.push(cx + r * ca, y, cz + r * sa); this.n.push(ca / nl, slope / nl, sa / nl); this.c.push(col[0], col[1], col[2]);
+        this.u.push(a * r0, y - y0); this.m.push(misc[0], misc[1], misc[2], misc[3]);
+      }
+    }
+    for (let k = 0; k < levels; k++) for (let s = 0; s < sides; s++) { const i0 = base + k * (sides + 1) + s, i1 = i0 + 1, i2 = i0 + sides + 1, i3 = i2 + 1; this.i.push(i0, i2, i1, i1, i2, i3); }
+    this.count += (levels + 1) * (sides + 1);
+  }
+  build() {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
+    g.setAttribute('aCol', new THREE.Float32BufferAttribute(this.c, 3));
+    g.setAttribute('aUv', new THREE.Float32BufferAttribute(this.u, 2));
+    g.setAttribute('aMisc', new THREE.Float32BufferAttribute(this.m, 4));
+    g.setIndex(this.count > 65535 ? new THREE.Uint32BufferAttribute(this.i, 1) : new THREE.Uint16BufferAttribute(this.i, 1));
+    return g;
+  }
+}
+function sheetXZ(size, cells) {
+  const n = cells + 1, p = new Float32Array(n * n * 3), idx = new Uint32Array(cells * cells * 6);
+  let k = 0;
+  for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) { p[k++] = -size / 2 + size * b / cells; p[k++] = 0; p[k++] = -size / 2 + size * a / cells; }
+  k = 0;
+  for (let a = 0; a < cells; a++) for (let b = 0; b < cells; b++) { const i0 = a * n + b, i1 = i0 + 1, i2 = i0 + n, i3 = i2 + 1; idx[k++] = i0; idx[k++] = i2; idx[k++] = i1; idx[k++] = i1; idx[k++] = i2; idx[k++] = i3; }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(p, 3)); g.setIndex(new THREE.BufferAttribute(idx, 1));
+  return g;
+}
+function skyShell() {
+  const rings = [0, 40, 90, 150, 220, 300, 400, 520, 680, 880, 1120, 1400, 1750, 2150, 2700], sectors = 72, R = 2700, p = [], idx = [];
+  for (let a = 0; a < rings.length; a++) for (let s = 0; s <= sectors; s++) {
+    const r = rings[a], an = s / sectors * Math.PI * 2, h = 120 * Math.pow(Math.max(0, 1 - (r / R) * (r / R)), 0.75);
+    p.push(r * Math.cos(an), h, r * Math.sin(an));
+  }
+  for (let a = 0; a < rings.length - 1; a++) for (let s = 0; s < sectors; s++) { const i0 = a * (sectors + 1) + s, i1 = i0 + 1, i2 = i0 + sectors + 1, i3 = i2 + 1; idx.push(i0, i2, i1, i1, i2, i3); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); g.setIndex(idx);
+  return g;
+}
+
+/* ---------- the town ---------- */
+function mulberry(seed) { let s = seed >>> 0; return () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const rand = mulberry(20261122);
+const city = new Geo(), prop = new Geo(), clock = new Geo(), tram = new Geo(), disc = new Geo();
+const tramBase = [], tramTrack = [];
+const solids = [];                                   // [x0, x1, z0, z1, top] of everything you can bump into
+const WALLS = [[0.62, 0.56, 0.46], [0.55, 0.30, 0.22], [0.40, 0.44, 0.50], [0.66, 0.60, 0.40], [0.50, 0.54, 0.46], [0.72, 0.70, 0.66], [0.34, 0.36, 0.40], [0.58, 0.44, 0.36]];
+const PLAIN = [0, 1, 0, 0];
+
+function building(x0, x1, z0, z1, h) {
+  const col = WALLS[Math.floor(rand() * WALLS.length)], seed = Math.floor(rand() * 997);
+  const roof = [col[0] * 0.45, col[1] * 0.45, col[2] * 0.48];
+  city.box((x0 + x1) / 2, (z0 + z1) / 2, (x1 - x0) / 2, (z1 - z0) / 2, 0, h, col, [seed, 0, 0, 0], { roofCol: roof, roofMisc: [seed, 1, 0, 0] });
+  solids.push([x0, x1, z0, z1, h]);
+  if (rand() < 0.3 && x1 - x0 > 7 && z1 - z0 > 7) city.box((x0 + x1) / 2 + (rand() - 0.5) * 2, (z0 + z1) / 2 + (rand() - 0.5) * 2, 1.6, 1.3, h, h + 2.4, roof, [seed, 1, 0, 0]);
+}
+function tree(x, z, s) {
+  const leaf = [0.05 + rand() * 0.05, 0.20 + rand() * 0.12, 0.05 + rand() * 0.04];
+  prop.round(x, z, 0, 2.2 * s, 0.22 * s, 0.18 * s, 6, 1, [0.16, 0.10, 0.06], PLAIN);
+  prop.round(x, z, 1.6 * s, 5.2 * s, 2.3 * s, 0.9 * s, 7, 2, leaf, [0, 2.4, 0, 0]);
+  prop.round(x, z, 4.4 * s, 7.6 * s, 1.6 * s, 0.02, 7, 2, leaf, [0, 2.4, 0, 0]);
+}
+function lamp(x, z) {
+  prop.box(x, z, 0.09, 0.09, 0, 4.6, [0.10, 0.11, 0.13], PLAIN, { seg: 2.4 });
+  prop.box(x, z, 0.28, 0.28, 4.6, 5.1, [1.0, 0.8, 0.5], [1, 1.6, 0, 0], { bottom: true });
+}
+// a square that faces (nx, nz) and carries a round dial
+function clockFace(cx, cy, cz, r, nx, nz) {
+  clock.grid([cx - nz * r + nx * 0.05, cy - r, cz + nx * r + nz * 0.05], [2 * r * nz, 0, -2 * r * nx], [0, 2 * r, 0], 4, 4, [nx, 0, nz], [1, 1, 1], [-1, -1], [2, 2], [0, 0, 0, 0]);
+}
+const FOUR = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+function clockTower(x, z) {
+  prop.box(x, z, 1.2, 1.2, 0, 17, [0.46, 0.43, 0.38], PLAIN);
+  prop.box(x, z, 2.1, 2.1, 17, 21.2, [0.20, 0.21, 0.24], PLAIN, { bottom: true, roofCol: [0.12, 0.13, 0.16] });
+  for (const [nx, nz] of FOUR) clockFace(x + nx * 2.1, 19.1, z + nz * 2.1, 1.75, nx, nz);
+  solids.push([x - 1.2, x + 1.2, z - 1.2, z + 1.2, 21.2]);
+}
+function gate(z) {
+  const red = [0.62, 0.16, 0.08];
+  for (const sx of [-1, 1]) { prop.box(25 + sx * 5.7, z, 0.55, 0.55, 0, 8.2, red, PLAIN); solids.push([25 + sx * 5.7 - 0.55, 25 + sx * 5.7 + 0.55, z - 0.55, z + 0.55, 9.3]); }
+  prop.box(25, z, 7.0, 0.6, 8.2, 9.3, red, PLAIN, { bottom: true, seg: 1.6 });
+}
+function addTram(alongX, lane, dir, offset, col) {
+  const before = tram.count, roof = [col[0] * 0.5 + 0.2, col[1] * 0.5 + 0.2, col[2] * 0.5 + 0.2];
+  if (alongX) tram.box(0, 0, 5.5, 1.25, 0.35, 3.3, col, [3, 1, 0, 0], { seg: 2.2, roofCol: roof, roofMisc: PLAIN });
+  else tram.box(0, 0, 1.25, 5.5, 0.35, 3.3, col, [3, 1, 0, 0], { seg: 2.2, roofCol: roof, roofMisc: PLAIN });
+  for (let k = before; k < tram.count; k++) {
+    if (alongX) { tramBase.push(0, 0, lane); tramTrack.push(dir, 0, 2.2, offset); }
+    else { tramBase.push(lane, 0, 0); tramTrack.push(0, dir, 2.2, offset); }
+  }
+}
+
+for (let i = -5; i <= 5; i++) for (let j = -5; j <= 5; j++) {
+  if (i === 0 && j === 0) continue;                                        // the plaza stays open
+  const cx = i * 50, cz = j * 50, central = Math.max(0, 1 - Math.hypot(cx, cz) / 260);
+  if (((3 * i + 5 * j) % 7 + 7) % 7 === 0) {                               // a park (the ground shader uses the same rule)
+    for (let k = 0; k < 13; k++) tree(cx + (rand() - 0.5) * 30, cz + (rand() - 0.5) * 30, 0.8 + rand() * 0.7);
+    continue;
+  }
+  const nx = rand() < 0.45 ? 3 : 2, nz = rand() < 0.45 ? 3 : 2, wx = 33 / nx, wz = 33 / nz;
+  for (let a = 0; a < nx; a++) for (let b = 0; b < nz; b++) {
+    if (rand() < 0.07) continue;
+    const x0 = cx - 16.5 + a * wx + 0.5 + rand() * 1.2, x1 = cx - 16.5 + (a + 1) * wx - 0.5 - rand() * 1.2;
+    const z0 = cz - 16.5 + b * wz + 0.5 + rand() * 1.2, z1 = cz - 16.5 + (b + 1) * wz - 0.5 - rand() * 1.2;
+    let h = 7 + rand() * 11;
+    if (rand() < 0.2 + 0.55 * central) h += (8 + rand() * 30) * (0.35 + central);
+    building(x0, x1, z0, z1, Math.min(h, 58));
+  }
+}
+for (let i = -6; i <= 5; i++) for (let j = -6; j <= 5; j++) lamp(31.2 + 50 * i, 31.2 + 50 * j);
+for (let i = -5; i <= 5; i++) for (let j = -6; j <= 5; j++) { lamp(50 * i, 31.2 + 50 * j); lamp(31.2 + 50 * j, 50 * i); }
+for (const i of [-4, -2, 0, 2, 4]) clockTower(25 + 50 * i - 6.6, 25 - 6.6);
+clockTower(18.4, -181.6);                                                  // one clock right under the hole
+for (let k = -4; k <= 4; k++) gate(50 * k);
+for (let k = 0; k < 10; k++) { const a = k / 10 * Math.PI * 2 + 0.3; tree(Math.cos(a) * 16.5, Math.sin(a) * 16.5, 0.9); }
+// the beacon in the plaza
+prop.round(0, 0, 0, 26, 1.5, 0.95, 14, 13, f => (Math.floor(f * 6.5) % 2 ? [0.62, 0.12, 0.10] : [0.82, 0.80, 0.76]), PLAIN);
+prop.box(0, 0, 2.5, 2.5, 9.6, 14.4, [0.20, 0.21, 0.24], PLAIN, { bottom: true });
+prop.box(0, 0, 1.3, 1.3, 26, 28.2, [1.0, 0.92, 0.72], [2, 1.6, 0, 0], { bottom: true });
+for (const [nx, nz] of FOUR) clockFace(nx * 2.5, 12, nz * 2.5, 2.3, nx, nz);
+solids.push([-2.5, 2.5, -2.5, 2.5, 28.2]);
+// trams on two streets, both ways
+for (let k = 0; k < 5; k++) {
+  addTram(true, 23.4, 1, k * 240 + 40, [0.70, 0.14, 0.10]); addTram(true, 26.6, -1, k * 240 + 150, [0.85, 0.62, 0.12]);
+  addTram(false, -26.6, 1, k * 240 + 90, [0.12, 0.36, 0.52]); addTram(false, -23.4, -1, k * 240 + 200, [0.70, 0.14, 0.10]);
+}
+// the ring around the hole: a flat band, tipped a little
+{
+  const tilt = 0.26, ct = Math.cos(tilt), st = Math.sin(tilt), rings = 14, sectors = 120, base = disc.count;
+  for (let a = 0; a <= rings; a++) for (let s = 0; s <= sectors; s++) {
+    const rr = 2.9 + (7.7 - 2.9) * a / rings, an = s / sectors * Math.PI * 2, x = rr * RS * Math.cos(an), z = rr * RS * Math.sin(an);
+    disc.p.push(HOLE.x + x, HOLE.y + z * st, HOLE.z + z * ct); disc.n.push(0, ct, -st); disc.c.push(1, 1, 1); disc.u.push(rr, an); disc.m.push(0, 1, 0, 1);
+  }
+  for (let a = 0; a < rings; a++) for (let s = 0; s < sectors; s++) { const i0 = base + a * (sectors + 1) + s, i1 = i0 + 1, i2 = i0 + sectors + 1, i3 = i2 + 1; disc.i.push(i0, i2, i1, i1, i2, i3); }
+  disc.count += (rings + 1) * (sectors + 1);
+}
+
+/* ---------- the visitor: a four-dimensional cube passing through. We only ever get the part that lies in our space. ---------- */
+const tv = [], tEdges = [], tCells = [];
+for (let i = 0; i < 16; i++) tv.push([(i & 1) ? 1 : -1, (i & 2) ? 1 : -1, (i & 4) ? 1 : -1, (i & 8) ? 1 : -1]);
+for (let i = 0; i < 16; i++) for (let b = 0; b < 4; b++) { const j = i ^ (1 << b); if (j > i) tEdges.push([i, j]); }
+for (let k = 0; k < 4; k++) for (const s of [0, 1]) tCells.push(tEdges.filter(([i, j]) => ((i >> k) & 1) === s && ((j >> k) & 1) === s));
+const CELL_COLS = [[0.02, 0.50, 0.70], [0.70, 0.08, 0.45], [0.85, 0.50, 0.05], [0.30, 0.15, 0.80], [0.05, 0.65, 0.35], [0.85, 0.22, 0.10], [0.40, 0.65, 0.05], [0.10, 0.25, 0.85]];
+const VF = 96, VL = 200;      // room for the faces' corners and for the edges' ends
+const vis = {
+  fp: new Float32Array(VF * 3), fn: new Float32Array(VF * 3), fc: new Float32Array(VF * 3), fu: new Float32Array(VF * 2), fm: new Float32Array(VF * 4),
+  lp: new Float32Array(VL * 3), ln: new Float32Array(VL * 3), lc: new Float32Array(VL * 3), lu: new Float32Array(VL * 2), lm: new Float32Array(VL * 4),
+  faces: null, lines: null, shown: false
+};
+const q4 = tv.map(() => [0, 0, 0, 0]);
+function rot(v, a, b, ang) { const c = Math.cos(ang), s = Math.sin(ang), x = v[a], y = v[b]; v[a] = c * x - s * y; v[b] = s * x + c * y; }
+function updateVisitor(T) {
+  const w0 = 1.9 * VA * Math.sin(T * 2 * Math.PI / 46);
+  for (let i = 0; i < 16; i++) {
+    const v = q4[i]; v[0] = tv[i][0] * VA; v[1] = tv[i][1] * VA; v[2] = tv[i][2] * VA; v[3] = tv[i][3] * VA;
+    rot(v, 0, 3, T * 0.21); rot(v, 1, 3, T * 0.13); rot(v, 2, 3, T * 0.17); rot(v, 0, 1, T * 0.07);
+    v[3] += w0;
+  }
+  let nf = 0, nl = 0;
+  const putF = (x, y, z, n, col, cell) => { const k = nf * 3; vis.fp[k] = VISIT.x + x; vis.fp[k + 1] = VISIT.y + y; vis.fp[k + 2] = VISIT.z + z; vis.fn[k] = n[0]; vis.fn[k + 1] = n[1]; vis.fn[k + 2] = n[2]; vis.fc[k] = col[0]; vis.fc[k + 1] = col[1]; vis.fc[k + 2] = col[2]; const m = nf * 4; vis.fm[m] = 4; vis.fm[m + 1] = 1; vis.fm[m + 2] = cell; vis.fm[m + 3] = 1; nf++; };
+  const putL = (x, y, z, col, kind) => { if (nl >= VL) return; const k = nl * 3; vis.lp[k] = VISIT.x + x; vis.lp[k + 1] = VISIT.y + y; vis.lp[k + 2] = VISIT.z + z; vis.ln[k + 1] = 1; vis.lc[k] = col[0]; vis.lc[k + 1] = col[1]; vis.lc[k + 2] = col[2]; const m = nl * 4; vis.lm[m] = kind; vis.lm[m + 1] = 1; vis.lm[m + 2] = 0; vis.lm[m + 3] = 1; nl++; };
+  // the slice: for each of the cube's eight ordinary-cube sides, the flat piece of it that lies in our space
+  for (let c = 0; c < 8; c++) {
+    const pts = [];
+    for (const [i, j] of tCells[c]) { const a = q4[i], b = q4[j]; if ((a[3] < 0) !== (b[3] < 0)) { const t = a[3] / (a[3] - b[3]); pts.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]); } }
+    if (pts.length < 3) continue;
+    const cen = [0, 0, 0]; for (const p of pts) { cen[0] += p[0] / pts.length; cen[1] += p[1] / pts.length; cen[2] += p[2] / pts.length; }
+    let n = null;
+    for (let a = 1; a < pts.length - 1 && !n; a++) {
+      const u = [pts[a][0] - pts[0][0], pts[a][1] - pts[0][1], pts[a][2] - pts[0][2]], v = [pts[a + 1][0] - pts[0][0], pts[a + 1][1] - pts[0][1], pts[a + 1][2] - pts[0][2]];
+      const x = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]], l = Math.hypot(x[0], x[1], x[2]);
+      if (l > 1e-5) n = [x[0] / l, x[1] / l, x[2] / l];
+    }
+    if (!n) continue;
+    if (n[0] * cen[0] + n[1] * cen[1] + n[2] * cen[2] < 0) n = [-n[0], -n[1], -n[2]];          // point away from the middle
+    const u0 = [pts[0][0] - cen[0], pts[0][1] - cen[1], pts[0][2] - cen[2]], ul = Math.hypot(u0[0], u0[1], u0[2]) || 1;
+    const u = [u0[0] / ul, u0[1] / ul, u0[2] / ul], v = [n[1] * u[2] - n[2] * u[1], n[2] * u[0] - n[0] * u[2], n[0] * u[1] - n[1] * u[0]];
+    pts.sort((a, b) => Math.atan2((a[0] - cen[0]) * v[0] + (a[1] - cen[1]) * v[1] + (a[2] - cen[2]) * v[2], (a[0] - cen[0]) * u[0] + (a[1] - cen[1]) * u[1] + (a[2] - cen[2]) * u[2]) -
+                       Math.atan2((b[0] - cen[0]) * v[0] + (b[1] - cen[1]) * v[1] + (b[2] - cen[2]) * v[2], (b[0] - cen[0]) * u[0] + (b[1] - cen[1]) * u[1] + (b[2] - cen[2]) * u[2]));
+    const col = CELL_COLS[c];
+    for (let a = 1; a < pts.length - 1 && nf + 3 <= VF; a++) { putF(pts[0][0], pts[0][1], pts[0][2], n, col, c); putF(pts[a][0], pts[a][1], pts[a][2], n, col, c); putF(pts[a + 1][0], pts[a + 1][1], pts[a + 1][2], n, col, c); }
+    for (let a = 0; a < pts.length; a++) { const p = pts[a], r = pts[(a + 1) % pts.length]; putL(p[0], p[1], p[2], [1, 1, 1], 5); putL(r[0], r[1], r[2], [1, 1, 1], 5); }
+  }
+  const sliced = nf > 0;
+  // its shadow: all thirty-two edges, squashed flat into our space, so you can tell it is still there when no part of it is here
+  for (const [i, j] of tEdges) for (const v of [q4[i], q4[j]]) { const s = 1 / (1 + 0.16 * Math.max(-2.5, Math.min(2.5, v[3] / VA))); putL(v[0] * s, v[1] * s, v[2] * s, [0.16, 0.20, 0.30], 5); }
+  if (vis.faces) {
+    for (const g of [vis.faces.geometry, vis.lines.geometry]) for (const k of ['position', 'normal', 'aCol', 'aMisc']) g.attributes[k].needsUpdate = true;
+    vis.faces.geometry.setDrawRange(0, nf); vis.lines.geometry.setDrawRange(0, nl);
+  }
+  vis.shown = sliced;
+}
+
+/* ---------- renderer, materials, meshes ---------- */
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
+const U = {
+  uO: { value: new THREE.Vector3() }, uVhat: { value: new THREE.Vector3(0, 0, -1) }, uBeta: { value: 0 }, uGamma: { value: 1 }, uC: { value: C }, uT0: { value: T_START },
+  uNow: { value: 0 }, uDay: { value: DAY }, uDoppler: { value: 1 }, uFog: { value: 1 / 500 }, uBeacon: { value: new THREE.Vector3(0, 27, 0) }, uPulse: { value: PULSE }, uLoop: { value: LOOP },
+  uHole: { value: HOLE.clone() }, uRs: { value: RS }
+};
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(72, 1, 0.12, 4500);
+camera.rotation.order = 'YXZ';
+const mat = (vert, frag, extra) => new THREE.ShaderMaterial({ uniforms: Object.assign({}, U, extra || {}), vertexShader: vert, fragmentShader: frag, side: THREE.DoubleSide });
+function add(geometry, material, Kind) { const m = new (Kind || THREE.Mesh)(geometry, material); m.frustumCulled = false; scene.add(m); return m; }
+const zero = () => ({ value: new THREE.Vector3() });
+const patchShift = { value: new THREE.Vector3(0, 0.012, 0) }, patchHole = { value: new THREE.Vector4(0, 0, 23.4, 0) };
+const dyn = (p, n, c, u, m) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); g.setAttribute('normal', new THREE.BufferAttribute(n, 3)); g.setAttribute('aCol', new THREE.BufferAttribute(c, 3)); g.setAttribute('aUv', new THREE.BufferAttribute(u, 2)); g.setAttribute('aMisc', new THREE.BufferAttribute(m, 4)); return g; };
+let rt = null, lensScene = null, lensCam = null, LU = null;
+if (renderer) {
+  renderer.autoClear = false;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  add(sheetXZ(1600, 320), mat(VERT_FLAT, FRAG_GROUND, { uShift: zero(), uHole4: patchHole }));                                   // the town's ground, with a hole under your feet...
+  add(sheetXZ(48, 96), mat(VERT_FLAT, FRAG_GROUND, { uShift: patchShift, uHole4: { value: new THREE.Vector4() } }));              // ...filled by a much finer sheet that follows you
+  add(sheetXZ(5600, 70), mat(VERT_FLAT, FRAG_GROUND, { uShift: { value: new THREE.Vector3(0, -0.03, 0) }, uHole4: { value: new THREE.Vector4(0, 0, 790, 0) } }));
+  add(skyShell(), mat(VERT_FLAT, FRAG_SKY, { uShift: zero() }));
+  add(city.build(), mat(VERT_SOLID, FRAG_CITY));
+  add(prop.build(), mat(VERT_SOLID, FRAG_PROP));
+  add(clock.build(), mat(VERT_SOLID, FRAG_CLOCK));
+  add(disc.build(), mat(VERT_SOLID, FRAG_DISC));
+  const tg = tram.build();
+  tg.setAttribute('aBase', new THREE.Float32BufferAttribute(tramBase, 3)); tg.setAttribute('aTrack', new THREE.Float32BufferAttribute(tramTrack, 4));
+  add(tg, mat(VERT_TRAM, FRAG_PROP));
+  const visMat = mat(VERT_SOLID, FRAG_PROP);
+  vis.faces = add(dyn(vis.fp, vis.fn, vis.fc, vis.fu, vis.fm), visMat);
+  vis.lines = add(dyn(vis.lp, vis.ln, vis.lc, vis.lu, vis.lm), visMat, THREE.LineSegments);
+  // the second look at the scene, kept so the hole can bend it
+  const floatOK = renderer.capabilities.isWebGL2 && renderer.extensions.has('EXT_color_buffer_float');
+  rt = new THREE.WebGLRenderTarget(4, 4, { depthTexture: new THREE.DepthTexture(4, 4), type: floatOK ? THREE.HalfFloatType : THREE.UnsignedByteType });
+  LU = { tScene: { value: rt.texture }, tDepth: { value: rt.depthTexture }, uHoleDir: { value: new THREE.Vector3(0, 0, -1) }, uHoleDist: { value: 300 }, uRs: { value: RS },
+    uTan: { value: new THREE.Vector2(1, 1) }, uNear: { value: camera.near }, uFar: { value: camera.far } };
+  lensScene = new THREE.Scene(); lensCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: LU, vertexShader: VERT_LENS, fragmentShader: FRAG_LENS, depthTest: false, depthWrite: false }));
+  quad.frustumCulled = false; lensScene.add(quad);
+}
+function fit() {
+  if (!renderer) return;
+  const w = app.clientWidth, h = app.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  const pr = renderer.getPixelRatio();
+  rt.setSize(Math.max(2, Math.round(w * pr)), Math.max(2, Math.round(h * pr)));
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(fit).observe(app);
+fit();
+
+/* ---------- you ---------- */
+const pl = { pos: new THREE.Vector3(25, EYE, 118), vel: new THREE.Vector3(), yaw: 0, pitch: 0.04, tau: 0, T0: T_START, pace: 2 };
+const state = { started: false, nowTarget: 0, dopTarget: 1, hud: 0, beta: 0, gamma: 1, moved: 0, lens: false };
+const keys = new Set(), stick = { id: null, x0: 0, y0: 0, dx: 0, dy: 0 }, look = { id: null, x: 0, y: 0 }, pad = { up: 0, down: 0, run: 0 };
+let drag = false;
+const fwd = new THREE.Vector3(), right = new THREE.Vector3(), want = new THREE.Vector3(), tA = new THREE.Vector3(), tB = new THREE.Vector3();
+function reset() { pl.pos.set(25, EYE, 118); pl.vel.set(0, 0, 0); pl.yaw = 0; pl.pitch = 0.04; pl.tau = 0; pl.T0 = T_START; }
+function turn(dx, dy, k) { pl.yaw -= dx * k; pl.pitch = Math.max(-1.45, Math.min(1.45, pl.pitch - dy * k)); }
+function setMode(now) { state.nowTarget = now ? 1 : 0; $('b-eyes').setAttribute('aria-pressed', String(!now)); $('b-now').setAttribute('aria-pressed', String(!!now)); }
+function setColour(on) { state.dopTarget = on ? 1 : 0; }
+function setPace(i) { pl.pace = Math.max(0, Math.min(PACES.length - 1, i)); }
+const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+// the same two rules the shaders use, for things worked out here
+function clockRate(p) { const r = p.distanceTo(HOLE); return Math.sqrt(1 - Math.min(RS / Math.max(r, 1.2 * RS) * (1 - smooth(70, 150, r)), 0.85)); }
+function groundLift(x, z) { const r = Math.hypot(HOLE.x - x, HOLE.y, HOLE.z - z); return HOLE.y * 0.5 * (1 - smooth(16, 78, r)); }
+function seen(P, out) {
+  const b = U.uBeta.value, g = U.uGamma.value, n = U.uNow.value, vh = U.uVhat.value;
+  tA.copy(P).sub(pl.pos); const r = tA.length(), par = tA.dot(vh);
+  out.copy(pl.pos).add(tA).addScaledVector(vh, (1 - n) * g * (par + b * r) + n * par / g - par);
+  return (1 - n) * (pl.T0 - r / C) + n * (pl.T0 + b * par / C);
+}
+
+function collide(p) {
+  for (const s of solids) {
+    if (p.y > s[4] + EYE + 0.05) continue;
+    const x0 = s[0] - 0.45, x1 = s[1] + 0.45, z0 = s[2] - 0.45, z1 = s[3] + 0.45;
+    if (p.x <= x0 || p.x >= x1 || p.z <= z0 || p.z >= z1) continue;
+    if (p.y > s[4] + 0.5) { p.y = s[4] + EYE; continue; }               // coming down onto a roof: stand on it
+    const d = [p.x - x0, x1 - p.x, p.z - z0, z1 - p.z], m = Math.min(d[0], d[1], d[2], d[3]);
+    if (m === d[0]) p.x = x0; else if (m === d[1]) p.x = x1; else if (m === d[2]) p.z = z0; else p.z = z1;
+  }
+  const r = Math.hypot(p.x, p.z);
+  if (r > 560) { p.x *= 560 / r; p.z *= 560 / r; }
+  p.y = Math.max(EYE + groundLift(p.x, p.z), Math.min(100, p.y));
+  const dh = tB.copy(p).sub(HOLE), rh = dh.length();                     // you cannot go in
+  if (rh < 1.5 * RS) p.copy(HOLE).addScaledVector(dh, 1.5 * RS / Math.max(rh, 1e-3));
+}
+
+/* ---------- small words that surface once, when you first run into something ---------- */
+const lines = [
+  ['far', () => pl.tau > 6 && state.beta < 0.05, 'Far away is long ago.'],
+  ['run', () => state.beta > 0.72 && U.uNow.value < 0.5, 'Run, and the town gathers in front of you.'],
+  ['now', () => state.nowTarget === 1 && state.beta > 0.4, 'Your now leans into tomorrow.'],
+  ['up', () => pl.pos.y > 36, 'From up here you can watch light arrive.'],
+  ['hole', () => pl.pos.distanceTo(HOLE) < 105, 'Time pools here.'],
+  ['gap', () => (pl.T0 - T_START - pl.tau) / (DAY / 24) > 8, 'You have been away longer than it felt.'],
+  ['visitor', () => vis.shown && Math.hypot(pl.pos.x, pl.pos.z) < 85, 'It is only the part that fits in our world.']
+];
+const said = new Set(), whisperEl = $('whisper');
+let quiet = 4, showing = 0;
+function whispers(dt) {
+  if (showing > 0) { showing -= dt; if (showing <= 0) { whisperEl.classList.remove('on'); quiet = 5; } return; }
+  quiet -= dt; if (quiet > 0) return;
+  for (const [id, test, text] of lines) if (!said.has(id) && test()) { said.add(id); whisperEl.textContent = text; whisperEl.classList.add('on'); showing = 6.5; return; }
+}
+
+const dayString = T => { const d = Math.floor(T / DAY), h = (T / DAY - d) * 24, hh = Math.floor(h), mm = Math.floor((h - hh) * 6) * 10; return 'day ' + (d + 1) + ' · ' + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0'); };
+function hud() {
+  const b = state.beta * 100;
+  $('r-speed').textContent = (b >= 90 ? b.toFixed(1) : Math.round(b)) + '%';
+  $('r-town').textContent = dayString(pl.T0);
+  $('r-watch').textContent = dayString(T_START + pl.tau);
+}
+
+function frame(dt) {
+  // what your hands and feet ask for
+  let f = 0, r = 0, u = 0;
+  if (state.started) {
+    f = (keys.has('KeyW') || keys.has('ArrowUp') ? 1 : 0) - (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0) - stick.dy;
+    r = (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0) - (keys.has('KeyA') || keys.has('ArrowLeft') ? 1 : 0) + stick.dx;
+    u = (keys.has('Space') || keys.has('KeyE') ? 1 : 0) - (keys.has('KeyQ') ? 1 : 0) + pad.up - pad.down;
+  }
+  const sprint = keys.has('ShiftLeft') || keys.has('ShiftRight') || pad.run;
+  const top = PACES[Math.min(PACES.length - 1, pl.pace + (sprint ? 2 : 0))];
+  fwd.set(-Math.sin(pl.yaw), 0, -Math.cos(pl.yaw)); right.set(Math.cos(pl.yaw), 0, -Math.sin(pl.yaw));
+  want.set(0, 0, 0).addScaledVector(fwd, f).addScaledVector(right, r); want.y = u;
+  const wl = want.length(); if (wl > 1) want.multiplyScalar(1 / wl);
+  if (wl > 0.1) state.moved += dt;
+  want.multiplyScalar(top * C);
+  pl.vel.lerp(want, 1 - Math.exp(-dt / 0.55));
+  let speed = pl.vel.length();
+  if (speed > 0.985 * C) { pl.vel.multiplyScalar(0.985 * C / speed); speed = 0.985 * C; }
+  const beta = speed / C, gamma = 1 / Math.sqrt(1 - beta * beta);
+  state.beta = beta; state.gamma = gamma;
+  // one second on your watch is more than a second of town time: more the faster you go, and more the nearer the hole
+  const dT = gamma * dt / clockRate(pl.pos);
+  pl.pos.addScaledVector(pl.vel, gamma * dt); collide(pl.pos);
+  pl.T0 += dT; pl.tau += dt;
+  // hand the renderer your place, your motion and your moment
+  U.uO.value.copy(pl.pos); U.uT0.value = pl.T0; U.uBeta.value = beta; U.uGamma.value = gamma;
+  if (speed > 1e-4) U.uVhat.value.copy(pl.vel).multiplyScalar(1 / speed);
+  U.uNow.value += (state.nowTarget - U.uNow.value) * (1 - Math.exp(-dt / 0.22));
+  U.uDoppler.value += (state.dopTarget - U.uDoppler.value) * (1 - Math.exp(-dt / 0.22));
+  const px = Math.round(pl.pos.x / 4) * 4, pz = Math.round(pl.pos.z / 4) * 4;
+  patchShift.value.set(px, 0.012, pz); patchHole.value.set(px, pz, 23.4, 0);
+  camera.position.copy(pl.pos); camera.rotation.set(pl.pitch, pl.yaw, 0);
+  camera.fov = 72 + 10 * beta * beta + 14 * (1 - smooth(20, 90, pl.pos.distanceTo(HOLE)));   // the view widens as you speed up and as you near the hole
+  camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+  updateVisitor(seen(VISIT, tB));
+  if (renderer) {
+    renderer.setRenderTarget(null); renderer.clear(); renderer.render(scene, camera);
+    // is the hole anywhere near the picture? if so, look again and let it bend what lies behind it
+    const dist = (seen(HOLE, tB), tB.distanceTo(pl.pos));
+    tB.applyMatrix4(camera.matrixWorldInverse).normalize();
+    const ring0 = Math.sqrt(2 * RS / dist), half = THREE.MathUtils.degToRad(camera.fov) / 2, diag = Math.atan(Math.tan(half) * Math.hypot(1, camera.aspect));
+    state.lens = Math.acos(Math.max(-1, Math.min(1, -tB.z))) < diag + 4.5 * ring0;
+    if (state.lens) {
+      LU.uHoleDir.value.copy(tB); LU.uHoleDist.value = dist; LU.uTan.value.set(Math.tan(half) * camera.aspect, Math.tan(half));
+      renderer.setRenderTarget(rt); renderer.clear(); renderer.render(scene, camera);
+      renderer.setRenderTarget(null); renderer.render(lensScene, lensCam);
+    }
+  }
+  state.hud += dt; if (state.hud > 0.16) { state.hud = 0; hud(); }
+  if (state.started) { whispers(dt); if (state.moved > 2.5) $('keys').classList.add('off'); }
+}
+
+/* ---------- controls ---------- */
+window.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+  if (!state.started) { if (e.code === 'Enter') start(); return; }
+  keys.add(e.code);
+  if (e.code === 'KeyN') setMode(!state.nowTarget);
+  else if (e.code === 'KeyC') setColour(!state.dopTarget);
+  else if (e.code === 'KeyR') reset();
+  else if (e.code === 'BracketRight' || e.code === 'Equal') setPace(pl.pace + 1);
+  else if (e.code === 'BracketLeft' || e.code === 'Minus') setPace(pl.pace - 1);
+  else if (/^Digit[1-7]$/.test(e.code)) setPace(Number(e.code.slice(5)) - 1);
+  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+});
+window.addEventListener('keyup', e => keys.delete(e.code));
+window.addEventListener('blur', () => keys.clear());
+canvas.addEventListener('wheel', e => { e.preventDefault(); setPace(pl.pace + (e.deltaY < 0 ? 1 : -1)); }, { passive: false });
+canvas.addEventListener('pointerdown', e => {
+  if (!state.started) return;
+  canvas.focus();
+  if (e.pointerType === 'touch') {
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientX - rect.left < rect.width * 0.45 && stick.id === null) { stick.id = e.pointerId; stick.x0 = e.clientX; stick.y0 = e.clientY; stick.dx = stick.dy = 0; }
+    else if (look.id === null) { look.id = e.pointerId; look.x = e.clientX; look.y = e.clientY; }
+  } else if (e.button === 0 && document.pointerLockElement !== canvas) {
+    drag = true; look.x = e.clientX; look.y = e.clientY;
+    try { const q = canvas.requestPointerLock && canvas.requestPointerLock(); if (q && q.catch) q.catch(() => {}); } catch (_) { /* some viewers refuse: dragging still works */ }
+  }
+  try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* fine */ }
+});
+canvas.addEventListener('pointermove', e => {
+  if (e.pointerType === 'touch') {
+    if (e.pointerId === stick.id) { stick.dx = Math.max(-1, Math.min(1, (e.clientX - stick.x0) / 55)); stick.dy = Math.max(-1, Math.min(1, (e.clientY - stick.y0) / 55)); }
+    else if (e.pointerId === look.id) { turn(e.clientX - look.x, e.clientY - look.y, 0.006); look.x = e.clientX; look.y = e.clientY; }
+    return;
+  }
+  if (document.pointerLockElement === canvas) turn(e.movementX || 0, e.movementY || 0, 0.0023);
+  else if (drag) { turn(e.clientX - look.x, e.clientY - look.y, 0.0045); look.x = e.clientX; look.y = e.clientY; }
+});
+const release = e => {
+  if (e.pointerId === stick.id) { stick.id = null; stick.dx = stick.dy = 0; }
+  if (e.pointerId === look.id) look.id = null;
+  if (e.pointerType !== 'touch') drag = false;
+};
+canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+for (const [id, key] of [['b-up', 'up'], ['b-down', 'down'], ['b-run', 'run']]) {
+  const b = $(id);
+  b.addEventListener('pointerdown', e => { e.preventDefault(); pad[key] = 1; });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, () => { pad[key] = 0; });
+}
+$('b-eyes').addEventListener('click', () => setMode(false));
+$('b-now').addEventListener('click', () => setMode(true));
+$('b-help').addEventListener('click', () => { $('about').hidden = false; if (document.exitPointerLock) document.exitPointerLock(); });
+$('b-close').addEventListener('click', () => { $('about').hidden = true; canvas.focus(); });
+function start() { state.started = true; $('start').hidden = true; canvas.focus(); }
+$('b-start').addEventListener('click', start);
+if (!renderer) { $('start-note').textContent = 'This browser could not start 3D graphics (WebGL), so the town cannot be drawn here.'; $('b-start').disabled = true; }
+setMode(false); hud();
+
+const timer = new THREE.Clock();
+let slowFor = 0, slowFrames = 0;
+function loop() {
+  requestAnimationFrame(loop);
+  const raw = timer.getDelta(), dt = Math.min(raw, 0.05);
+  if (document.hidden) return;
+  frame(reduceMotion && !state.started ? 0 : dt);
+  // if the picture is slow to draw, draw it a little coarser
+  slowFor += raw; slowFrames++;
+  if (slowFor > 2) {
+    const fps = slowFrames / slowFor, pr = renderer ? renderer.getPixelRatio() : 1;
+    if (renderer && state.started && fps > 8 && fps < 30 && pr > 0.7) { renderer.setPixelRatio(Math.max(0.7, pr * 0.82)); fit(); }
+    slowFor = 0; slowFrames = 0;
+  }
+}
+loop();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>

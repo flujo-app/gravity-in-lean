@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>Light Clock &amp; Falling Wave</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+/* Layout: the same lab-notebook series as "Arrows to Amplitudes" and "Spacetime Speedometer": text, then a wide 3D figure, then live readouts. Light theme is graph paper, dark is a blueprint. */
+:root {
+  --paper: #f3f6f8;
+  --paper-raised: #ffffff;
+  --grid-faint: #e6edf2;
+  --grid: #c9d6e1;
+  --rule: #c8d5df;
+  --ink: #132331;
+  --ink-soft: #4a5d6e;
+  --photon: #d99100;
+  --mirror: #7f97ab;
+  --crest: #1c5ed4;
+  --trough: #b4500f;
+  --you: #12805a;
+  --fast: #d3e4fb;
+  --slow: #ffffff;
+  --mark: #ffe066;
+  --mark-ink: #1c1a0c;
+  --measured: #12805a;
+  --theory: #1c5ed4;
+  --picture: #b4500f;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d2136; --paper-raised: #122a44; --grid-faint: #112c48; --grid: #24476b; --rule: #2a4d71;
+    --ink: #e9f1f8; --ink-soft: #a2b9cd; --photon: #ffd85a; --mirror: #6f8fb0; --crest: #8cc3ff; --trough: #ffab6e;
+    --you: #6fdcaa; --fast: #24507e; --slow: #122a44; --mark: #ffd85a; --measured: #6fdcaa; --theory: #8cc3ff; --picture: #ffab6e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d2136; --paper-raised: #122a44; --grid-faint: #112c48; --grid: #24476b; --rule: #2a4d71;
+  --ink: #e9f1f8; --ink-soft: #a2b9cd; --photon: #ffd85a; --mirror: #6f8fb0; --crest: #8cc3ff; --trough: #ffab6e;
+  --you: #6fdcaa; --fast: #24507e; --slow: #122a44; --mark: #ffd85a; --measured: #6fdcaa; --theory: #8cc3ff; --picture: #ffab6e;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid-faint) 1px, transparent 1px), linear-gradient(90deg, var(--grid-faint) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 1140px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.masthead { display: grid; gap: 12px; }
+.eyebrow, .kicker { margin: 0; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+h1 { margin: 0; font-family: var(--font-display); font-stretch: 125%; font-weight: 800; font-size: clamp(2.1rem, 1.4rem + 3vw, 3.4rem); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+.intro { margin: 0; max-width: 64ch; font-size: 1.06rem; color: var(--ink-soft); }
+.legend { margin: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 0.92rem; color: var(--ink-soft); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1.5px solid currentColor; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 2px; white-space: nowrap; }
+.tag.measured { color: var(--measured); }
+.tag.theory { color: var(--theory); }
+.tag.picture { color: var(--picture); }
+
+.chapter { margin-top: 28px; padding-top: 28px; border-top: 1.5px solid var(--rule); display: grid; gap: 18px; }
+.text { min-width: 0; display: grid; gap: 14px; align-content: start; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 14px 40px; }
+.text p { margin: 0; max-width: 64ch; }
+h2 { margin: 0; font-family: var(--font-display); font-stretch: 110%; font-weight: 760; font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.05rem); line-height: 1.1; text-wrap: balance; }
+h3 { margin: 4px 0 0; font-family: var(--font-display); font-stretch: 105%; font-weight: 700; font-size: 1.1rem; line-height: 1.2; }
+.aside { font-size: 0.95rem; color: var(--ink-soft); }
+mark { background: var(--mark); color: var(--mark-ink); padding: 0 0.2em; border-radius: 2px; }
+
+.figure { margin: 0; background: var(--paper-raised); border: 1.5px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.figure figcaption { padding: 8px 12px; border-top: 1.5px solid var(--rule); font-size: 0.85rem; line-height: 1.45; color: var(--ink-soft); }
+.scene { position: relative; width: 100%; aspect-ratio: 16 / 8; background: var(--paper-raised); }
+@media (max-width: 700px) { .scene { aspect-ratio: 4 / 3.4; } }
+.scene canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.scene canvas:active { cursor: grabbing; }
+.scene-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.scene-label {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700; line-height: 1.2; white-space: nowrap;
+  color: var(--ink); background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; padding: 2px 6px; opacity: 0.94;
+}
+.scene-label.photon { color: var(--ink); border-color: var(--photon); }
+.scene-label.soft { color: var(--ink-soft); }
+.scene-label.fast { color: var(--crest); border-color: var(--crest); }
+.scene-label.slowl { color: var(--trough); border-color: var(--trough); }
+@media (max-width: 700px) { .scene-label { font-size: 11px; padding: 1px 4px; } }
+.fallback { margin: 0; padding: 24px; color: var(--ink-soft); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: end; }
+.control { display: grid; gap: 6px; min-width: 0; flex: 1 1 280px; }
+.control > label { font-weight: 700; }
+.control output { font-family: var(--font-mono); font-weight: 700; }
+input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--ink); cursor: pointer; }
+.check { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+button { font: inherit; }
+.btn { padding: 9px 13px; border-radius: 6px; border: 1.5px solid var(--ink); background: var(--paper-raised); color: var(--ink); font-family: var(--font-body); font-size: 0.9rem; font-weight: 700; line-height: 1; cursor: pointer; }
+.btn:hover { background: var(--paper); }
+.btn.solid { background: var(--ink); color: var(--paper-raised); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+:focus-visible { outline: 3px solid var(--crest); outline-offset: 2px; }
+
+.readouts { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); }
+.readout { min-width: 0; display: grid; gap: 7px; align-content: start; padding: 14px 16px; background: var(--paper-raised); border: 1.5px solid var(--rule); border-radius: 6px; font-variant-numeric: tabular-nums; }
+.readout h3 { margin: 0 0 2px; font-size: 1rem; }
+.row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; min-width: 0; }
+.row .lab { color: var(--ink-soft); min-width: 15ch; }
+.row .val { font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
+.eqn { font-family: var(--font-mono); overflow-wrap: anywhere; }
+.eqn b { color: var(--ink); }
+.step { color: var(--ink-soft); font-size: 0.92rem; }
+.big { font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem; padding: 6px 10px; background: var(--mark); color: var(--mark-ink); border-radius: 4px; justify-self: start; overflow-wrap: anywhere; }
+.facts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.fact { padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--paper-raised); display: grid; gap: 6px; align-content: start; }
+.fact p { margin: 0; font-size: 0.95rem; }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Maths for quantum physics · 3D workshop</p>
+    <h1>Light Clock &amp; Falling Wave</h1>
+    <p class="intro">Two scenes you can turn around with your mouse or finger. The first shows where your budget equation comes from. The second shows why a matter wave, and so a ball, falls and keeps speeding up.</p>
+    <p class="legend"><span><span class="tag measured">Measured</span> checked by experiment</span><span><span class="tag theory">Worked out</span> follows from measured facts</span><span><span class="tag picture">Picture</span> slowed down or exaggerated so you can see it</span></p>
+  </header>
+
+  <main>
+    <!-- Scene 1 -->
+    <section class="chapter" aria-labelledby="h-clock">
+      <div class="text">
+        <p class="kicker">Scene 1 · The light clock</p>
+        <h2 id="h-clock">Where your equation comes from</h2>
+        <div class="cols">
+          <div class="text">
+            <p>The simplest clock there is: a flash of light bouncing between two mirrors. One trip from one mirror to the other is one tick.</p>
+            <p>The clock on the left stands still. The one on the right flies sideways. <b>Light moves at the same speed for both</b> <span class="tag measured">Measured</span>. That's the only fact this scene uses.</p>
+          </div>
+          <div class="text">
+            <p>Seen from here, the flying clock's light has to travel a slanted path to reach the far mirror, because the mirror moves on while the light is on its way. A longer path at the same speed takes longer, so the flying clock ticks slower <span class="tag theory">Worked out</span>.</p>
+            <p>The slanted path, the gap between the mirrors and the distance the clock moved form a right-angled triangle. <mark>Pythagoras on that triangle is your equation.</mark></p>
+          </div>
+        </div>
+      </div>
+      <figure class="figure">
+        <div class="scene" id="scene-clock" role="img" aria-label="Two light clocks. One stands still, one flies sideways and its light traces a zigzag. A dashed triangle marks one trip of the flying clock's light."></div>
+        <figcaption>Drag sideways to turn the view. The bright zigzag is the path of the flying clock's light. The dashed triangle is its most recent trip upwards. <span class="tag picture">Picture</span> Light is slowed to 4 squares per second here so you can follow it.</figcaption>
+      </figure>
+      <div class="controls">
+        <div class="control">
+          <label for="beta">Speed of the flying clock: <output id="beta-out" for="beta">60%</output> of light speed</label>
+          <input type="range" id="beta" min="0" max="0.95" step="0.01" value="0.6">
+        </div>
+        <div class="btn-row">
+          <button class="btn" type="button" id="clock-pause">Pause</button>
+          <button class="btn" type="button" id="clock-view">Reset view</button>
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="readout" id="out-ticks" aria-live="polite"></div>
+        <div class="readout" id="out-pyth"></div>
+      </div>
+      <div class="text">
+        <h3>Why every clock slows, not just light clocks</h3>
+        <p>Suppose the crew's wristwatches kept a different pace from their light clock. Then they could tell they were moving just by comparing the two, without looking outside. Every experiment says that's impossible <span class="tag measured">Measured</span>. So everything on board slows by the same amount: atoms, wristwatches, heartbeats, thoughts. That's also why each clock feels perfectly normal to itself. Nothing on board has anything "normal" to compare against.</p>
+      </div>
+    </section>
+
+    <!-- Scene 2 -->
+    <section class="chapter" aria-labelledby="h-wave">
+      <div class="text">
+        <p class="kicker">Scene 2 · The falling wave</p>
+        <h2 id="h-wave">Why a matter wave falls, and keeps speeding up</h2>
+        <div class="cols">
+          <div class="text">
+            <p>Every object is also a wave. Electrons, neutrons, whole atoms and even large molecules have been made to interfere like waves <span class="tag measured">Measured</span>. Inside that wave sits a clock: a little arrow, the amplitude from your first lesson, turning at a fixed rate. For a neutron it turns about 2 × 10²³ times a second.</p>
+            <p>That arrow turns at the pace of the local clock. Lower down, clocks run slower <span class="tag measured">Measured</span>, so arrows lower down fall behind the ones higher up, and the lag grows every second.</p>
+          </div>
+          <div class="text">
+            <p>When the arrows are out of step with height, the wave's crests are tilted. A wave always travels at right angles to its crests, so a tilted wave heads downward <span class="tag theory">Worked out</span>. Because the lag keeps growing, the tilt keeps growing, and the wave heads down faster and faster. <mark>That's falling, speeding up included.</mark></p>
+            <p>The column on the left is a magnified slice of the wave's height, with the arrows' shared spin taken out so you only see the lag. Turn the view to watch it twist into a spiral.</p>
+          </div>
+        </div>
+      </div>
+      <figure class="figure">
+        <div class="scene" id="scene-wave" role="img" aria-label="A wave packet thrown sideways. Its crests tilt more and more and it curves downward. On the left, a column of arrows twists as the lower arrows fall behind."></div>
+        <figcaption>Blue shading: clocks tick faster higher up. Green line: the wave's path. Dashed line: its path with no gravity. The thin bar inside the wave is the height slice shown magnified in the arrow column. <span class="tag picture">Picture</span> Gravity is hugely exaggerated, and the wave is slowed down.</figcaption>
+      </figure>
+      <div class="controls">
+        <div class="control">
+          <label for="grav">Gravity (exaggerated): <output id="grav-out" for="grav">0.6</output></label>
+          <input type="range" id="grav" min="0" max="1.2" step="0.05" value="0.6">
+        </div>
+        <label class="check"><input type="checkbox" id="shade" checked> Show clock-speed shading</label>
+        <div class="btn-row">
+          <button class="btn solid" type="button" id="wave-again">Release again</button>
+          <button class="btn" type="button" id="wave-pause">Pause</button>
+          <button class="btn" type="button" id="wave-view">Reset view</button>
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="readout" id="out-wave" aria-live="off"></div>
+        <div class="readout">
+          <h3>The real numbers</h3>
+          <p class="step">On Earth, clocks speed up by 1.09 × 10⁻¹⁶ for every metre of height <span class="tag measured">Measured</span>. Tiny. But a neutron's arrow turns about 2 × 10²³ times a second, so the lag still piles up fast.</p>
+          <p class="eqn">lag per metre, after t seconds<br>= (arrow's turning rate) × (clock change per metre) × t</p>
+          <p class="step">Convert that lag into a speed using the neutron's mass and Planck's constant, and everything else cancels out:</p>
+          <p class="big">downward speed = 9.81 × t metres per second</p>
+          <p class="step">That's exactly Newton's falling, and the same for every mass. The 1975 neutron experiment by Colella, Overhauser and Werner saw this lag directly <span class="tag measured">Measured</span>.</p>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact">
+          <h3>What this picture leaves out</h3>
+          <p>It uses only the time part of gravity. For slow things like balls and neutrons, that's almost all of it. Fast things like light also feel the bending of space, which doubles how much starlight bends near the Sun.</p>
+        </div>
+        <div class="fact">
+          <h3>How to check it yourself</h3>
+          <p>Set gravity to 0 and the crests stay upright and the path stays straight. Pause at any moment: the crest tilt and the direction of travel are always the same angle.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const MINUS = '−';
+const f2 = x => (Math.round(x * 100) / 100).toFixed(2).replace('-', MINUS);
+
+/* ---------- colours follow the page theme ---------- */
+const themedList = [];
+function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888888'; }
+function apply1(target, token, prop) { const o = target[prop]; if (o && o.isColor) o.set(tok(token)); }
+function themed(target, token, prop = 'color') { themedList.push([target, token, prop]); apply1(target, token, prop); return target; }
+function applyTheme() { themedList.forEach(([t, k, p]) => apply1(t, k, p)); }
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
+
+/* ---------- shared stage ---------- */
+const stages = [];
+function makeStage(box, o) {
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
+  catch (e) { box.innerHTML = '<p class="fallback">This browser couldn\'t start 3D graphics (WebGL), so this scene can\'t be shown here.</p>'; return null; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  box.appendChild(renderer.domElement);
+  const labels = new CSS2DRenderer();
+  labels.domElement.className = 'scene-labels';
+  box.appendChild(labels.domElement);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color();
+  themed(scene, '--paper-raised', 'background');
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(6, 12, 10); scene.add(sun);
+  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 500);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = 0.08;
+  renderer.domElement.style.touchAction = 'pan-y';
+  const S = { box, renderer, labels, scene, camera, controls, lineMats: [], visible: true, update: () => {} };
+  const target = new THREE.Vector3(...o.target), dir = new THREE.Vector3(...o.dir).normalize();
+  let lastW = 0, lastH = 0;
+  S.fit = (force) => {
+    const w = box.clientWidth, h = box.clientHeight;
+    if (!w || !h) return;
+    const sizeChanged = w !== lastW || h !== lastH;
+    lastW = w; lastH = h;
+    renderer.setSize(w, h, false); labels.setSize(w, h);
+    S.lineMats.forEach(m => m.resolution.set(w, h));
+    camera.aspect = w / h;
+    if (sizeChanged || force) {
+      const vf = THREE.MathUtils.degToRad(camera.fov), hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect);
+      const dist = Math.max(o.fitWidth / 2 / Math.tan(hf / 2), o.fitHeight / 2 / Math.tan(vf / 2));
+      camera.position.copy(target).addScaledVector(dir, dist);
+      camera.near = dist / 40; camera.far = dist * 6;
+      controls.target.copy(target);
+    }
+    camera.updateProjectionMatrix();
+    controls.update();
+  };
+  new ResizeObserver(() => S.fit(false)).observe(box);
+  new IntersectionObserver(es => { S.visible = es.some(e => e.isIntersecting); }, { rootMargin: '120px' }).observe(box);
+  S.fit(true);
+  stages.push(S);
+  return S;
+}
+function makeLine(S, token, width, opts = {}) {
+  const m = new LineMaterial({ linewidth: width, dashed: !!opts.dashed, dashSize: opts.dash || 0.3, gapSize: opts.gap || 0.22, transparent: opts.opacity !== undefined, opacity: opts.opacity === undefined ? 1 : opts.opacity });
+  themed(m, token);
+  m.resolution.set(S.box.clientWidth || 800, S.box.clientHeight || 450);
+  S.lineMats.push(m);
+  const g = new LineGeometry(); g.setPositions([0, 0, 0, 0, 0.001, 0]);
+  const l = new Line2(g, m); l.frustumCulled = false; l.visible = false;
+  S.scene.add(l);
+  return l;
+}
+function setLine(l, pts) {
+  if (pts.length < 6) { l.visible = false; return; }
+  l.visible = true;
+  l.geometry.dispose();
+  const g = new LineGeometry(); g.setPositions(pts);
+  l.geometry = g;
+  if (l.material.dashed) l.computeLineDistances();
+}
+function label(text, cls) {
+  const d = document.createElement('div');
+  d.className = 'scene-label' + (cls ? ' ' + cls : '');
+  d.textContent = text;
+  return new CSS2DObject(d);
+}
+function makeGrid(S, half, step, y, token) {
+  const pts = [];
+  for (let v = -half; v <= half + 1e-6; v += step) { pts.push(-half, y, v, half, y, v, v, y, -half, v, y, half); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  const seg = new THREE.LineSegments(g, themed(new THREE.LineBasicMaterial({ transparent: true, opacity: 0.9 }), token));
+  S.scene.add(seg);
+  return seg;
+}
+function glowTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  r.addColorStop(0, 'rgba(255,255,255,0.95)'); r.addColorStop(0.35, 'rgba(255,255,255,0.45)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function makeArrow(len, radius, token) {
+  const g = new THREE.Group();
+  const mat = themed(new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1 }), token);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len * 0.76, 12), mat);
+  shaft.rotation.z = -Math.PI / 2; shaft.position.x = len * 0.38;
+  const head = new THREE.Mesh(new THREE.ConeGeometry(radius * 2.8, len * 0.26, 16), mat);
+  head.rotation.z = -Math.PI / 2; head.position.x = len * 0.87;
+  g.add(shaft, head);
+  return g;
+}
+
+/* ---------- Scene 1: light clock ---------- */
+function initClock() {
+  const S = makeStage(document.getElementById('scene-clock'), { fitWidth: 37, fitHeight: 9.5, target: [0.5, 2.2, 0], dir: [0, 0.32, 1] });
+  if (!S) return;
+  const { scene } = S;
+  makeGrid(S, 22, 2, -0.17, '--grid');
+  const L = 4, C = 4, X_REST = -14.5, X_START = -9.5, X_END = 17;
+  const glowTex = glowTexture();
+  function body(x, text) {
+    const g = new THREE.Group(); g.position.set(x, 0, 0);
+    const mirrorMat = themed(new THREE.MeshStandardMaterial({ metalness: 0.35, roughness: 0.35 }), '--mirror');
+    const frameMat = themed(new THREE.MeshStandardMaterial({ roughness: 0.9 }), '--ink-soft');
+    const mGeo = new THREE.BoxGeometry(2.4, 0.16, 1.2);
+    const b = new THREE.Mesh(mGeo, mirrorMat); b.position.y = -0.08;
+    const t = new THREE.Mesh(mGeo, mirrorMat); t.position.y = L + 0.08;
+    g.add(b, t);
+    const pGeo = new THREE.CylinderGeometry(0.04, 0.04, L + 0.32, 8);
+    for (const px of [-1.1, 1.1]) for (const pz of [-0.5, 0.5]) { const p = new THREE.Mesh(pGeo, frameMat); p.position.set(px, L / 2, pz); g.add(p); }
+    const lab = label(text, 'soft'); lab.position.set(0, L + 0.85, 0); g.add(lab);
+    scene.add(g);
+    const photon = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 14), themed(new THREE.MeshBasicMaterial(), '--photon'));
+    const glow = new THREE.Sprite(themed(new THREE.SpriteMaterial({ map: glowTex, transparent: true, depthWrite: false }), '--photon'));
+    glow.scale.set(1.3, 1.3, 1); photon.add(glow);
+    scene.add(photon);
+    return { g, photon };
+  }
+  const rest = body(X_REST, 'standing still');
+  const fly = body(X_START, 'flying');
+  const trail = makeLine(S, '--photon', 3.5);
+  const vert = makeLine(S, '--ink', 2.2, { dashed: true });
+  const horiz = makeLine(S, '--ink', 2.2, { dashed: true });
+  const hyp = makeLine(S, '--ink', 2.2, { dashed: true });
+  const labV = label('c·t₀  the gap', ''), labH = label('v·t  how far it moved', ''), labC = label('c·t  the light\'s path', 'photon');
+  scene.add(labV, labH, labC);
+
+  const st = { beta: 0.6, paused: reduceMotion, restPhase: 0, restUp: true, restTicks: 0, flyX: X_START, flyPhase: 0, flyUp: true, flyTicks: 0, bounces: [[X_START, 0]], tri: null };
+  const yOf = (ph, up) => up ? ph * L : (1 - ph) * L;
+  function reset() {
+    Object.assign(st, { restPhase: 0, restUp: true, restTicks: 0, flyX: X_START, flyPhase: 0, flyUp: true, flyTicks: 0, bounces: [[X_START, 0]], tri: null });
+    place(); writeTicks(); writePyth();
+  }
+  function place() {
+    rest.photon.position.set(X_REST, yOf(st.restPhase, st.restUp), 0);
+    fly.g.position.x = st.flyX;
+    const fy = yOf(st.flyPhase, st.flyUp);
+    fly.photon.position.set(st.flyX, fy, 0);
+    const pts = [];
+    st.bounces.forEach(b => pts.push(b[0], b[1], 0));
+    pts.push(st.flyX, fy, 0);
+    setLine(trail, pts);
+    const showTri = !!st.tri;
+    [labV, labH, labC].forEach(l => { l.visible = showTri; });
+    if (showTri) {
+      const [xs, xe] = st.tri;
+      setLine(vert, [xs, 0, 0.02, xs, L, 0.02]);
+      setLine(hyp, [xs, 0, 0.02, xe, L, 0.02]);
+      if (xe - xs > 0.05) setLine(horiz, [xs, 0, 0.02, xe, 0, 0.02]); else horiz.visible = false;
+      labV.position.set(xs - 0.35, L * 0.42, 0);
+      labV.element.style.transform = '';
+      labH.position.set((xs + xe) / 2, -0.75, 0);
+      labH.visible = xe - xs > 1.2;
+      labC.position.set((xs + xe) / 2 + 0.6, L * 0.62, 0);
+    } else { vert.visible = horiz.visible = hyp.visible = false; }
+  }
+  const outT = document.getElementById('out-ticks'), outP = document.getElementById('out-pyth');
+  function writeTicks() {
+    const r = Math.sqrt(1 - st.beta * st.beta);
+    const ratio = st.restTicks >= 4 ? f2(st.flyTicks / st.restTicks) : '…';
+    outT.innerHTML = '<h3>Count the ticks</h3>' +
+      '<div class="row"><span class="lab">Standing still</span><span class="val">' + st.restTicks + ' ticks</span></div>' +
+      '<div class="row"><span class="lab">Flying</span><span class="val">' + st.flyTicks + ' ticks</span></div>' +
+      '<div class="row"><span class="lab">Flying ÷ still</span><span class="val">' + ratio + '</span></div>' +
+      '<div class="row"><span class="lab">Triangle predicts</span><span class="val">√(1 − ' + f2(st.beta) + '²) = ' + f2(r) + '</span></div>' +
+      '<p class="step">The count can only be a whole number, so the measured ratio wobbles around the prediction and settles as more ticks pile up.</p>';
+  }
+  function writePyth() {
+    const b = st.beta, r = Math.sqrt(1 - b * b);
+    outP.innerHTML = '<h3>Pythagoras on the triangle</h3>' +
+      '<p class="eqn">(c·t)² = (c·t₀)² + (v·t)²</p>' +
+      '<p class="step">Divide every part by (c·t)²:</p>' +
+      '<p class="eqn">1 = (t₀ ÷ t)² + (v ÷ c)²</p>' +
+      '<p class="step">t₀ ÷ t is how fast the flying clock ticks compared with yours. v ÷ c is its share of light speed. So:</p>' +
+      '<p class="big">1 = (clock rate)² + (speed share)²</p>' +
+      '<p class="eqn">1 = ' + f2(r) + '² + ' + f2(b) + '² = ' + f2(r * r) + ' + ' + f2(b * b) + '</p>' +
+      '<p class="step">That is your quarter circle, built from nothing but "light has the same speed for everyone" and a right-angled triangle.</p>';
+  }
+  S.update = dt => {
+    if (st.paused) return;
+    const r = Math.sqrt(1 - st.beta * st.beta);
+    let ticked = false;
+    st.restPhase += dt * C / L;
+    while (st.restPhase >= 1) { st.restPhase -= 1; st.restUp = !st.restUp; st.restTicks++; ticked = true; }
+    st.flyX += st.beta * C * dt;
+    st.flyPhase += dt * C * r / L;
+    while (st.flyPhase >= 1) {
+      st.flyPhase -= 1;
+      const since = st.flyPhase * L / (C * r);
+      const xb = st.flyX - st.beta * C * since, yb = st.flyUp ? L : 0;
+      const prev = st.bounces[st.bounces.length - 1];
+      if (st.flyUp && prev && prev[1] === 0) st.tri = [prev[0], xb];
+      st.bounces.push([xb, yb]);
+      if (st.bounces.length > 80) st.bounces.shift();
+      st.flyUp = !st.flyUp; st.flyTicks++; ticked = true;
+    }
+    if (st.flyX > X_END) {
+      st.flyX -= (X_END - X_START);
+      st.bounces = [[st.flyX, yOf(st.flyPhase, st.flyUp)]];
+      st.tri = null;
+    }
+    place();
+    if (ticked) writeTicks();
+  };
+  const slider = document.getElementById('beta'), bOut = document.getElementById('beta-out');
+  slider.addEventListener('input', () => { st.beta = parseFloat(slider.value); bOut.textContent = Math.round(st.beta * 100) + '%'; reset(); });
+  const pauseBtn = document.getElementById('clock-pause');
+  const syncPause = () => { pauseBtn.textContent = st.paused ? 'Play' : 'Pause'; };
+  pauseBtn.addEventListener('click', () => { st.paused = !st.paused; syncPause(); });
+  document.getElementById('clock-view').addEventListener('click', () => S.fit(true));
+  syncPause();
+  reset();
+}
+
+/* ---------- Scene 2: falling matter wave ---------- */
+function initWave() {
+  const S = makeStage(document.getElementById('scene-wave'), { fitWidth: 31, fitHeight: 14.5, target: [1.6, 0, 0], dir: [0.28, 0.22, 1] });
+  if (!S) return;
+  const { scene } = S;
+  const PW = 20, PH = 13, PCX = 5.5, YT = PH / 2, YB = -PH / 2, XL = PCX - PW / 2, XR = PCX + PW / 2;
+  const U = {
+    uC: { value: new THREE.Vector2() }, uK: { value: new THREE.Vector2() }, uTheta: { value: 0 }, uSigma: { value: 1.25 },
+    uShade: { value: 1 }, uYT: { value: YT }, uYB: { value: YB },
+    uCrest: { value: new THREE.Color() }, uTrough: { value: new THREE.Color() }, uFast: { value: new THREE.Color() }, uSlow: { value: new THREE.Color() }
+  };
+  themed(U.uCrest, '--crest', 'value'); themed(U.uTrough, '--trough', 'value'); themed(U.uFast, '--fast', 'value'); themed(U.uSlow, '--slow', 'value');
+  const mat = new THREE.ShaderMaterial({
+    uniforms: U, side: THREE.DoubleSide,
+    vertexShader: 'varying vec2 vP; void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vP = w.xy; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: [
+      'uniform vec2 uC; uniform vec2 uK; uniform float uTheta; uniform float uSigma; uniform float uShade;',
+      'uniform float uYT; uniform float uYB; uniform vec3 uCrest; uniform vec3 uTrough; uniform vec3 uFast; uniform vec3 uSlow;',
+      'varying vec2 vP;',
+      'void main(){',
+      '  float h = clamp((vP.y - uYB) / (uYT - uYB), 0.0, 1.0);',
+      '  vec3 bg = mix(uSlow, mix(uSlow, uFast, h), uShade);',
+      '  vec2 d = vP - uC;',
+      '  float env = exp(-dot(d, d) / (2.0 * uSigma * uSigma));',
+      '  float w = cos(dot(uK, d) + uTheta);',
+      '  vec3 c = mix(bg, w > 0.0 ? uCrest : uTrough, clamp(env * abs(w) * 1.08, 0.0, 1.0));',
+      '  gl_FragColor = vec4(c, 1.0);',
+      '  #include <colorspace_fragment>',
+      '}'
+    ].join('\n')
+  });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(PW, PH), mat);
+  plane.position.set(PCX, 0, 0);
+  scene.add(plane);
+  const frame = makeLine(S, '--rule', 1.5);
+  setLine(frame, [XL, YB, 0, XR, YB, 0, XR, YT, 0, XL, YT, 0, XL, YB, 0]);
+  const lf = label('clocks tick faster ↑', 'fast'); lf.position.set(XR - 2.6, YT - 0.6, 0); scene.add(lf);
+  const ls = label('clocks tick slower ↓', 'slowl'); ls.position.set(XR - 2.6, YB + 0.6, 0); scene.add(ls);
+
+  // physics in scene units: wave number = K × velocity
+  const K = 3, VX = 1.8, X0 = -3, Y0 = 4.4, OMEGA = 5, HSLICE = 1.0;
+  const ghost = makeLine(S, '--ink-soft', 1.6, { dashed: true, dash: 0.35, gap: 0.3 });
+  setLine(ghost, [X0, Y0, 0.03, XR - 0.3, Y0, 0.03]);
+  const path = makeLine(S, '--you', 3.5);
+  const slice = makeLine(S, '--ink', 3);
+  const linkTop = makeLine(S, '--ink-soft', 1.2, { dashed: true, dash: 0.2, gap: 0.25, opacity: 0.8 });
+  const linkBot = makeLine(S, '--ink-soft', 1.2, { dashed: true, dash: 0.2, gap: 0.25, opacity: 0.8 });
+  const dirArrow = makeArrow(1.8, 0.06, '--ink'); scene.add(dirArrow);
+
+  // arrow column
+  const COLX = -8.6, N = 13, COLH = 10;
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, COLH + 0.9, 10), themed(new THREE.MeshStandardMaterial({ roughness: 0.8 }), '--ink-soft'));
+  pole.position.set(COLX, 0, 0); scene.add(pole);
+  const arrows = [];
+  for (let i = 0; i < N; i++) {
+    const a = makeArrow(1.5, 0.05, i === N - 1 ? '--crest' : (i === 0 ? '--trough' : '--ink'));
+    a.position.set(COLX, -COLH / 2 + i * COLH / (N - 1), 0);
+    scene.add(a); arrows.push(a);
+  }
+  const helix = makeLine(S, '--you', 2.5);
+  const lt = label('top of the slice', 'fast'); lt.position.set(COLX, COLH / 2 + 0.95, 0); scene.add(lt);
+  const lb = label('bottom: falls behind', 'slowl'); lb.position.set(COLX, -COLH / 2 - 0.95, 0); scene.add(lb);
+
+  const st = { a: 0.6, t: 0, paused: reduceMotion, trail: [], lastTrail: -1, lastWrite: -1 };
+  const out = document.getElementById('out-wave');
+  function restart() { st.t = 0; st.trail = []; st.lastTrail = -1; draw(); write(); }
+  function draw() {
+    const t = st.t, a = st.a;
+    const cx = X0 + VX * t, cy = Y0 - 0.5 * a * t * t;
+    const ky = -K * a * t, kx = K * VX;
+    U.uC.value.set(cx, cy); U.uK.value.set(kx, ky); U.uTheta.value = -OMEGA * t;
+    if (st.lastTrail < 0 || t - st.lastTrail > 0.04) { st.trail.push(cx, cy, 0.03); st.lastTrail = t; }
+    setLine(path, st.trail.length >= 6 ? st.trail.concat([cx, cy, 0.03]) : [X0, Y0, 0.03, cx, cy, 0.03]);
+    const ang = Math.atan2(ky, kx);
+    dirArrow.position.set(cx, cy, 0.08); dirArrow.rotation.z = ang;
+    setLine(slice, [cx - 0.0, cy - HSLICE / 2, 0.06, cx, cy + HSLICE / 2, 0.06]);
+    setLine(linkTop, [cx, cy + HSLICE / 2, 0.06, COLX, COLH / 2, 0]);
+    setLine(linkBot, [cx, cy - HSLICE / 2, 0.06, COLX, -COLH / 2, 0]);
+    // lag per unit height equals |ky|; column shows the slice HSLICE magnified
+    const tips = [];
+    for (let i = 0; i < N; i++) {
+      const frac = i / (N - 1);                 // 0 bottom, 1 top
+      const lag = K * a * t * HSLICE * (1 - frac);   // radians behind the top arrow
+      arrows[i].rotation.y = lag;
+      tips.push(COLX + 1.5 * Math.cos(lag), arrows[i].position.y, -1.5 * Math.sin(lag));
+    }
+    setLine(helix, tips);
+  }
+  function write() {
+    const t = st.t, a = st.a;
+    const lagTurns = K * a * t * HSLICE / (2 * Math.PI);
+    const tilt = Math.atan2(a * t, VX) * 180 / Math.PI;
+    const crestTilt = Math.atan2(K * a * t, K * VX) * 180 / Math.PI;
+    out.innerHTML = '<h3>Live numbers</h3>' +
+      '<div class="row"><span class="lab">Time since release</span><span class="val">' + t.toFixed(1) + ' s</span></div>' +
+      '<div class="row"><span class="lab">Lag, bottom vs top</span><span class="val">' + lagTurns.toFixed(2) + ' turns</span></div>' +
+      '<div class="row"><span class="lab">Crests tilted by</span><span class="val">' + crestTilt.toFixed(1) + '°</span></div>' +
+      '<div class="row"><span class="lab">Path points down by</span><span class="val">' + tilt.toFixed(1) + '°</span></div>' +
+      '<div class="row"><span class="lab">Downward speed</span><span class="val">' + (a * t).toFixed(2) + ' squares/s</span></div>' +
+      '<p class="step">The lag grows steadily with time, and the downward speed grows with it. The crest tilt and the angle of the path always match: the wave moves at right angles to its crests.</p>';
+  }
+  S.update = dt => {
+    if (st.paused) return;
+    st.t += dt;
+    const cx = X0 + VX * st.t, cy = Y0 - 0.5 * st.a * st.t * st.t;
+    if (cy < YB + 1.1 || cx > XR - 1.1) { restart(); return; }
+    draw();
+    if (st.t - st.lastWrite > 0.1 || st.t < st.lastWrite) { write(); st.lastWrite = st.t; }
+  };
+  const g = document.getElementById('grav'), gOut = document.getElementById('grav-out');
+  g.addEventListener('input', () => { st.a = parseFloat(g.value); gOut.textContent = st.a.toFixed(2).replace(/0$/, ''); restart(); });
+  document.getElementById('shade').addEventListener('change', e => { U.uShade.value = e.target.checked ? 1 : 0; });
+  document.getElementById('wave-again').addEventListener('click', () => { restart(); if (st.paused) { st.paused = false; syncPause(); } });
+  const pauseBtn = document.getElementById('wave-pause');
+  const syncPause = () => { pauseBtn.textContent = st.paused ? 'Play' : 'Pause'; };
+  pauseBtn.addEventListener('click', () => { st.paused = !st.paused; syncPause(); });
+  document.getElementById('wave-view').addEventListener('click', () => S.fit(true));
+  syncPause();
+  if (reduceMotion) { st.t = 2.5; draw(); write(); } else restart();
+}
+
+initClock();
+initWave();
+
+const clk = new THREE.Clock();
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(clk.getDelta(), 0.05);
+  if (document.hidden) return;
+  for (const S of stages) {
+    if (!S.visible) continue;
+    S.update(dt);
+    S.controls.update();
+    S.renderer.render(S.scene, S.camera);
+    S.labels.render(S.scene, S.camera);
+  }
+}
+loop();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>

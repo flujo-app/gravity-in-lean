@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>Everything Rises</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+/* One look only: a dark deep space that fills the page, with a few quiet instruments floating over it. */
+:root {
+  color-scheme: dark;
+  --bg: #04060c;
+  --panel: rgba(7, 11, 20, 0.62);
+  --line: rgba(160, 190, 230, 0.26);
+  --ink: #e9eff8;
+  --soft: #a3b4cb;
+  --hot: #ffd27a;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; overflow: hidden; }
+.app { position: relative; width: 100%; height: 100%; min-height: 380px; overflow: hidden; background: var(--bg); }
+#view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; cursor: grab; }
+#view:active { cursor: grabbing; }
+.app:not(.live) .read, .app:not(.live) .rides, .app:not(.live) .chip, .app:not(.live) .keys, .app:not(.live) .pad, .app:not(.live) #tags { visibility: hidden; }
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%); }
+#tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.tag { position: absolute; left: 0; top: 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); white-space: nowrap; text-shadow: 0 1px 6px #000; will-change: transform; }
+
+.read { position: absolute; left: max(14px, env(safe-area-inset-left, 0px)); top: 12px; display: grid; gap: 2px; pointer-events: none; text-shadow: 0 1px 8px rgba(0,0,0,0.85); font-variant-numeric: tabular-nums; }
+.read .who { font-family: var(--font-display); font-stretch: 116%; font-weight: 800; font-size: 24px; line-height: 1.05; color: var(--hot); }
+.read .row { display: flex; gap: 6px; align-items: flex-end; }
+.read .clocks { display: grid; gap: 1px; padding-bottom: 6px; }
+.read .clk { display: flex; gap: 8px; align-items: baseline; }
+.read .clk span { min-width: 11ch; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+.read .clk b { font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
+.read .clk.base b { color: var(--hot); }
+.dial { display: block; overflow: visible; }
+.dial .arc { fill: none; stroke: var(--line); stroke-width: 1.3; }
+.dial .nd { stroke: var(--hot); stroke-width: 2.3; stroke-linecap: round; }
+.dial .tp { fill: var(--hot); }
+.dial text { font-family: var(--font-mono); font-size: 8.5px; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--soft); }
+button { font: inherit; color: inherit; cursor: pointer; }
+.rides { position: absolute; right: max(56px, calc(env(safe-area-inset-right, 0px) + 56px)); top: 12px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: min(58%, 620px); }
+.rides button { flex: none; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); padding: 6px 12px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--soft); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.rides button[aria-pressed="true"] { background: var(--hot); color: #1b1404; border-color: var(--hot); }
+.chip { position: absolute; right: max(12px, env(safe-area-inset-right, 0px)); top: 12px; width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%; background: var(--panel); font-weight: 700; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+:focus-visible { outline: 2px solid var(--hot); outline-offset: 2px; }
+.whisper { position: absolute; left: 50%; bottom: 13%; transform: translateX(-50%); margin: 0; width: min(92%, 700px); text-align: center; font-family: var(--font-display); font-stretch: 108%; font-weight: 600; font-size: clamp(17px, 2.6vw, 24px); line-height: 1.25; text-wrap: balance; color: #fff6e0; text-shadow: 0 2px 14px rgba(0,0,0,0.95), 0 0 2px rgba(0,0,0,0.9); opacity: 0; transition: opacity 1.4s ease; pointer-events: none; }
+.whisper.on { opacity: 1; }
+.keys { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; padding: 5px 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); font-family: var(--font-mono); font-size: 11.5px; color: var(--soft); white-space: nowrap; pointer-events: none; transition: opacity 1.2s ease; }
+.keys.off { opacity: 0; }
+.pad { position: absolute; right: max(12px, env(safe-area-inset-right, 0px)); bottom: 14px; display: none; gap: 8px; }
+.pad button { width: 54px; height: 54px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); font-family: var(--font-mono); font-size: 12px; font-weight: 700; touch-action: none; }
+@media (pointer: coarse) { .pad { display: flex; } .keys { display: none; } }
+@media (max-width: 720px) {
+  .keys { display: none; }
+  .read .who { font-size: 20px; }
+  .rides { top: auto; bottom: 78px; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); max-width: none; flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+  .whisper { bottom: 24%; }
+}
+@media (prefers-reduced-motion: reduce) { .whisper, .keys { transition: none; } }
+
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); background: rgba(3, 5, 10, 0.5); overflow: auto; }
+#start { background: rgba(3, 5, 10, 0.28); }
+.sheet { width: min(580px, 100%); background: rgba(8, 12, 22, 0.92); border: 1px solid var(--line); border-radius: 12px; padding: 24px 26px; display: grid; gap: 11px; }
+.sheet h1 { margin: 0; font-family: var(--font-display); font-stretch: 122%; font-weight: 800; font-size: clamp(32px, 7vw, 50px); line-height: 0.98; letter-spacing: -0.01em; }
+.sheet h2 { margin: 6px 0 0; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hot); }
+.sheet p, .sheet li { margin: 0; color: #d3ddec; }
+.sheet ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.sheet .fine, .sheet .fine li { font-size: 13.5px; color: var(--soft); }
+.sheet .fine b { color: var(--ink); }
+.go { justify-self: start; padding: 11px 22px; border-radius: 999px; border: 0; background: var(--hot); color: #1b1404; font-weight: 800; font-size: 16px; }
+.go:disabled { opacity: 0.5; cursor: not-allowed; }
+[hidden] { display: none !important; }
+</style>
+
+<div class="app" id="app">
+  <canvas id="view" tabindex="0" aria-label="A deep space in which everything climbs steadily upward through time"></canvas>
+  <div class="vignette"></div>
+  <div id="tags"></div>
+
+  <div class="read" aria-live="off">
+    <div class="who" id="r-who">you</div>
+    <div class="row">
+      <svg class="dial" viewBox="0 0 92 68" width="92" height="68" aria-hidden="true">
+        <path class="arc" d="M10 12 A46 46 0 0 1 56 58"/>
+        <line class="nd" id="needle" x1="10" y1="58" x2="10" y2="12"/>
+        <circle class="tp" id="tip" cx="10" cy="12" r="2.8"/>
+        <text x="17" y="11">time</text>
+        <text x="61" y="61">space</text>
+      </svg>
+      <div class="clocks">
+        <div class="clk" id="c-own"><span>this clock</span><b id="r-own"></b></div>
+        <div class="clk base" id="c-far"><span>far station</span><b id="r-far"></b></div>
+        <div class="clk" id="c-held" hidden><span>time held</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="rides" id="rides" role="group" aria-label="Whose climb to follow"></div>
+  <button type="button" class="chip" id="b-help" aria-label="Controls and notes">?</button>
+  <p class="whisper" id="whisper" aria-live="polite"></p>
+  <p class="keys" id="keys">W A S D push · Space stop · G let go · T own time · drag to look · wheel to zoom</p>
+  <div class="pad"><button type="button" id="b-out" aria-label="Pull back">−</button><button type="button" id="b-in" aria-label="Move in">+</button><button type="button" id="b-stop" aria-label="Stand still">stop</button></div>
+
+  <div class="overlay" id="start">
+    <div class="sheet">
+      <h1>Everything Rises</h1>
+      <p>You are moving at the speed of light. You always have been. Most of it goes into time. Here, time is a direction you can see: up.</p>
+      <button type="button" class="go" id="b-start">Enter</button>
+      <p class="fine" id="start-note">Drag to look around, wheel to pull back a long way. W A S D to push yourself, Space to stop. On a phone: left thumb pushes, right thumb looks.</p>
+    </div>
+  </div>
+
+  <div class="overlay" id="about" hidden>
+    <div class="sheet">
+      <h2>Getting around</h2>
+      <ul>
+        <li>Drag to look around. The wheel pulls back or moves in, a long way.</li>
+        <li>W A S D: your engine carries you sideways through space. Let go of the keys and you drift freely.</li>
+        <li>Space brings you to a stop and holds you there. G lets go again, and you fall freely.</li>
+        <li>Keys 1 to 7, or the names at the top, let you ride along with someone else.</li>
+        <li>T plays the world by the clock you are riding instead of the far station's. P holds time still. R starts again.</li>
+      </ul>
+      <h2>How to read it</h2>
+      <p>Sideways is where a thing is. Height is how much time it has lived through. Two things meet when one is straight above the other. Each bead on a thread is one second on that thing's own clock. Rings are flashes of light. The net is everything that has never moved. The pale arrow is the you that never set off.</p>
+      <h2>How sure is this</h2>
+      <ul class="fine">
+        <li><b>Measured:</b> moving clocks run slow, and clocks lower down near a mass run slow (particle rings, navigation satellites, lab clocks raised by a third of a metre). Light bends and is held up near a mass.</li>
+        <li><b>Worked out:</b> every path, clock rate and bent ring here follows Einstein's equations for one heavy thing that does not spin.</li>
+        <li><b>Picture:</b> drawing a thing's own time as height is Lewis Epstein's idea. "Everything moves at light speed, only the direction changes" is a way of reading the maths, not a motion anyone measures. The moments are cut the way the far clocks cut them. Someone moving fast would cut them differently, and neither cut is the right one. Only ages compared at the same place are beyond argument.</li>
+        <li><b>Invented:</b> the engine, the sizes, how deep you can go, two directions of space instead of three, and the squeezing of heights far above and below you.</li>
+      </ul>
+      <button type="button" class="go" id="b-close">Back</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+// M: the heavy thing's size. RATE: how much of the world's time passes per second on screen. SQ: beyond this far above or below you, heights are squeezed.
+const M = 4, RH = M / 2, FLOOR = 2.8, RATE = 26, SQ = 220, TICK = RATE, SAMPLE = 6, T_PRE = 2600, RAYS = 216, RING_LIFE = 620, TRAIL = 720, AWAY = -1e7, LOST2 = 9, HOME_YAW = Math.PI / 2 + 0.35;
+const MOTES = 48, MOTE_TRAIL = 200;
+const app = document.getElementById('app'), canvas = document.getElementById('view');
+const $ = id => document.getElementById(id);
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+let seed = 20261122;
+const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+
+/* ---------- the shape of space and time around one heavy thing ---------- */
+// Clocks tick at the rate N compared with clocks far away. Distances are stretched by the factor C.
+const F = { N: 1, C: 1, dNx: 0, dNy: 0, dCx: 0, dCy: 0 }, G = { n: 1, gx: 0, gy: 0 };
+function field(x, y) {
+  const rho = Math.max(Math.sqrt(x * x + y * y), RH * 1.001), s = M / (2 * rho), q = 1 + s, r2 = rho * rho;
+  F.N = (1 - s) / q; F.C = q * q * q * q;
+  const dN = (M / r2) / (q * q) / rho, dC = -2 * M * q * q * q / r2 / rho;
+  F.dNx = dN * x; F.dNy = dN * y; F.dCx = dC * x; F.dCy = dC * y;
+}
+const lapse = rho => { const s = M / (2 * Math.max(rho, RH * 1.001)); return (1 - s) / (1 + s); };
+const stretch = rho => { const q = 1 + M / (2 * Math.max(rho, RH * 1.001)); return q * q; };
+// the speed light makes across the map, and which way it gets faster
+function lightField(x, y) {
+  const rho = Math.max(Math.sqrt(x * x + y * y), RH * 1.001), s = M / (2 * rho), q2 = (1 + s) * (1 + s);
+  G.n = (1 - s) / (q2 * (1 + s));
+  const dn = M * (2 - s) / (rho * rho * q2 * q2) / rho;
+  G.gx = dn * x; G.gy = dn * y;
+}
+// A free thing: state is place (x, y), push (px, py) and own time. With f, an engine carries it instead of the pull.
+const k1 = new Float64Array(5), k2 = new Float64Array(5), k3 = new Float64Array(5), k4 = new Float64Array(5), tmp = new Float64Array(5);
+function deriv(s, f, o) {
+  field(s[0], s[1]);
+  const p2 = (s[2] * s[2] + s[3] * s[3]) / F.C, E = Math.sqrt(1 + p2), a = F.N / (F.C * E);
+  o[0] = a * s[2]; o[1] = a * s[3]; o[4] = F.N / E;
+  if (f) { const g = Math.sqrt(F.C) * F.N / E; o[2] = f[0] * g; o[3] = f[1] * g; }
+  else { const k = F.N * p2 / (2 * F.C * E); o[2] = -F.dNx * E + k * F.dCx; o[3] = -F.dNy * E + k * F.dCy; }
+}
+function stepFree(s, dt, f) {
+  deriv(s, f, k1);
+  for (let i = 0; i < 5; i++) tmp[i] = s[i] + k1[i] * dt / 2; deriv(tmp, f, k2);
+  for (let i = 0; i < 5; i++) tmp[i] = s[i] + k2[i] * dt / 2; deriv(tmp, f, k3);
+  for (let i = 0; i < 5; i++) tmp[i] = s[i] + k3[i] * dt; deriv(tmp, f, k4);
+  for (let i = 0; i < 5; i++) s[i] += dt * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6;
+}
+function measure(b) {
+  const s = b.st; field(s[0], s[1]);
+  const p2 = (s[2] * s[2] + s[3] * s[3]) / F.C, E = Math.sqrt(1 + p2), a = F.N / (F.C * E);
+  b.rate = F.N / E; b.speed = Math.sqrt(p2) / E; b.vx = a * s[2]; b.vy = a * s[3];
+}
+// something set going sideways at distance rho: scale 1 gives a round path
+function circ(rho, phase, scale = 1, dir = 1) {
+  const s = M / (2 * rho), q = 1 + s, r = rho * q * q, v = Math.sqrt(M / (r - 2 * M)) * scale, p = q * q * v / Math.sqrt(1 - v * v);
+  return [rho * Math.cos(phase), rho * Math.sin(phase), -Math.sin(phase) * p * dir, Math.cos(phase) * p * dir, 0];
+}
+// will it keep circling, rather than drop into the heavy thing or drift off for good?
+function keeps(rho, scale) {
+  const s = M / (2 * rho), q = 1 + s, r = rho * q * q, v = Math.sqrt(M / (r - 2 * M)) * scale;
+  if (v > 0.9) return false;
+  const g2 = 1 / (1 - v * v), L2 = r * r * g2 * v * v, E2 = (1 - 2 * M / r) * g2;
+  if (E2 > 0.998 || L2 < 12.6 * M * M) return false;
+  const rp = L2 / (2 * M) * (1 - Math.sqrt(1 - 12 * M * M / L2));
+  return r > rp && E2 < (1 - 2 * M / rp) * (1 + L2 / (rp * rp)) * 0.99;
+}
+
+/* ---------- drawing ---------- */
+let renderer = null;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); } catch (e) { renderer = null; }
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x04060c);
+scene.fog = new THREE.FogExp2(0x04060c, 0.0011);
+const camera = new THREE.PerspectiveCamera(60, 1, 0.5, 9000);
+const lineMats = [];
+const GLOW = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d'), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.22, 'rgba(255,255,255,0.6)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = r; g.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const glowLine = (o) => { const m = new LineMaterial(Object.assign({ transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: true }, o)); lineMats.push(m); return m; };
+const sprite = color => new THREE.Sprite(new THREE.SpriteMaterial({ map: GLOW, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, fog: false }));
+
+// the path something has taken: remembered places and own times, oldest first
+class Path {
+  constructor(cap) { this.cap = cap; this.n = 0; this.x = new Float32Array(cap); this.y = new Float32Array(cap); this.tau = new Float64Array(cap); }
+  clear() { this.n = 0; }
+  push(x, y, tau) {
+    if (this.n === this.cap) { this.x.copyWithin(0, 1); this.y.copyWithin(0, 1); this.tau.copyWithin(0, 1); this.n--; }
+    this.x[this.n] = x; this.y[this.n] = y; this.tau[this.n] = tau; this.n++;
+  }
+  // fill this path's line pieces into a, ending at the thing itself; pieces not yet used are parked out of sight
+  write(a, off, tx, ty, ttau, disp) {
+    const n = this.n, lead = this.cap - n;
+    for (let i = 0; i < lead; i++) { a[off + i * 6 + 1] = AWAY; a[off + i * 6 + 4] = AWAY; }
+    if (!n) return;
+    let px = this.x[0], ph = disp(this.tau[0]), py = this.y[0];
+    for (let i = 0; i < n; i++) {
+      const k = off + (lead + i) * 6, last = i + 1 === n;
+      const qx = last ? tx : this.x[i + 1], qh = disp(last ? ttau : this.tau[i + 1]), qy = last ? ty : this.y[i + 1];
+      a[k] = px; a[k + 1] = ph; a[k + 2] = py; a[k + 3] = qx; a[k + 4] = qh; a[k + 5] = qy;
+      px = qx; ph = qh; py = qy;
+    }
+  }
+}
+// a thread: a path drawn as a glowing line, newest end brightest
+function makeThread(color, width) {
+  const g = new LineGeometry(); g.setPositions(new Float32Array((TRAIL + 1) * 3));
+  const c = new Float32Array((TRAIL + 1) * 3), col = new THREE.Color(color);
+  for (let i = 0; i <= TRAIL; i++) { const f = 0.05 + 0.95 * Math.pow(i / TRAIL, 1.6); c[i * 3] = col.r * f; c[i * 3 + 1] = col.g * f; c[i * 3 + 2] = col.b * f; }
+  g.setColors(c);
+  const line = new Line2(g, glowLine({ linewidth: width, vertexColors: true })); line.frustumCulled = false; scene.add(line);
+  return { path: new Path(TRAIL), buf: g.attributes.instanceStart.data, line };
+}
+
+const DEFS = [['you', 'you', 0xffd27a, 3.2], ['far', 'far station', 0xe9eff8, 2.4], ['low', 'low station', 0x9fd8ff, 2.4], ['orb', 'orbiter', 0x7ee0b2, 2.4],
+  ['orb2', '', 0x6fb8ff, 2.0], ['orb3', '', 0xc3a6ff, 2.0], ['orb4', '', 0xff8fc5, 2.0], ['diver', 'diver', 0xff7a5c, 2.4], ['shuttle', 'shuttle', 0xffb86b, 2.4], ['light', 'light', 0xfff3c0, 2.2]];
+const IDS = DEFS.map(d => d[0]), RIDES = ['you', 'far', 'low', 'orb', 'diver', 'shuttle', 'light'];
+const V = {}, B = {};
+const tagsEl = $('tags');
+for (const [id, name, color, width] of DEFS) {
+  const v = { name, color: new THREE.Color(color), thread: makeThread(color, width), glow: sprite(color), flare: 0 };
+  scene.add(v.glow);
+  if (name) { v.tag = document.createElement('div'); v.tag.className = 'tag'; v.tag.textContent = name; tagsEl.appendChild(v.tag); }
+  V[id] = v;
+}
+// your craft is an arrow that points the way you are really going: partly up through time, partly sideways through space
+function arrow(head, shaft) {
+  const g = new THREE.Group();
+  const a = new THREE.Mesh(new THREE.ConeGeometry(0.85, 2.3, 16), new THREE.MeshBasicMaterial({ color: head, fog: false })); a.position.y = 0.65;
+  const b = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.6, 10), new THREE.MeshBasicMaterial({ color: shaft, fog: false })); b.position.y = -1.8;
+  g.add(a, b); scene.add(g); return g;
+}
+const craft = arrow(0xfff0cc, 0xffb347);
+const flame = sprite(0xff7a2a); scene.add(flame);
+// the you that stayed: once you set off, a copy keeps climbing where you stood
+const twin = { on: false, x: 0, y: 0, tau0: 0, t0: 0, N: 1 };
+const twinTau = () => twin.tau0 + twin.N * (sim.t - twin.t0);
+const ghost = arrow(0x9fb2cc, 0x64768f); ghost.visible = false;
+const ghostGlow = sprite(0x9fb2cc); ghostGlow.visible = false; scene.add(ghostGlow);
+let ghostText = '', ghostWay = '', ghostShown = '';
+const ghostLine = (() => {
+  const g = new LineGeometry(); g.setPositions(new Float32Array(6));
+  const line = new Line2(g, glowLine({ color: 0x9fb2cc, linewidth: 1.4, opacity: 0.75 })); line.frustumCulled = false; line.visible = false; scene.add(line);
+  return { buf: g.attributes.instanceStart.data, line };
+})();
+const ghostTag = document.createElement('div'); ghostTag.className = 'tag'; ghostTag.style.display = 'none'; tagsEl.appendChild(ghostTag);
+// at the very bottom, at the rim of the heavy thing, no time has passed at all
+const bottom = sprite(0xffb060); bottom.scale.setScalar(18); scene.add(bottom);
+
+// beads: one for every second on a thing's own clock
+const BEADS = 140, beadPos = new Float32Array(IDS.length * BEADS * 3), beadCol = new Float32Array(IDS.length * BEADS * 3);
+const beadGeo = new THREE.BufferGeometry();
+beadGeo.setAttribute('position', new THREE.BufferAttribute(beadPos, 3)); beadGeo.setAttribute('color', new THREE.BufferAttribute(beadCol, 3));
+const beadPts = new THREE.Points(beadGeo, new THREE.PointsMaterial({ size: 2.6, map: GLOW, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true, fog: true }));
+beadPts.frustumCulled = false; scene.add(beadPts);
+
+// flashes of light: rings that spread sideways and never climb
+const NR = 72, rings = [];
+for (let i = 0; i < NR; i++) {
+  const g = new LineGeometry(); g.setPositions(new Float32Array((RAYS + 1) * 3));
+  const mat = glowLine({ color: 0xffffff, linewidth: 1.7, opacity: 0 }), line = new Line2(g, mat);
+  line.frustumCulled = false; line.visible = false; scene.add(line);
+  rings.push({ alive: false, born: 0, tau: 0, cx: 0, cy: 0, from: '', seen: new Uint8Array(IDS.length), x: new Float32Array(RAYS), y: new Float32Array(RAYS), ux: new Float32Array(RAYS), uy: new Float32Array(RAYS), buf: g.attributes.instanceStart.data, mat, line });
+}
+// a spark: the moment a flash reaches someone, drawn straight up or down between the two
+const sparks = []; let sparkAt = 0;
+for (let i = 0; i < 16; i++) {
+  const g = new LineGeometry(); g.setPositions(new Float32Array(6));
+  const mat = glowLine({ color: 0xffffff, linewidth: 1.6, opacity: 0 }), line = new Line2(g, mat);
+  line.frustumCulled = false; line.visible = false; scene.add(line);
+  sparks.push({ life: 0, x: 0, y: 0, a: 0, b: 0, buf: g.attributes.instanceStart.data, mat, line });
+}
+
+// the net: where everything that has never moved has got to. Flat far away, sunk deep around the heavy thing.
+const NET_S = 144, netR = [RH];
+while (netR[netR.length - 1] < 1150) netR.push(netR[netR.length - 1] * 1.085 + 0.03);
+const netP = [], netN = [];
+for (let i = 0; i < netR.length; i++) {
+  const R = netR[i], N = i ? lapse(R) : 0;
+  for (let s = 0; s < NET_S; s++) {
+    const a0 = s / NET_S * Math.PI * 2, a1 = (s + 1) / NET_S * Math.PI * 2;
+    netP.push(R * Math.cos(a0), 0, R * Math.sin(a0), R * Math.cos(a1), 0, R * Math.sin(a1)); netN.push(N, N);
+  }
+  if (i + 1 < netR.length) {
+    const R2 = netR[i + 1], N2 = lapse(R2), every = R < 12 ? 6 : R < 45 ? 3 : R < 160 ? 2 : 1;
+    for (let s = 0; s < NET_S; s += every) { const a = s / NET_S * Math.PI * 2, c = Math.cos(a), sn = Math.sin(a); netP.push(R * c, 0, R * sn, R2 * c, 0, R2 * sn); netN.push(N, N2); }
+  }
+}
+const netGeo = new THREE.BufferGeometry();
+netGeo.setAttribute('position', new THREE.Float32BufferAttribute(netP, 3)); netGeo.setAttribute('aN', new THREE.Float32BufferAttribute(netN, 1));
+const netU = { uT: { value: 0 }, uTau: { value: 0 }, uSQ: { value: SQ }, uFog: { value: 0.0011 }, uCol: { value: new THREE.Color(0x1b7d89) } };
+const net = new THREE.LineSegments(netGeo, new THREE.ShaderMaterial({
+  uniforms: netU, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  vertexShader: `attribute float aN; uniform float uT; uniform float uTau; uniform float uSQ; uniform float uFog; varying float vA;
+    void main() { float d = (aN * uT - uTau) / uSQ; float h = uTau + uSQ * sign(d) * log(abs(d) + sqrt(d * d + 1.0));
+      vec4 mv = viewMatrix * vec4(position.x, h, position.z, 1.0); float f = uFog * length(mv.xyz);
+      vA = exp(-f * f) * smoothstep(1.0, 9.0, length(mv.xyz)); gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `uniform vec3 uCol; varying float vA; void main() { gl_FragColor = vec4(uCol * vA, 1.0); }`
+}));
+net.frustumCulled = false; scene.add(net);
+
+// dust that hangs still, so you can feel yourself moving through it
+const DUST = 5200, BOX = 150;
+const dustBase = new Float32Array(DUST * 6), dustEnd = new Float32Array(DUST * 2);
+for (let i = 0; i < DUST; i++) { const x = Math.random() * BOX, y = Math.random() * BOX, z = Math.random() * BOX; dustBase.set([x, y, z, x, y, z], i * 6); dustEnd[i * 2 + 1] = 1; }
+const dustGeo = new THREE.BufferGeometry();
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustBase, 3)); dustGeo.setAttribute('aEnd', new THREE.BufferAttribute(dustEnd, 1));
+const dustU = { uCam: { value: new THREE.Vector3() }, uVel: { value: new THREE.Vector3() }, uBox: { value: BOX }, uStreak: { value: 0.05 }, uDim: { value: 1 }, uCol: { value: new THREE.Color(0x9fc4ff) } };
+const dust = new THREE.LineSegments(dustGeo, new THREE.ShaderMaterial({
+  uniforms: dustU, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  vertexShader: `attribute float aEnd; uniform vec3 uCam; uniform vec3 uVel; uniform float uBox; uniform float uStreak; varying float vA;
+    void main() { vec3 p = mod(position - uCam + 0.5 * uBox, uBox) - 0.5 * uBox; float d = length(p);
+      vA = (1.0 - smoothstep(uBox * 0.26, uBox * 0.5, d)) * smoothstep(1.5, 7.0, d);
+      p -= uVel * uStreak * aEnd; gl_Position = projectionMatrix * viewMatrix * vec4(uCam + p, 1.0); }`,
+  fragmentShader: `uniform vec3 uCol; uniform float uDim; varying float vA; void main() { gl_FragColor = vec4(uCol * vA * 0.55 * uDim, 1.0); }`
+}));
+dust.frustumCulled = false; scene.add(dust);
+
+// motes: small things circling the heavy thing, each leaving a fine thread
+const motes = [], motePos = new Float32Array(MOTES * MOTE_TRAIL * 6), moteCol = new Float32Array(MOTES * MOTE_TRAIL * 6), moteHead = new Float32Array(MOTES * 3), moteHeadCol = new Float32Array(MOTES * 3);
+for (let i = 0; i < MOTES; i++) {
+  const c = new THREE.Color().setHSL(0.5 + 0.24 * rnd(), 0.6, 0.6), o = i * MOTE_TRAIL * 6;
+  motes.push({ st: new Float64Array(5), path: new Path(MOTE_TRAIL) });
+  for (let k = 0; k < MOTE_TRAIL; k++) for (let e = 0; e < 2; e++) { const f = 0.02 + 0.5 * Math.pow((k + e) / MOTE_TRAIL, 1.8), q = o + k * 6 + e * 3; moteCol[q] = c.r * f; moteCol[q + 1] = c.g * f; moteCol[q + 2] = c.b * f; }
+  moteHeadCol.set([c.r, c.g, c.b], i * 3);
+}
+const moteGeo = new THREE.BufferGeometry();
+moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3)); moteGeo.setAttribute('color', new THREE.BufferAttribute(moteCol, 3));
+const moteLines = new THREE.LineSegments(moteGeo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: true }));
+moteLines.frustumCulled = false; scene.add(moteLines);
+const moteHeadGeo = new THREE.BufferGeometry();
+moteHeadGeo.setAttribute('position', new THREE.BufferAttribute(moteHead, 3)); moteHeadGeo.setAttribute('color', new THREE.BufferAttribute(moteHeadCol, 3));
+const motePts = new THREE.Points(moteHeadGeo, new THREE.PointsMaterial({ size: 2.2, map: GLOW, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true, fog: true }));
+motePts.frustumCulled = false; scene.add(motePts);
+
+function fit() {
+  if (!renderer) return;
+  const w = app.clientWidth, h = app.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  for (const m of lineMats) m.resolution.set(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+if (renderer) renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+new ResizeObserver(fit).observe(app);
+fit();
+
+/* ---------- you, and whoever you ride with ---------- */
+const cam = { yaw: HOME_YAW + 0.9, pitch: 0.5, dist: 800 };
+let intro = null;
+const state = { started: false, ride: 0, anchored: true, pushed: 0, hud: 0, moved: 0, fellFor: 0, since: 0, gotFlash: 0, flashBelow: false, own: false, paused: false, pace: 1, braking: false };
+const view = { blend: 1, dur: 0.9, fx: 0, fy: 0, ft: 0, x: 0, y: 0, tau: 0 };
+const glide = (dur = 0.9) => { view.fx = view.x; view.fy = view.y; view.ft = view.tau; view.blend = 0; view.dur = dur; };   // move the eye over smoothly
+const keys = new Set(), stick = { id: null, x0: 0, y0: 0, dx: 0, dy: 0 }, look = { id: null, x: 0, y: 0 }, pad = { stop: 0, in: 0, out: 0 };
+let drag = false;
+const ZERO = [0, 0], thrust = [0, 0], target = new THREE.Vector3(), off = new THREE.Vector3(), vdir = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), tv = new THREE.Vector3();
+const rideId = () => RIDES[state.ride], rideIs = id => RIDES[state.ride] === id;
+
+/* ---------- the world's contents and how they move ---------- */
+const sim = { t: 0, sampleAt: 0, samples: 0, ref: {}, tRef: 0 };
+const mk = (kind, st, o) => Object.assign({ kind, st: Float64Array.from(st), rate: 1, speed: 0, vx: 0, vy: 0, beads: [], tick: 0, every: 0, emitAt: Infinity, frozen: 0, thrust: null }, o || {});
+// put a thing back on the net, as if it had stood at this spot all along
+function renew(id, x, y) {
+  const b = B[id], j = IDS.indexOf(id), was = b.st[4];
+  b.st[0] = x; b.st[1] = y; b.st[2] = b.st[3] = 0; b.st[4] = lapse(Math.hypot(x, y)) * sim.t;
+  if (id in sim.ref) sim.ref[id] += b.st[4] - was;      // its clock reading carries on from where the last one stopped
+  b.tick = Math.floor(b.st[4] / TICK); b.beads.length = 0; b.frozen = 0; V[id].thread.path.clear();
+  for (const r of rings) if (r.alive) r.seen[j] = inside(r, x, y) ? 1 : 0;
+}
+function flash(id) {
+  const b = B[id];
+  let r = rings.find(q => !q.alive);
+  if (!r) r = rings.reduce((a, q) => (q.born < a.born ? q : a), rings[0]);
+  if (B.light.ring === r) B.light.ring = null;
+  r.alive = true; r.born = sim.t; r.tau = b.st[4]; r.cx = b.st[0]; r.cy = b.st[1]; r.from = id; r.mat.color.copy(V[id].color);
+  r.seen.fill(0); r.seen[IDS.indexOf(id)] = 1;
+  for (let i = 0; i < RAYS; i++) { const a = i / RAYS * Math.PI * 2; r.x[i] = b.st[0]; r.y[i] = b.st[1]; r.ux[i] = Math.cos(a); r.uy[i] = Math.sin(a); }
+  // the beam you can ride: one ray of a flash from the far station, aimed to graze the heavy thing
+  if (id === 'far' && !(B.light.ring && B.light.ring.alive)) {
+    B.light.ring = r; B.light.idx = Math.round((Math.PI + 0.085) / (2 * Math.PI) * RAYS) % RAYS; V.light.thread.path.clear();
+    if (rideIs('light')) glide();
+  }
+}
+function stepRing(r, dt) {
+  for (let i = 0; i < RAYS; i++) {
+    let x = r.x[i], y = r.y[i], ux = r.ux[i], uy = r.uy[i];
+    lightField(x, y);
+    let d = G.gx * ux + G.gy * uy;
+    const mx = x + G.n * ux * dt / 2, my = y + G.n * uy * dt / 2;
+    let hx = ux - (G.gx - d * ux) * dt / 2, hy = uy - (G.gy - d * uy) * dt / 2, l = Math.sqrt(hx * hx + hy * hy); hx /= l; hy /= l;
+    lightField(mx, my);
+    d = G.gx * hx + G.gy * hy;
+    x += G.n * hx * dt; y += G.n * hy * dt;
+    ux -= (G.gx - d * hx) * dt; uy -= (G.gy - d * hy) * dt; l = Math.sqrt(ux * ux + uy * uy);
+    r.x[i] = x; r.y[i] = y; r.ux[i] = ux / l; r.uy[i] = uy / l;
+  }
+  if (sim.t - r.born > RING_LIFE) { r.alive = false; r.line.visible = false; }
+}
+// is this spot inside the flash yet?
+function inside(r, px, py) {
+  let wn = 0;
+  for (let i = 0; i < RAYS; i++) {
+    const j = i + 1 === RAYS ? 0 : i + 1, x0 = r.x[i], y0 = r.y[i], y1 = r.y[j];
+    if (y0 <= py) { if (y1 > py && (r.x[j] - x0) * (py - y0) - (px - x0) * (y1 - y0) > 0) wn++; }
+    else if (y1 <= py && (r.x[j] - x0) * (py - y0) - (px - x0) * (y1 - y0) < 0) wn--;
+  }
+  return wn !== 0;
+}
+function sees(r, quiet) {
+  const R = sim.t - r.born + 1.5, R2 = R * R;
+  for (let j = 0; j < IDS.length; j++) {
+    if (r.seen[j]) continue;
+    const b = B[IDS[j]];
+    if (b.kind === 'photon') continue;
+    const dx = b.st[0] - r.cx, dy = b.st[1] - r.cy;
+    if (dx * dx + dy * dy > R2 || !inside(r, b.st[0], b.st[1])) continue;
+    r.seen[j] = 1;
+    if (quiet) continue;
+    const id = IDS[j], mine = rideId();
+    V[id].flare = 1;
+    if (id !== mine && r.from !== mine) continue;
+    if (id === 'you') { state.gotFlash++; state.flashBelow = r.tau < b.st[4]; }
+    const s = sparks[sparkAt++ % sparks.length];
+    s.x = b.st[0]; s.y = b.st[1]; s.a = r.tau; s.b = b.st[4]; s.life = 1; s.mat.color.copy(r.mat.color);
+  }
+}
+function advance(dt, flashes, quiet) {
+  sim.t += dt;
+  for (const id of IDS) {
+    const b = B[id], s = b.st;
+    if (b.kind === 'static') { b.rate = lapse(Math.hypot(s[0], s[1])); s[4] += b.rate * dt; b.speed = 0; b.vx = b.vy = 0; }
+    else if (b.kind === 'free') { stepFree(s, dt, b.thrust); measure(b); }
+    else if (b.kind === 'shuttle') {
+      const rho = Math.hypot(s[0], s[1]), N = lapse(rho);
+      if (b.leg === 0) {                                  // waiting at the station
+        b.rate = N; b.speed = 0; b.vx = b.vy = 0; s[4] += N * dt;
+        if (sim.t >= b.at) { if (b.back) { renew(id, b.a[0], b.a[1]); b.back = false; } b.leg = 1; }   // a fresh one sets out, the same age as the station
+      } else {                                            // out and back at four fifths of light speed
+        const v = 0.8, tgt = b.leg === 1 ? b.b : b.a, go = N * v / stretch(rho);
+        let dx = tgt[0] - s[0], dy = tgt[1] - s[1]; const dl = Math.hypot(dx, dy);
+        if (dl <= go * dt) { s[0] = tgt[0]; s[1] = tgt[1]; if (b.leg === 1) b.leg = 2; else { b.leg = 0; b.at = sim.t + 230; b.back = true; } }
+        else { dx /= dl; dy /= dl; s[0] += dx * go * dt; s[1] += dy * go * dt; b.vx = dx * go; b.vy = dy * go; }
+        b.rate = N * Math.sqrt(1 - v * v); b.speed = v; s[4] += b.rate * dt;
+      }
+    } else {
+      const r = b.ring;
+      if (r && r.alive) { lightField(r.x[b.idx], r.y[b.idx]); s[0] = r.x[b.idx]; s[1] = r.y[b.idx]; s[4] = r.tau; b.vx = G.n * r.ux[b.idx]; b.vy = G.n * r.uy[b.idx]; }
+      b.rate = 0; b.speed = 1;
+      continue;
+    }
+    while (s[4] >= (b.tick + 1) * TICK) { b.tick++; b.beads.push(s[0], s[1], b.tick * TICK); if (b.beads.length > BEADS * 3) b.beads.splice(0, 3); }
+    if (s[4] >= b.emitAt) { b.emitAt += b.every; if (flashes) flash(id); }
+  }
+  const dv = B.diver;                                    // the diver starts over once it has all but stopped
+  if (dv.rate < 0.03) { dv.frozen += dt; if (dv.frozen > 340) { const a = rnd() * Math.PI * 2; renew('diver', 84 * Math.cos(a), 84 * Math.sin(a)); } }
+  for (const m of motes) stepFree(m.st, dt, null);
+  for (const r of rings) if (r.alive) { stepRing(r, dt); if (r.alive) sees(r, quiet); }
+  if (sim.t >= sim.sampleAt) {
+    sim.sampleAt += SAMPLE;
+    for (const id of IDS) { const b = B[id]; if (b.kind !== 'photon' || (b.ring && b.ring.alive)) V[id].thread.path.push(b.st[0], b.st[1], b.st[4]); }
+    if (sim.samples++ % 3 === 0) for (const m of motes) m.path.push(m.st[0], m.st[1], m.st[4]);
+  }
+}
+function resetWorld() {
+  sim.t = 0; sim.sampleAt = 0; sim.samples = 0; seed = 7;
+  B.you = mk('static', [298.5, -30, 0, 0, 0], { every: TICK, emitAt: TICK });
+  B.far = mk('static', [300, 0, 0, 0, 0], { every: TICK * 3, emitAt: TICK * 3 });
+  B.low = mk('static', [-9, -26.5, 0, 0, 0], { every: TICK * 3, emitAt: TICK * 2 });
+  B.orb = mk('free', circ(24, 0.3), { every: TICK * 3, emitAt: TICK });
+  B.orb2 = mk('free', circ(40, 2.1));
+  B.orb3 = mk('free', circ(62, 4.0, 0.84));
+  B.orb4 = mk('free', circ(96, 5.2, 1, -1));
+  B.diver = mk('free', [78, 30, 0, 0, 0]);
+  B.shuttle = mk('shuttle', [300, 14, 0, 0, 0], { a: [300, 14], b: [300, 164], leg: 0, at: T_PRE + 110, back: false });
+  B.light = mk('photon', [300, 0, 0, 0, 0], { ring: null, idx: 0 });
+  for (const id of IDS) V[id].thread.path.clear();
+  for (const r of rings) { r.alive = false; r.line.visible = false; }
+  for (const s of sparks) s.life = 0;
+  for (const m of motes) {
+    const rho = 27 + 125 * Math.pow(rnd(), 1.4), a = rnd() * Math.PI * 2, dir = rnd() < 0.8 ? 1 : -1;
+    let sc = 0.86 + 0.24 * rnd(); if (!keeps(rho, sc)) sc = 1;
+    m.st.set(circ(rho, a, sc, dir)); m.path.clear();
+  }
+  // let the world run for a while before you arrive, so there is a past to look down into
+  while (sim.t < T_PRE) advance(2, sim.t > T_PRE - RING_LIFE, true);
+  for (const id of IDS) sim.ref[id] = B[id].st[4];
+  sim.tRef = sim.t; state.anchored = true; twin.on = false;
+}
+
+const ridesEl = $('rides');
+RIDES.forEach((id, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = V[id].name; b.setAttribute('aria-pressed', String(i === 0));
+  b.addEventListener('click', () => { setRide(i); canvas.focus(); }); ridesEl.appendChild(b);
+});
+function setRide(i) {
+  if (i !== state.ride) glide();
+  state.ride = i; [...ridesEl.children].forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
+  $('r-who').textContent = V[RIDES[i]].name; hud();
+}
+function turn(dx, dy, k) { cam.yaw -= dx * k; cam.pitch = Math.max(-1.45, Math.min(1.45, cam.pitch + dy * k)); }
+const zoom = f => { cam.dist = Math.max(7, Math.min(1500, cam.dist * f)); };
+function hold() { const you = B.you; you.st[2] = you.st[3] = 0; you.kind = 'static'; you.thrust = null; state.anchored = true; state.braking = false; }
+function leave() {   // set off; the first time, a copy of you stays behind
+  const you = B.you;
+  if (!twin.on) { twin.on = true; twin.x = you.st[0]; twin.y = you.st[1]; twin.tau0 = you.st[4]; twin.t0 = sim.t; twin.N = lapse(Math.hypot(twin.x, twin.y)); }
+  you.kind = 'free'; state.anchored = false;
+}
+
+function control(dt) {
+  const you = B.you, mine = state.started && rideIs('you');
+  let f = 0, r = 0;
+  if (mine) {
+    f = (keys.has('KeyW') || keys.has('ArrowUp') ? 1 : 0) - (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0) - stick.dy;
+    r = (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0) - (keys.has('KeyA') || keys.has('ArrowLeft') ? 1 : 0) + stick.dx;
+  }
+  const len = Math.hypot(f, r), rho = Math.hypot(you.st[0], you.st[1]), rx = you.st[0] / rho, ry = you.st[1] / rho;
+  if (mine && (keys.has('Space') || pad.stop)) state.braking = true;
+  if (len > 0.1) {
+    state.braking = false;
+    // push across the map, relative to where you are looking from
+    const fx = -Math.sin(cam.yaw), fz = -Math.cos(cam.yaw), k = 0.034 / Math.max(1, len);
+    let tx = (fx * f - fz * r) * k, ty = (fz * f + fx * r) * k;
+    if (rho < FLOOR + 0.3) { const d = tx * rx + ty * ry; if (d < 0) { tx -= d * rx; ty -= d * ry; } }   // the engine will not take you any deeper than this
+    thrust[0] = tx; thrust[1] = ty;
+    if (you.kind === 'static') leave();
+    you.thrust = thrust; state.pushed += dt; state.moved += dt;
+  } else if (state.braking && you.kind === 'free') {
+    you.thrust = ZERO;                                   // the engine cancels your motion and holds you up
+    const d = Math.exp(-dt / 0.22); you.st[2] *= d; you.st[3] *= d;
+    if (Math.hypot(you.st[2], you.st[3]) < 0.02) hold();
+  } else { you.thrust = null; state.braking = false; }
+  if (you.kind === 'free' && rho < FLOOR) hold();
+  if (pad.in) zoom(Math.exp(-dt * 1.4)); if (pad.out) zoom(Math.exp(dt * 1.4));
+}
+
+/* ---------- small words that surface once ---------- */
+const below = () => lapse(Math.hypot(B.you.st[0], B.you.st[1])) * sim.t - B.you.st[4];   // how far the net has risen above you
+const lines = [
+  ['start', () => state.since > 4.6 && state.pushed < 0.1, 'This is you, doing nothing. Still climbing. Up is time.'],
+  ['push', () => state.since > 12 && state.pushed < 0.2 && rideIs('you'), 'Push sideways. See what it costs you.'],
+  ['lean', () => rideIs('you') && B.you.speed > 0.35, 'Lean into space and you climb more slowly. The total stays the same.'],
+  ['flat', () => rideIs('you') && B.you.speed > 0.9, 'Almost flat. Light goes exactly flat, and never climbs at all.'],
+  ['net', () => rideIs('you') && below() > TICK * 1.5 && B.you.speed < 0.05, 'The net is everything that never moved. It is above you now, and standing still will not bring it back.'],
+  ['home', () => rideIs('you') && twin.on && state.moved > 4 && B.you.speed < 0.3 && twinTau() - B.you.st[4] > TICK && Math.hypot(B.you.st[0] - twin.x, B.you.st[1] - twin.y) < 12, 'Back where you began. The you that stayed has lived longer.'],
+  ['light', () => rideIs('light'), 'Light spends everything on space. It does not climb, so it does not age.'],
+  ['bottom', () => rideIs('you') && state.anchored && Math.hypot(B.you.st[0], B.you.st[1]) < FLOOR + 0.4, 'This is as deep as your engine can hold you. Look up.'],
+  ['deep', () => rideIs('you') && B.you.rate < 0.3 && B.you.speed < 0.05, 'Clocks kept down here fall further behind with every tick. At the very rim they have not ticked at all.'],
+  ['well', () => { const b = B[rideId()]; return b.kind !== 'photon' && Math.hypot(b.st[0], b.st[1]) < 70; }, 'Near the heavy thing, even standing still climbs more slowly.'],
+  ['fall', () => rideIs('you') && state.fellFor > 3 && B.you.speed > 0.1 && Math.hypot(B.you.st[0], B.you.st[1]) < 170, 'Let go, and your path leans toward the slower clocks. That is falling.'],
+  ['diver', () => rideIs('diver') && B.diver.rate < 0.25 && !state.own, 'By the far clocks, the diver never quite arrives.'],
+  ['shuttle', () => B.shuttle.back && (rideIs('shuttle') || rideIs('far') || (rideIs('you') && Math.hypot(B.you.st[0] - 300, B.you.st[1]) < 120)), 'The shuttle is back where it began, and younger than the one who stayed.'],
+  ['own', () => state.own, 'Now your own clock sets the pace, and the rest runs ahead. Deep down that is what you would see. In flight it is only one way of keeping the books.'],
+  ['seen', () => state.gotFlash > 0 && state.flashBelow && state.since > 22, 'A flash reaches you. Straight below you is the moment it left.'],
+  ['rings', () => state.since > 45 && cam.pitch > 0.1, 'Every flash is still down there, at the age it was sent.']
+];
+const said = new Set(), whisperEl = $('whisper');
+let quiet = 1.2, showing = 0;
+function whispers(dt) {
+  state.since += dt;
+  state.fellFor = (B.you.kind === 'free' && !B.you.thrust) ? state.fellFor + dt : 0;
+  if (showing > 0) { showing -= dt; if (showing <= 0) { whisperEl.classList.remove('on'); quiet = 4; } return; }
+  quiet -= dt; if (quiet > 0) return;
+  for (const [id, test, text] of lines) if (!said.has(id) && test()) { said.add(id); whisperEl.textContent = text; whisperEl.classList.add('on'); showing = 6.5; return; }
+}
+const clock = u => { const s = Math.max(0, u / RATE), m = Math.floor(s / 60); return m + ':' + String(Math.floor(s % 60)).padStart(2, '0') + '.' + Math.floor((s % 1) * 10); };
+const needle = $('needle'), tip = $('tip');
+function hud() {
+  const id = rideId(), b = B[id];
+  $('r-own').textContent = b.kind === 'photon' ? 'not running' : clock(b.st[4] - sim.ref[id]);
+  $('r-far').textContent = clock(B.far.st[4] - sim.ref.far);
+  // the needle: how much of the going is through time (up) and how much through space (across), counted by whichever clock sets the pace
+  const N = lapse(Math.hypot(b.st[0], b.st[1])), own = state.own && b.kind !== 'photon', far = B.far.rate;
+  const x = (10 + 46 * (own ? b.speed : N * b.speed / far)).toFixed(1), y = (58 - 46 * (own ? Math.sqrt(1 - b.speed * b.speed) : b.rate / far)).toFixed(1);
+  needle.setAttribute('x2', x); needle.setAttribute('y2', y); tip.setAttribute('cx', x); tip.setAttribute('cy', y);
+  if (twin.on) {   // only where you stand next to it can the two ages be compared without argument
+    const you = B.you, gap = (twinTau() - you.st[4]) / RATE, near = Math.hypot(you.st[0] - twin.x, you.st[1] - twin.y) < 12;
+    ghostText = 'you, had you stayed' + (near && Math.abs(gap) >= 0.1 ? ' · ' + Math.abs(gap).toFixed(1) + (gap > 0 ? ' s older' : ' s younger') : '');
+  }
+}
+
+/* ---------- one moment of the world, drawn ---------- */
+function draw(dt) {
+  const ride = B[rideId()];
+  let cx = ride.st[0], cy = ride.st[1], ct = ride.st[4];
+  if (!state.started) { cx = 40; cy = 0; ct = B.you.st[4] - 110; }   // before you enter: the whole place, seen from far off
+  else if (view.blend < 1) { const e = view.blend * view.blend * (3 - 2 * view.blend); cx = view.fx + (cx - view.fx) * e; cy = view.fy + (cy - view.fy) * e; ct = view.ft + (ct - view.ft) * e; }
+  view.x = cx; view.y = cy; view.tau = ct;
+  // true height near you; squeezed far above and below, so the whole past stays in sight
+  const disp = tau => ct + SQ * Math.asinh((tau - ct) / SQ);
+  let nb = 0;
+  for (const id of IDS) {
+    const b = B[id], v = V[id], s = b.st, shown = b.kind !== 'photon' || !!(b.ring && b.ring.alive);
+    v.thread.line.visible = shown; v.glow.visible = shown;
+    if (shown) { v.thread.path.write(v.thread.buf.array, 0, s[0], s[1], s[4], disp); v.thread.buf.needsUpdate = true; v.glow.position.set(s[0], disp(s[4]), s[1]); }
+    for (let i = 0; i < b.beads.length; i += 3) { beadPos[nb * 3] = b.beads[i]; beadPos[nb * 3 + 1] = disp(b.beads[i + 2]); beadPos[nb * 3 + 2] = b.beads[i + 1]; beadCol[nb * 3] = v.color.r; beadCol[nb * 3 + 1] = v.color.g; beadCol[nb * 3 + 2] = v.color.b; nb++; }
+    v.flare *= Math.exp(-dt / 0.3);
+  }
+  beadGeo.attributes.position.needsUpdate = true; beadGeo.attributes.color.needsUpdate = true; beadGeo.setDrawRange(0, nb);
+  for (let i = 0; i < MOTES; i++) { const m = motes[i], s = m.st; m.path.write(motePos, i * MOTE_TRAIL * 6, s[0], s[1], s[4], disp); moteHead[i * 3] = s[0]; moteHead[i * 3 + 1] = disp(s[4]); moteHead[i * 3 + 2] = s[1]; }
+  moteGeo.attributes.position.needsUpdate = true; moteHeadGeo.attributes.position.needsUpdate = true;
+  for (const r of rings) {
+    if (!r.alive) continue;
+    const a = r.buf.array, h = disp(r.tau), age = (sim.t - r.born) / RING_LIFE;
+    for (let i = 0; i < RAYS; i++) {
+      const j = i + 1 === RAYS ? 0 : i + 1, k = i * 6, xi = r.x[i], yi = r.y[i], xj = r.x[j], yj = r.y[j], dx = xi - xj, dy = yi - yj;
+      const hh = xi * xi + yi * yi < LOST2 || xj * xj + yj * yj < LOST2 || dx * dx + dy * dy > 3600 ? AWAY : h;   // pieces swallowed or torn apart are not drawn
+      a[k] = xi; a[k + 1] = hh; a[k + 2] = yi; a[k + 3] = xj; a[k + 4] = hh; a[k + 5] = yj;
+    }
+    r.buf.needsUpdate = true; r.line.visible = true; r.mat.opacity = 0.85 * Math.pow(Math.max(0, 1 - age), 1.4);
+  }
+  for (const s of sparks) {
+    if (s.life <= 0) { s.line.visible = false; continue; }
+    const a = s.buf.array; a[0] = s.x; a[1] = disp(s.a); a[2] = s.y; a[3] = s.x; a[4] = disp(s.b); a[5] = s.y; s.buf.needsUpdate = true;
+    s.line.visible = true; s.mat.opacity = 0.9 * s.life * s.life; s.life -= dt / 1.4;
+  }
+  scene.fog.density = 0.9 / (cam.dist + 800);
+  netU.uT.value = sim.t; netU.uTau.value = ct; netU.uFog.value = scene.fog.density;
+  bottom.position.set(0, disp(0), 0);
+  ghost.visible = ghostLine.line.visible = ghostGlow.visible = twin.on;
+  if (twin.on) {
+    const gh = disp(twinTau()), a = ghostLine.buf.array;
+    ghost.position.set(twin.x, gh, twin.y); ghostGlow.position.copy(ghost.position);
+    a[0] = twin.x; a[1] = disp(twin.tau0); a[2] = twin.y; a[3] = twin.x; a[4] = gh - 3.1; a[5] = twin.y; ghostLine.buf.needsUpdate = true;
+  }
+  // you, pointing the way you are going
+  const you = B.you; vdir.set(you.vx, you.rate, you.vy).normalize();
+  craft.position.set(you.st[0], disp(you.st[4]), you.st[1]); craft.quaternion.setFromUnitVectors(UP, vdir);
+  const pushing = you.thrust === thrust, holding = you.kind === 'static' || you.thrust === ZERO, rho = Math.hypot(you.st[0], you.st[1]);
+  flame.visible = pushing || holding;
+  if (pushing) { tv.set(-thrust[0], 0, -thrust[1]).normalize(); flame.position.copy(craft.position).addScaledVector(tv, 2.2); flame.scale.setScalar(4.2); }
+  else if (holding) { flame.position.copy(craft.position).add(tv.set(-you.st[0] / rho, 0, -you.st[1] / rho).multiplyScalar(1.8)); flame.scale.setScalar(Math.min(4, 0.6 + 2600 / (rho * rho))); }
+  // the eye circles whoever you ride with
+  target.set(cx, ct, cy);
+  off.set(Math.cos(cam.pitch) * Math.sin(cam.yaw), Math.sin(cam.pitch), Math.cos(cam.pitch) * Math.cos(cam.yaw)).multiplyScalar(cam.dist);
+  camera.position.copy(target).add(off); camera.lookAt(target); camera.updateMatrixWorld();
+  if (twin.on) ghostGlow.scale.setScalar(Math.max(2.6, ghost.position.distanceTo(camera.position) * 0.02));
+  for (const id of IDS) { const v = V[id], g = v.glow; if (g.visible) g.scale.setScalar(Math.max(id === 'you' ? 2.2 : 3.2, g.position.distanceTo(camera.position) * 0.02) * (1 + 1.1 * v.flare)); }
+  dustU.uCam.value.copy(camera.position); dustU.uDim.value = Math.max(0.18, Math.min(1, 110 / cam.dist)); dustU.uVel.value.set(ride.vx, ride.rate, ride.vy).multiplyScalar(RATE * state.pace);
+  if (renderer) renderer.render(scene, camera);
+  // names
+  const w = app.clientWidth, h = app.clientHeight, mine = rideId();
+  for (const id of IDS) {
+    const v = V[id]; if (!v.tag) continue;
+    let show = v.glow.visible && (id !== mine || view.blend < 1);
+    if (show) { tv.copy(v.glow.position).project(camera); show = tv.z < 1 && Math.abs(tv.x) < 1.05 && Math.abs(tv.y) < 1.05; }
+    v.tag.style.display = show ? '' : 'none';
+    if (show) v.tag.style.transform = 'translate(' + ((tv.x * 0.5 + 0.5) * w + 9).toFixed(1) + 'px,' + ((-tv.y * 0.5 + 0.5) * h - 16).toFixed(1) + 'px)';
+  }
+  let gs = twin.on;
+  if (gs) { tv.copy(ghost.position).project(camera); gs = tv.z < 1 && Math.abs(tv.x) < 1.05; }
+  ghostTag.style.display = gs ? '' : 'none';
+  if (gs) {
+    ghostWay = tv.y > 0.8 ? '\u25b2 ' : tv.y < -0.86 ? '\u25bc ' : '';
+    if (ghostWay + ghostText !== ghostShown) { ghostShown = ghostWay + ghostText; ghostTag.textContent = ghostShown; }
+    const gx = Math.max(10, Math.min(w - 250, (tv.x * 0.5 + 0.5) * w + 9)), gy = Math.max(h * 0.1 + 44, Math.min(h * 0.93 - 20, (-tv.y * 0.5 + 0.5) * h + 6));
+    ghostTag.style.transform = 'translate(' + gx.toFixed(1) + 'px,' + gy.toFixed(1) + 'px)';
+  }
+}
+function frame(dt) {
+  control(dt);
+  // whose second counts: the far station's (everything near the heavy thing slows), or the one you ride (everything else runs ahead)
+  const ride = B[rideId()], want = state.paused ? 0 : Math.min(12, 1 / Math.max(state.own && ride.kind !== 'photon' ? ride.rate : B.far.rate, 0.01));
+  state.pace += (want - state.pace) * Math.min(1, dt * 4);
+  let left = dt * RATE * state.pace;
+  while (left > 1e-6) { const step = Math.min(1.5, left); advance(step, true, false); left -= step; }
+  view.blend = Math.min(1, view.blend + dt / view.dur);
+  if (!state.started) { if (!reduceMotion) cam.yaw += dt * 0.035; }
+  else if (intro) {                                      // the way in: from far off, down to your shoulder
+    intro.k = Math.min(1, intro.k + dt / 4.2); const e = intro.k * intro.k * (3 - 2 * intro.k);
+    cam.dist = Math.exp(Math.log(intro.d0) + (Math.log(52) - Math.log(intro.d0)) * e); cam.pitch = intro.p0 + (0.34 - intro.p0) * e; cam.yaw = intro.y0 + (intro.y1 - intro.y0) * e;
+    if (intro.k >= 1) intro = null;
+  }
+  draw(dt);
+  state.hud += dt; if (state.hud > 0.12) { state.hud = 0; hud(); }
+  if (state.started) { whispers(dt); if (state.moved > 2) $('keys').classList.add('off'); }
+}
+
+/* ---------- controls ---------- */
+window.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+  if (!state.started) { if (e.code === 'Enter') start(); return; }
+  keys.add(e.code);
+  if (/^Digit[1-7]$/.test(e.code)) setRide(Number(e.code.slice(5)) - 1);
+  else if (e.code === 'KeyG') { if (B.you.kind === 'static' && rideIs('you')) leave(); }
+  else if (e.code === 'KeyT') { state.own = !state.own; $('c-own').classList.toggle('base', state.own); $('c-far').classList.toggle('base', !state.own); }
+  else if (e.code === 'KeyP') { state.paused = !state.paused; $('c-held').hidden = !state.paused; }
+  else if (e.code === 'KeyR') { resetWorld(); setRide(0); view.blend = 1; }
+  if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+});
+window.addEventListener('keyup', e => keys.delete(e.code));
+window.addEventListener('blur', () => keys.clear());
+canvas.addEventListener('wheel', e => { e.preventDefault(); if (!state.started) return; intro = null; zoom(Math.exp(e.deltaY * 0.0012)); }, { passive: false });
+canvas.addEventListener('pointerdown', e => {
+  if (!state.started) return;
+  canvas.focus(); intro = null;
+  if (e.pointerType === 'touch') {
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientX - rect.left < rect.width * 0.4 && stick.id === null) { stick.id = e.pointerId; stick.x0 = e.clientX; stick.y0 = e.clientY; stick.dx = stick.dy = 0; }
+    else if (look.id === null) { look.id = e.pointerId; look.x = e.clientX; look.y = e.clientY; }
+  } else if (e.button === 0) { drag = true; look.x = e.clientX; look.y = e.clientY; }
+  try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* fine */ }
+});
+canvas.addEventListener('pointermove', e => {
+  if (e.pointerType === 'touch') {
+    if (e.pointerId === stick.id) { stick.dx = Math.max(-1, Math.min(1, (e.clientX - stick.x0) / 55)); stick.dy = Math.max(-1, Math.min(1, (e.clientY - stick.y0) / 55)); }
+    else if (e.pointerId === look.id) { turn(e.clientX - look.x, e.clientY - look.y, 0.006); look.x = e.clientX; look.y = e.clientY; }
+    return;
+  }
+  if (drag) { turn(e.clientX - look.x, e.clientY - look.y, 0.0045); look.x = e.clientX; look.y = e.clientY; }
+});
+const release = e => {
+  if (e.pointerId === stick.id) { stick.id = null; stick.dx = stick.dy = 0; }
+  if (e.pointerId === look.id) look.id = null;
+  if (e.pointerType !== 'touch') drag = false;
+};
+canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+for (const [id, key] of [['b-stop', 'stop'], ['b-in', 'in'], ['b-out', 'out']]) {
+  const b = $(id);
+  b.addEventListener('pointerdown', e => { e.preventDefault(); pad[key] = 1; });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, () => { pad[key] = 0; });
+}
+$('b-help').addEventListener('click', () => { $('about').hidden = false; });
+$('b-close').addEventListener('click', () => { $('about').hidden = true; canvas.focus(); });
+function start() {
+  state.started = true; $('start').hidden = true; app.classList.add('live'); canvas.focus();
+  for (const id of IDS) sim.ref[id] = B[id].st[4];
+  if (reduceMotion) { cam.dist = 52; cam.pitch = 0.34; cam.yaw = HOME_YAW; view.blend = 1; return; }
+  glide(4.2);
+  intro = { k: 0, d0: cam.dist, p0: cam.pitch, y0: cam.yaw, y1: HOME_YAW + Math.PI * 2 * Math.round((cam.yaw - HOME_YAW) / (Math.PI * 2)) };
+}
+$('b-start').addEventListener('click', start);
+if (!renderer) { $('start-note').textContent = 'This browser could not start 3D graphics (WebGL), so this place cannot be drawn here.'; $('b-start').disabled = true; }
+
+resetWorld(); setRide(0);
+const timer = new THREE.Clock();
+let slowFor = 0, slowFrames = 0, tried = null, settled = false;
+function loop() {
+  requestAnimationFrame(loop);
+  const raw = timer.getDelta(), dt = Math.min(raw, 0.05);
+  if (document.hidden) return;
+  frame(reduceMotion && !state.started ? 0 : dt);
+  // if the picture is slow to draw, try drawing it a little coarser; if that does not help, put it back and leave it alone
+  slowFor += raw; slowFrames++;
+  if (slowFor > 2) {
+    const fps = slowFrames / slowFor;
+    if (renderer && state.started && !settled && fps > 8) {
+      const pr = renderer.getPixelRatio();
+      if (tried) { if (fps < tried.fps * 1.12) { renderer.setPixelRatio(tried.pr); fit(); settled = true; } tried = null; }
+      else if (fps < 24 && pr > 0.75) { tried = { fps, pr }; renderer.setPixelRatio(Math.max(0.75, pr * 0.8)); fit(); }
+    }
+    slowFor = 0; slowFrames = 0;
+  }
+}
+loop();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>

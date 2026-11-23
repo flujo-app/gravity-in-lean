@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!-- Below this line is the page exactly as it was published. The lines above, and the last lines of the file, only make it open by itself. -->
+<title>The Dome and the Horn</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+/* Layout: lab-notebook series (graph paper by day, blueprint by night). Each room: short text, then a near-square 3D stage with its controls and live numbers beside it; stacked on phones. */
+:root {
+  --paper: #f3f6f8;
+  --paper-raised: #ffffff;
+  --grid-faint: #e6edf2;
+  --grid: #cfdbe5;
+  --grid-strong: #9db2c3;
+  --rule: #c8d5df;
+  --ink: #132331;
+  --ink-soft: #4a5d6e;
+  --photon: #d99100;
+  --dome: #1c5ed4;
+  --shadow: #132331;
+  --t30: #1c5ed4;
+  --t60: #b32f6b;
+  --t80: #b4500f;
+  --t95: #6a3fc0;
+  --you: #12805a;
+  --crest: #1c5ed4;
+  --trough: #b4500f;
+  --horn-low: #f3cfb3;
+  --horn-high: #bcd3f7;
+  --mark: #ffe066;
+  --mark-ink: #1c1a0c;
+  --measured: #12805a;
+  --theory: #1c5ed4;
+  --picture: #b4500f;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d2136; --paper-raised: #122a44; --grid-faint: #112c48; --grid: #24476b; --grid-strong: #44709a; --rule: #2a4d71;
+    --ink: #e9f1f8; --ink-soft: #a2b9cd; --photon: #ffd85a; --dome: #8cc3ff; --shadow: #040c16;
+    --t30: #8cc3ff; --t60: #ff8fc5; --t80: #ffab6e; --t95: #c3a6ff; --you: #6fdcaa; --crest: #8cc3ff; --trough: #ffab6e;
+    --horn-low: #8a5a3c; --horn-high: #3f7fcc; --mark: #ffd85a; --measured: #6fdcaa; --theory: #8cc3ff; --picture: #ffab6e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d2136; --paper-raised: #122a44; --grid-faint: #112c48; --grid: #24476b; --grid-strong: #44709a; --rule: #2a4d71;
+  --ink: #e9f1f8; --ink-soft: #a2b9cd; --photon: #ffd85a; --dome: #8cc3ff; --shadow: #040c16;
+  --t30: #8cc3ff; --t60: #ff8fc5; --t80: #ffab6e; --t95: #c3a6ff; --you: #6fdcaa; --crest: #8cc3ff; --trough: #ffab6e;
+  --horn-low: #8a5a3c; --horn-high: #3f7fcc; --mark: #ffd85a; --measured: #6fdcaa; --theory: #8cc3ff; --picture: #ffab6e;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid-faint) 1px, transparent 1px), linear-gradient(90deg, var(--grid-faint) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.masthead { display: grid; gap: 12px; }
+.eyebrow, .kicker { margin: 0; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+h1 { margin: 0; font-family: var(--font-display); font-stretch: 125%; font-weight: 800; font-size: clamp(2.1rem, 1.4rem + 3vw, 3.4rem); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+.intro { margin: 0; max-width: 64ch; font-size: 1.06rem; color: var(--ink-soft); }
+.legend { margin: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 0.92rem; color: var(--ink-soft); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1.5px solid currentColor; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; vertical-align: 2px; white-space: nowrap; }
+.tag.measured { color: var(--measured); }
+.tag.theory { color: var(--theory); }
+.tag.picture { color: var(--picture); }
+
+.chapter { margin-top: 28px; padding-top: 28px; border-top: 1.5px solid var(--rule); display: grid; gap: 18px; }
+.text { min-width: 0; display: grid; gap: 14px; align-content: start; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 14px 40px; }
+.text p { margin: 0; max-width: 64ch; }
+h2 { margin: 0; font-family: var(--font-display); font-stretch: 110%; font-weight: 760; font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.05rem); line-height: 1.1; text-wrap: balance; }
+h3 { margin: 0; font-family: var(--font-display); font-stretch: 105%; font-weight: 700; font-size: 1.05rem; line-height: 1.2; }
+mark { background: var(--mark); color: var(--mark-ink); padding: 0 0.2em; border-radius: 2px; }
+
+.stage { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 900px) { .stage { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 901px) { .stage > .figure { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); } }
+.figure { margin: 0; min-width: 0; background: var(--paper-raised); border: 1.5px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.figure figcaption { padding: 8px 12px; border-top: 1.5px solid var(--rule); font-size: 0.85rem; line-height: 1.45; color: var(--ink-soft); }
+.scene { position: relative; width: 100%; aspect-ratio: 1.12 / 1; background: var(--paper-raised); }
+@media (max-width: 900px) { .scene { aspect-ratio: 1 / 1.04; } }
+.scene canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.scene canvas:active { cursor: grabbing; }
+.scene-labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.scene-label {
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; line-height: 1.2; white-space: nowrap;
+  color: var(--ink); background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 6px; opacity: 0.94;
+}
+.scene-label.soft { color: var(--ink-soft); font-weight: 400; }
+.scene-label.you { border-color: var(--you); border-width: 2px; }
+.scene-label.light { border-color: var(--photon); }
+.scene-label.fast { border-color: var(--crest); }
+.scene-label.slow { border-color: var(--trough); }
+@media (max-width: 560px) { .scene-label { font-size: 10.5px; padding: 0 4px; } .scene-label.star { display: none; } }
+.fallback { margin: 0; padding: 24px; color: var(--ink-soft); }
+
+.panel { min-width: 0; display: grid; gap: 14px; align-content: start; }
+.control { display: grid; gap: 4px; min-width: 0; }
+.control > label { font-weight: 700; }
+.control output { font-family: var(--font-mono); font-weight: 700; }
+.hint { margin: 0; font-size: 0.9rem; color: var(--ink-soft); }
+input[type="range"] { width: 100%; margin: 0; height: 30px; accent-color: var(--ink); cursor: pointer; }
+.check { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; cursor: pointer; }
+.check input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+button { font: inherit; }
+.btn { padding: 9px 12px; border-radius: 6px; border: 1.5px solid var(--ink); background: var(--paper-raised); color: var(--ink); font-family: var(--font-body); font-size: 0.9rem; font-weight: 700; line-height: 1.1; cursor: pointer; }
+.btn:hover { background: var(--paper); }
+.btn.solid { background: var(--ink); color: var(--paper-raised); }
+.btn.solid:hover { opacity: 0.88; }
+.btn[aria-pressed="true"] { background: var(--mark); color: var(--mark-ink); border-color: var(--mark-ink); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+:focus-visible { outline: 3px solid var(--crest); outline-offset: 2px; }
+
+.readout { min-width: 0; display: grid; gap: 6px; align-content: start; padding: 12px 14px; background: var(--paper-raised); border: 1.5px solid var(--rule); border-radius: 6px; font-variant-numeric: tabular-nums; }
+.row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; min-width: 0; }
+.row .lab { color: var(--ink-soft); min-width: 12ch; }
+.row .val { font-family: var(--font-mono); font-weight: 700; overflow-wrap: anywhere; }
+.row .say { color: var(--ink-soft); font-size: 0.88rem; }
+.eqn { margin: 0; font-family: var(--font-mono); overflow-wrap: anywhere; }
+.step { margin: 0; color: var(--ink-soft); font-size: 0.92rem; }
+.status { margin: 0; font-weight: 700; }
+.big { margin: 0; font-family: var(--font-mono); font-weight: 700; padding: 6px 10px; background: var(--mark); color: var(--mark-ink); border-radius: 4px; justify-self: start; overflow-wrap: anywhere; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 0.92rem; }
+th, td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-family: var(--font-mono); font-weight: 700; }
+.sw { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+
+.facts { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.fact { padding: 12px 14px; border: 1.5px solid var(--rule); border-radius: 6px; background: var(--paper-raised); display: grid; gap: 6px; align-content: start; }
+.fact p { margin: 0; font-size: 0.95rem; }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Maths for quantum physics · 3D workshop 2</p>
+    <h1>The Dome and the Horn</h1>
+    <p class="intro">Two rooms where the third dimension is the whole point. It stands for a direction we can't see: time. What we call the world is only the shadow it casts.</p>
+    <p class="legend"><span><span class="tag measured">Measured</span> checked by experiment</span><span><span class="tag theory">Worked out</span> follows from measured facts</span><span><span class="tag picture">Picture</span> a way of drawing it</span></p>
+  </header>
+
+  <main>
+    <!-- Room 1 -->
+    <section class="chapter" aria-labelledby="h-dome">
+      <div class="text">
+        <p class="kicker">Room 1 · The Dome</p>
+        <h2 id="h-dome">Our world is the shadow of a growing ball</h2>
+        <div class="cols">
+          <div class="text">
+            <p>The floor is space, drawn as a flat map with home in the middle. Straight up is a direction we can't see: each traveller's own time, their age since leaving.</p>
+            <p>Everyone leaves home at the same moment, at different speeds. As time passes at home a dome inflates, and everyone flying straight rides on its surface <span class="tag theory">Worked out</span>. Through space and time together, they have all travelled exactly the same distance.</p>
+          </div>
+          <div class="text">
+            <p>What we see is only the shadow on the floor. Near the top of the dome you barely move on the map and age fast. Near the rim you race across the map and hardly age <span class="tag measured">Measured</span>. Light runs along the rim itself: all shadow, no height.</p>
+            <p>Each traveller carries a balloon that inflates with their own time, so you can read ages from above too. Press “Our world” to see only what we normally see, then step back out. You're the green one: <mark>grab your balloon and slide it over the dome.</mark></p>
+          </div>
+        </div>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <div class="scene" id="scene-dome" role="img" aria-label="A dome inflating over a flat star map. Travellers sit on the dome as balloons; each casts a shadow on the map."></div>
+          <figcaption>Labels show speed and age in years. One square is one light-year. The stars sit at their real distances <span class="tag measured">Measured</span>: Alpha Centauri 4.4 light-years, Barnard's Star 6.0, Sirius 8.6, Procyon 11.5. Their directions are made up so they fit on a flat map <span class="tag picture">Picture</span>. Real space has three directions; one is left out here so the hidden one fits on the screen.</figcaption>
+        </figure>
+        <div class="panel">
+          <div class="btn-row" role="group" aria-label="View">
+            <button class="btn" type="button" id="dome-flat">Our world (from above)</button>
+            <button class="btn" type="button" id="dome-out">Step out and see time</button>
+          </div>
+          <div class="control">
+            <label for="dome-time">Time at home: <output id="dome-time-out" for="dome-time">10.0</output> years</label>
+            <input type="range" id="dome-time" min="0" max="15" step="0.05" value="10">
+            <div class="btn-row">
+              <button class="btn solid" type="button" id="dome-play">Inflate from the start</button>
+              <button class="btn" type="button" id="dome-pause">Play</button>
+            </div>
+          </div>
+          <div class="control">
+            <label for="you-speed">Your speed: <output id="you-speed-out" for="you-speed">70%</output> of light speed</label>
+            <input type="range" id="you-speed" min="0" max="0.99" step="0.01" value="0.7">
+            <p class="hint">Or drag the green balloon: that changes your direction too.</p>
+          </div>
+          <label class="check"><input type="checkbox" id="you-round"> Turn around at year 7.5 and fly home</label>
+          <div class="readout" id="out-you" aria-live="off"></div>
+          <div class="readout">
+            <table>
+              <thead><tr><th>Traveller</th><th>Speed</th><th>On the map</th><th>Age</th></tr></thead>
+              <tbody id="out-table"></tbody>
+            </table>
+            <p class="step">Map distances in light-years, ages in years.</p>
+          </div>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact">
+          <h3>Your equation, as a shape</h3>
+          <p>(distance on the map)² + (age)² = (time at home)². That's your budget equation multiplied by time, and it's why the shape is round. The panel shows it with live numbers.</p>
+        </div>
+        <div class="fact">
+          <h3>The round trip</h3>
+          <p>Tick “turn around”. At year 15 your shadow is back home, next to the one who stayed. On the map you're together again. In the hidden direction you aren't: the height gap is how much less you aged. In 1971, atomic clocks flown around the world came back out of step with the ones that stayed, by the predicted amount <span class="tag measured">Measured</span>.</p>
+        </div>
+        <div class="fact">
+          <h3>What kind of picture this is</h3>
+          <p><span class="tag picture">Picture</span> with exact numbers. “Up” isn't a place you could fly to. It's each traveller's age drawn as a height. The usual physics picture puts home time in the extra direction and has a minus sign where this one has a plus. Both give the same numbers.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Room 2 -->
+    <section class="chapter" aria-labelledby="h-horn">
+      <div class="text">
+        <p class="kicker">Room 2 · The Horn</p>
+        <h2 id="h-horn">Falling is driving straight ahead on a flared tube</h2>
+        <div class="cols">
+          <div class="text">
+            <p>Now keep just one direction of space: height in a tower. Roll the hidden direction, the ball's own time, into a loop, so that one trip around is 3 years on the ball's clock. The distance driven over the surface is time on the floor clock. As on the dome, everything drives at the same speed.</p>
+            <p>With no gravity the tube is plain. A ball left in mid-air circles at the same height for ever: all time, no space.</p>
+            <p>Now the measured fact: clocks lower down tick slower <span class="tag measured">Measured</span>. A slow tick takes more floor time, so the loop has to be longer lower down. The tube flares into a horn <span class="tag theory">Worked out</span>. Slide gravity to watch it happen.</p>
+          </div>
+          <div class="text">
+            <p>On the horn a free ball does nothing special. It drives dead straight, like a toy car with locked steering: both wheels roll the same distance. But on a flared surface, straight ahead doesn't stay level. The path peels away from the circle and spirals down, faster and faster. <mark>That is falling.</mark></p>
+            <p>Holding the ball means steering it the whole time to keep it level. That steady push is its weight. Press “Let go” and “Hold” to feel the difference, then ride along on the ball.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stage">
+        <figure class="figure">
+          <div class="scene" id="scene-horn" role="img" aria-label="A horn-shaped tube, wide at the floor and narrow at the top. A ball circles it; when released its path spirals down to the floor."></div>
+          <figcaption>Around the horn: the ball's own time. Up: height. Dashed: the straight path it will take when released. The pole in the middle is all we normally see: a ball at some height. <span class="tag picture">Picture</span> of scale: to make the flare visible, this tower is one light-year tall and stands in a rocket that keeps speeding up at 1 g. In a 10-metre room on Earth the horn narrows by one part in a million billion.</figcaption>
+        </figure>
+        <div class="panel">
+          <div class="btn-row">
+            <button class="btn solid" type="button" id="horn-let">Let go</button>
+            <button class="btn" type="button" id="horn-hold">Hold</button>
+            <button class="btn" type="button" id="horn-reset">Back to start</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn" type="button" id="horn-throwfloor">Throw it up from the floor</button>
+            <button class="btn" type="button" id="horn-pause">Pause</button>
+          </div>
+          <div class="btn-row" role="group" aria-label="View">
+            <button class="btn" type="button" id="horn-ride" aria-pressed="false">Ride on the ball</button>
+            <button class="btn" type="button" id="horn-out">Outside view</button>
+          </div>
+          <div class="control">
+            <label for="grav">Gravity: <output id="grav-out" for="grav">1.00</output> g <span class="hint">(1 g = Earth's surface)</span></label>
+            <input type="range" id="grav" min="0" max="1.5" step="0.05" value="1">
+          </div>
+          <div class="control">
+            <label for="starth">Start height: <output id="starth-out" for="starth">0.80</output> light-years</label>
+            <input type="range" id="starth" min="0" max="1" step="0.05" value="0.8">
+          </div>
+          <div class="control">
+            <label for="throw">Upward push on release: <output id="throw-out" for="throw">0%</output> of light speed</label>
+            <input type="range" id="throw" min="0" max="0.9" step="0.05" value="0">
+          </div>
+          <div class="readout" id="out-horn" aria-live="off"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div class="fact">
+          <h3>Why “most clock time” isn't arbitrary</h3>
+          <p>Press “Throw it up from the floor” and wait for it to land. The ball and the floor clock have driven exactly the same distance, because everything drives at the same speed. But the ball lands further around the horn: it cut across the narrow part. Further around means more of its own time. A straight line is the shortest way, so no steered path gets further. On the horn, “the path with the most clock time” just means “straight” <span class="tag theory">Worked out</span>.</p>
+        </div>
+        <div class="fact">
+          <h3>Check it yourself</h3>
+          <p>Set gravity to 0. The horn becomes a plain tube, the wheels match even while you hold the ball, and nothing falls: weightless. Turn gravity up and hold: now the lower wheel has to roll further than the upper one. That difference is the steering.</p>
+        </div>
+        <div class="fact">
+          <h3>What this leaves out</h3>
+          <p>The flare is exact for straight up-and-down motion <span class="tag theory">Worked out</span>. Sideways motion needs more dimensions than fit on a screen. Rolling time into a loop of 3 years is my choice, to make it fit; the flare isn't. And one spot on the horn means “this height, this reading on your own clock”, not one shared moment for everybody.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const MINUS = '−';
+const f1 = x => (Math.round(x * 10) / 10).toFixed(1).replace('-', MINUS);
+const f2 = x => (Math.round(x * 100) / 100).toFixed(2).replace('-', MINUS);
+function pct(f) { const p = f * 100; if (f >= 1) return '100%'; if (p >= 99.95) return '99.9%'; if (p > 99) return p.toFixed(1) + '%'; return Math.round(p) + '%'; }
+const row = (lab, val, say) => '<div class="row"><span class="lab">' + lab + '</span><span class="val">' + val + '</span>' + (say ? '<span class="say">' + say + '</span>' : '') + '</div>';
+
+/* ---------- colours follow the page theme ---------- */
+const themedList = [], themeFns = [];
+function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888888'; }
+function apply1(target, token, prop) { const o = target[prop]; if (o && o.isColor) o.set(tok(token)); }
+function themed(target, token, prop = 'color') { themedList.push([target, token, prop]); apply1(target, token, prop); return target; }
+function applyTheme() { themedList.forEach(([t, k, p]) => apply1(t, k, p)); themeFns.forEach(fn => fn()); }
+if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
+
+/* ---------- shared stage ---------- */
+const stages = [];
+function makeStage(box, o) {
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
+  catch (e) { box.innerHTML = '<p class="fallback">This browser could not start 3D graphics (WebGL), so this room cannot be shown here.</p>'; return null; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  box.appendChild(renderer.domElement);
+  const labels = new CSS2DRenderer();
+  labels.domElement.className = 'scene-labels';
+  box.appendChild(labels.domElement);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color();
+  themed(scene, '--paper-raised', 'background');
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.3); sun.position.set(6, 12, 10); scene.add(sun);
+  const camera = o.ortho ? new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 500) : new THREE.PerspectiveCamera(o.fov, 1, 0.05, 500);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minPolarAngle = 0.02; controls.maxPolarAngle = o.maxPolar;
+  controls.target.set(o.target[0], o.target[1], o.target[2]);
+  renderer.domElement.style.touchAction = 'pan-y';
+  const S = { box, renderer, labels, scene, camera, controls, lineMats: [], visible: true, update: () => {}, tween: null, manualCam: false, dist: o.dist || 60, home: { polar: o.polar, az: o.az }, opt: o };
+  const sph = new THREE.Spherical(), off = new THREE.Vector3();
+  S.place = (polar, az) => {
+    sph.set(S.dist, polar, az);
+    camera.position.setFromSpherical(sph).add(controls.target);
+    camera.up.set(0, 1, 0);
+    camera.lookAt(controls.target);
+    controls.update();
+  };
+  S.angles = () => { off.copy(camera.position).sub(controls.target); sph.setFromVector3(off); return { polar: sph.phi, az: sph.theta }; };
+  S.goView = (polar, az, ms = 950) => {
+    const a = S.angles();
+    if (reduceMotion || !ms) { S.tween = null; controls.enabled = true; S.place(polar, az); return; }
+    let d = az - a.az; d = Math.atan2(Math.sin(d), Math.cos(d));
+    S.tween = { t: 0, dur: ms / 1000, p0: a.polar, p1: polar, a0: a.az, a1: a.az + d };
+    controls.enabled = false;
+  };
+  let first = true;
+  S.fit = () => {
+    const w = box.clientWidth, h = box.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false); labels.setSize(w, h);
+    S.lineMats.forEach(m => m.resolution.set(w, h));
+    const aspect = w / h;
+    let polar = o.polar, az = o.az;
+    if (!first) { const a = S.angles(); polar = a.polar; az = a.az; }
+    if (o.ortho) {
+      let hh = o.half, hw = hh * aspect;
+      if (hw < o.half) { hw = o.half; hh = hw / aspect; }
+      camera.left = -hw; camera.right = hw; camera.top = hh; camera.bottom = -hh;
+    } else {
+      camera.aspect = aspect;
+      const vf = THREE.MathUtils.degToRad(o.fov), hf = 2 * Math.atan(Math.tan(vf / 2) * aspect);
+      S.dist = Math.max(o.fitWidth / 2 / Math.tan(hf / 2), o.fitHeight / 2 / Math.tan(vf / 2));
+    }
+    camera.updateProjectionMatrix();
+    if (!S.manualCam && !S.tween) S.place(polar, az);
+    first = false;
+  };
+  new ResizeObserver(() => S.fit()).observe(box);
+  new IntersectionObserver(es => { S.visible = es.some(e => e.isIntersecting); }, { rootMargin: '120px' }).observe(box);
+  S.fit();
+  stages.push(S);
+  return S;
+}
+function makeLine(S, token, width, opts = {}) {
+  const m = new LineMaterial({ linewidth: width, dashed: !!opts.dashed, dashSize: opts.dash || 0.3, gapSize: opts.gap || 0.22, transparent: opts.opacity !== undefined, opacity: opts.opacity === undefined ? 1 : opts.opacity });
+  themed(m, token);
+  m.resolution.set(S.box.clientWidth || 800, S.box.clientHeight || 700);
+  S.lineMats.push(m);
+  const g = new LineGeometry(); g.setPositions([0, 0, 0, 0, 0.001, 0]);
+  const l = new Line2(g, m); l.frustumCulled = false; l.visible = false;
+  S.scene.add(l);
+  return l;
+}
+function setLine(l, pts) {
+  if (!pts || pts.length < 6) { l.visible = false; return; }
+  l.visible = true;
+  l.geometry.dispose();
+  const g = new LineGeometry(); g.setPositions(pts);
+  l.geometry = g;
+  if (l.material.dashed) l.computeLineDistances();
+}
+function label(text, cls, cy) {
+  const d = document.createElement('div');
+  d.className = 'scene-label' + (cls ? ' ' + cls : '');
+  d.textContent = text;
+  const o = new CSS2DObject(d);
+  if (cy !== undefined) o.center.set(0.5, cy);
+  return o;
+}
+function segs(scene, pts, token, opacity) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  const l = new THREE.LineSegments(g, themed(new THREE.LineBasicMaterial({ transparent: true, opacity }), token));
+  scene.add(l);
+  return l;
+}
+
+/* ---------- Room 1: the Dome ---------- */
+function initDome() {
+  const box = document.getElementById('scene-dome');
+  const S = makeStage(box, { ortho: true, half: 17.2, dist: 90, target: [0, 3.2, 0], polar: 1.06, az: 0.42, maxPolar: Math.PI / 2 - 0.02 });
+  if (!S) return;
+  const { scene, camera } = S;
+  const TMAX = 15, RATE = 1.5, D2R = Math.PI / 180, HALF = TMAX / 2;
+  const st = { t: 10, playing: false, dirty: true, acc: 0 };
+
+  // the map
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(16.6, 96), themed(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.6, depthWrite: false }), '--paper'));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -0.03; floor.renderOrder = -2; scene.add(floor);
+  const g1 = [], g5 = [];
+  for (let i = -16; i <= 16; i++) {
+    const half = Math.sqrt(16.6 * 16.6 - i * i), arr = i % 5 === 0 ? g5 : g1;
+    arr.push(i, 0, -half, i, 0, half, -half, 0, i, half, 0, i);
+  }
+  segs(scene, g1, '--grid', 0.9); segs(scene, g5, '--grid-strong', 0.9);
+  const stars = [
+    { name: 'Alpha Centauri', d: 4.4, az: 205 }, { name: "Barnard's Star", d: 6.0, az: 330 },
+    { name: 'Sirius', d: 8.6, az: 170 }, { name: 'Procyon', d: 11.5, az: 262 }
+  ];
+  const starGeo = new THREE.OctahedronGeometry(0.3), starMat = themed(new THREE.MeshBasicMaterial(), '--photon');
+  for (const s of stars) {
+    const a = s.az * D2R, m = new THREE.Mesh(starGeo, starMat);
+    m.position.set(s.d * Math.cos(a), 0.3, -s.d * Math.sin(a)); scene.add(m);
+    const l = label(s.name, 'soft star');
+    l.position.set((s.d + 2.2) * Math.cos(a), 0.3, -(s.d + 2.2) * Math.sin(a)); scene.add(l);
+  }
+
+  // the dome: a unit hemisphere, scaled by time at home
+  const domeGroup = new THREE.Group(); scene.add(domeGroup);
+  const domeMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 24, 0, Math.PI * 2, 0, Math.PI / 2),
+    themed(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.13, side: THREE.DoubleSide, depthWrite: false }), '--dome'));
+  domeGroup.add(domeMesh);
+  const wp = [];
+  for (const v of [0.3, 0.6, 0.8, 0.95]) {
+    const y = Math.sqrt(1 - v * v);
+    for (let i = 0; i < 96; i++) { const a0 = i / 96 * Math.PI * 2, a1 = (i + 1) / 96 * Math.PI * 2; wp.push(v * Math.cos(a0), y, v * Math.sin(a0), v * Math.cos(a1), y, v * Math.sin(a1)); }
+  }
+  for (let m = 0; m < 12; m++) {
+    const az = m * Math.PI / 6;
+    for (let i = 0; i < 24; i++) { const t0 = i / 24 * Math.PI / 2, t1 = (i + 1) / 24 * Math.PI / 2; wp.push(Math.sin(t0) * Math.cos(az), Math.cos(t0), Math.sin(t0) * Math.sin(az), Math.sin(t1) * Math.cos(az), Math.cos(t1), Math.sin(t1) * Math.sin(az)); }
+  }
+  const wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(wp, 3));
+  domeGroup.add(new THREE.LineSegments(wg, themed(new THREE.LineBasicMaterial({ transparent: true, opacity: 0.4 }), '--dome')));
+  const rim = makeLine(S, '--photon', 4);
+  { const rp = []; for (let i = 0; i <= 128; i++) { const a = i / 128 * Math.PI * 2; rp.push(Math.cos(a), 0, Math.sin(a)); } setLine(rim, rp); rim.position.y = 0.05; }
+  const LA = 285 * D2R, lightLabel = label('light · 0 y', 'light', 1.7); scene.add(lightLabel);
+
+  // travellers
+  const defs = [
+    { id: 'home', name: 'Stays home', v: 0, az: 0, token: '--ink', anchor: [0.5, 2.0] },
+    { id: 'p', name: 'Probe', v: 0.3, az: 205 * D2R, token: '--t30', anchor: [1.18, 0.5] },
+    { id: 's', name: 'Ship', v: 0.6, az: 330 * D2R, token: '--t60', anchor: [-0.18, 0.5] },
+    { id: 'f', name: 'Fast ship', v: 0.8, az: 170 * D2R, token: '--t80', anchor: [0.5, 1.9] },
+    { id: 'x', name: 'Fastest ship', v: 0.95, az: 262 * D2R, token: '--t95', anchor: [1.18, 0.5] },
+    { id: 'you', name: 'You', v: 0.7, az: 35 * D2R, token: '--you', cls: 'you', round: false, anchor: [-0.16, 0.5] }
+  ];
+  const beadGeo = new THREE.SphereGeometry(1, 28, 20), discGeo = new THREE.CircleGeometry(1, 40);
+  const trav = defs.map(def => {
+    const tr = Object.assign({}, def);
+    tr.bead = new THREE.Mesh(beadGeo, themed(new THREE.MeshStandardMaterial({ roughness: 0.45 }), def.token)); scene.add(tr.bead);
+    tr.shadow = new THREE.Mesh(discGeo, themed(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.4, depthWrite: false }), '--shadow'));
+    tr.shadow.rotation.x = -Math.PI / 2; scene.add(tr.shadow);
+    tr.pin = makeLine(S, '--ink-soft', 1.6, { dashed: true, dash: 0.3, gap: 0.25 });
+    tr.spoke = makeLine(S, def.token, 3);
+    tr.track = makeLine(S, def.token, 2.2, { opacity: 0.6 });
+    tr.label = label('', def.cls || ''); tr.label.center.set(def.anchor[0], def.anchor[1]); scene.add(tr.label);
+    return tr;
+  });
+  const you = trav[trav.length - 1];
+
+  function stateOf(tr, t) {
+    const g = Math.sqrt(1 - tr.v * tr.v);
+    const d = (tr.round && t > HALF) ? tr.v * Math.max(0, TMAX - t) : tr.v * t;
+    return { x: d * Math.cos(tr.az), z: -d * Math.sin(tr.az), d, age: g * t };
+  }
+  function placeAll() {
+    const t = st.t, R = Math.max(t, 0.001);
+    domeGroup.scale.setScalar(R); rim.scale.setScalar(R);
+    lightLabel.position.set(R * Math.cos(LA), 0.2, -R * Math.sin(LA));
+    for (const tr of trav) {
+      const s = stateOf(tr, t), rad = 0.26 + 0.05 * s.age;
+      tr.bead.position.set(s.x, s.age, s.z); tr.bead.scale.setScalar(rad);
+      tr.shadow.position.set(s.x, 0.02, s.z); tr.shadow.scale.setScalar(rad);
+      setLine(tr.pin, s.age > 0.05 ? [s.x, 0.03, s.z, s.x, s.age, s.z] : null);
+      const turned = tr.round && t > HALF, k = turned ? stateOf(tr, HALF) : null;
+      setLine(tr.spoke, t > 0.02 ? (turned ? [0, 0, 0, k.x, k.age, k.z, s.x, s.age, s.z] : [0, 0, 0, s.x, s.age, s.z]) : null);
+      const far = turned ? k : s;
+      setLine(tr.track, tr.v > 0 && t > 0.02 ? [0, 0.04, 0, far.x, 0.04, far.z] : null);
+      tr.label.position.set(s.x, s.age, s.z);
+      tr.label.element.textContent = (tr.id === 'home' ? 'home' : tr.id === 'you' ? 'you' : pct(tr.v)) + ' · ' + f1(s.age) + ' y';
+    }
+  }
+
+  const outYou = document.getElementById('out-you'), outTable = document.getElementById('out-table');
+  const timeSlider = document.getElementById('dome-time'), timeOut = document.getElementById('dome-time-out');
+  const speed = document.getElementById('you-speed'), speedOut = document.getElementById('you-speed-out');
+  function write() {
+    const t = st.t, s = stateOf(you, t), turned = you.round && t > HALF;
+    timeOut.textContent = f1(t); speedOut.textContent = pct(you.v);
+    let h = '<h3>You</h3>' + row('Time at home', f2(t) + ' years', "the dome's radius") +
+      row('On the map', f2(s.d) + ' light-years', 'your shadow') + row('Your age', f2(s.age) + ' years', 'your height');
+    if (!turned) {
+      const a2 = Math.round(s.d * s.d * 100) / 100, c2 = Math.round(t * t * 100) / 100;
+      h += '<p class="eqn">' + f2(s.d) + '² + ' + f2(s.age) + '² = ' + f2(t) + '²</p>' +
+        '<p class="eqn">' + f2(a2) + ' + ' + f2(c2 - a2) + ' = ' + f2(c2) + '</p>' +
+        '<p class="step">(shadow)² + (height)² = (radius)². True at every moment, for every traveller.</p>';
+    } else if (t >= TMAX - 1e-6) {
+      h += '<p class="big">Back home, ' + f1(t - s.age) + ' years younger</p>' +
+        '<p class="step">Home aged ' + f1(t) + ' years, you aged ' + f1(s.age) + '. Your shadows touch. Your heights do not.</p>';
+    } else {
+      h += '<p class="step">After the turn your path has a kink, so you are inside the dome now. Your shadow is heading home.</p>';
+    }
+    outYou.innerHTML = h;
+    const rows = trav.map(tr => { const q = stateOf(tr, t); return '<tr><td><span class="sw" style="background:var(' + tr.token + ')"></span>' + tr.name + '</td><td class="num">' + pct(tr.v) + '</td><td class="num">' + f1(q.d) + '</td><td class="num">' + f1(q.age) + '</td></tr>'; });
+    rows.splice(5, 0, '<tr><td><span class="sw" style="background:var(--photon)"></span>Light</td><td class="num">100%</td><td class="num">' + f1(t) + '</td><td class="num">0.0</td></tr>');
+    outTable.innerHTML = rows.join('');
+  }
+
+  // controls
+  const pauseBtn = document.getElementById('dome-pause');
+  const syncPlay = () => { pauseBtn.textContent = st.playing ? 'Pause' : 'Play'; };
+  pauseBtn.addEventListener('click', () => { if (!st.playing && st.t >= TMAX) st.t = 0; st.playing = !st.playing; syncPlay(); st.dirty = true; });
+  document.getElementById('dome-play').addEventListener('click', () => {
+    st.t = 0; st.dirty = true;
+    if (reduceMotion) { st.t = TMAX; timeSlider.value = String(TMAX); return; }
+    st.playing = true; syncPlay();
+  });
+  timeSlider.addEventListener('input', () => { st.t = parseFloat(timeSlider.value); st.playing = false; syncPlay(); st.dirty = true; });
+  speed.addEventListener('input', () => { you.v = parseFloat(speed.value); st.dirty = true; });
+  document.getElementById('you-round').addEventListener('change', e => { you.round = e.target.checked; st.dirty = true; });
+  document.getElementById('dome-flat').addEventListener('click', () => S.goView(0.02, 0));
+  document.getElementById('dome-out').addEventListener('click', () => S.goView(S.home.polar, S.home.az));
+
+  // drag yourself over the dome
+  const dom = S.renderer.domElement, ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), ball = new THREE.Sphere(new THREE.Vector3(), 1), hit = new THREE.Vector3(), tmp = new THREE.Vector3();
+  let dragging = false;
+  const canDrag = () => st.t > 0.6 && !(you.round && st.t > HALF) && !S.tween;
+  function nearYou(e) {
+    const r = dom.getBoundingClientRect();
+    tmp.copy(you.bead.position).project(camera);
+    return Math.hypot(e.clientX - ((tmp.x * 0.5 + 0.5) * r.width + r.left), e.clientY - ((-tmp.y * 0.5 + 0.5) * r.height + r.top)) < 36;
+  }
+  function dragTo(e) {
+    const r = dom.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    ball.radius = st.t;
+    if (!ray.ray.intersectSphere(ball, hit)) { ray.ray.closestPointToPoint(ball.center, hit); if (hit.lengthSq() < 1e-9) return; hit.setLength(st.t); }
+    const horiz = Math.hypot(hit.x, hit.z);
+    you.v = hit.y <= 0 ? 0.999 : Math.min(0.999, horiz / st.t);
+    if (horiz > 1e-4) you.az = Math.atan2(-hit.z, hit.x);
+    speed.value = String(Math.min(0.99, you.v));
+    st.dirty = true;
+  }
+  box.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (!canDrag() || !nearYou(e)) return;
+    dragging = true; e.stopPropagation(); e.preventDefault();
+    try { dom.setPointerCapture(e.pointerId); } catch (_) { /* older browsers */ }
+    st.playing = false; syncPlay();
+    dragTo(e);
+  }, true);
+  dom.addEventListener('pointermove', e => {
+    if (dragging) { e.preventDefault(); dragTo(e); }
+    else dom.style.cursor = (canDrag() && nearYou(e)) ? 'pointer' : '';
+  });
+  const endDrag = e => { if (!dragging) return; dragging = false; try { dom.releasePointerCapture(e.pointerId); } catch (_) { /* fine */ } };
+  dom.addEventListener('pointerup', endDrag); dom.addEventListener('pointercancel', endDrag);
+  box.addEventListener('touchstart', e => { if (dragging) e.preventDefault(); }, { passive: false, capture: true });
+
+  S.update = dt => {
+    if (st.playing) {
+      st.t = Math.min(TMAX, st.t + dt * RATE);
+      if (st.t >= TMAX) { st.playing = false; syncPlay(); }
+      timeSlider.value = String(st.t); st.dirty = true;
+    }
+    if (st.dirty) {
+      placeAll();
+      st.acc += dt;
+      if (!st.playing || st.acc > 0.09) { write(); st.acc = 0; }
+      st.dirty = false;
+    }
+  };
+  syncPlay(); placeAll(); write();
+}
+
+/* ---------- Room 2: the Horn ---------- */
+function initHorn() {
+  const box = document.getElementById('scene-horn');
+  // SC: scene units per light-year. P: years of own time per trip around. R0: floor radius. K1: clock gradient at 1 g, per light-year.
+  const SC = 6, H = 1, P = 3, R0 = P / (2 * Math.PI), K1 = 1.0323, WHEEL = 0.1, RATE = 0.36;
+  const S = makeStage(box, { fov: 36, fitWidth: 9.4, fitHeight: 8.2, target: [0, 2.6, 0], polar: 1.13, az: 0.4, maxPolar: Math.PI * 0.55 });
+  if (!S) return;
+  const { scene, camera } = S;
+  const st = { g: 1, k: K1, t: 0, playing: !reduceMotion, startH: 0.8, throwU: 0, ride: false, ball: null, up: 0, low: 0, flight: null, result: null, acc: 0, saved: null };
+
+  // height on screen for each height in the tower (the surface must keep true distances)
+  const NT = 240, zt = new Float64Array(NT + 1);
+  function rebuildTable() {
+    const k = st.k, dh = H / NT;
+    const f = h => { const q = k * R0 / (1 + k * h); return Math.sqrt(Math.max(0, 1 - q * q)) / (1 + k * h); };
+    let z = 0; zt[0] = 0;
+    for (let i = 1; i <= NT; i++) { const a = (i - 1) * dh, b = i * dh; z += (f(a) + 4 * f((a + b) / 2) + f(b)) * dh / 6; zt[i] = z; }
+  }
+  function zOf(h) { const x = Math.min(Math.max(h / H, 0), 1) * NT, i = Math.min(NT - 1, Math.floor(x)); return zt[i] + (zt[i + 1] - zt[i]) * (x - i); }
+  const mkFrame = () => ({ P: new THREE.Vector3(), ePhi: new THREE.Vector3(), eM: new THREE.Vector3(), N: new THREE.Vector3() });
+  function frame(h, tau, out) {
+    const k = st.k, phi = tau / R0, c = Math.cos(phi), s = Math.sin(phi);
+    const q = 1 + k * h, rho = R0 / q, drho = -k * R0 / (q * q), qq = k * R0 / q, dz = Math.sqrt(Math.max(0, 1 - qq * qq)) / q, n = 1 / q;
+    out.P.set(SC * rho * c, SC * zOf(h), -SC * rho * s);
+    out.ePhi.set(-s, 0, -c);
+    out.eM.set(drho * c / n, dz / n, -drho * s / n);
+    out.N.set(dz * c / n, -drho / n, -dz * s / n);
+    return out;
+  }
+  const F = mkFrame(), G = mkFrame();
+
+  // ground, surface, grid
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(4.7, 72), themed(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.7, depthWrite: false }), '--paper'));
+  ground.rotation.x = -Math.PI / 2; ground.position.y = -0.04; ground.renderOrder = -2; scene.add(ground);
+  const NH = 44, NP = 96, nV = (NH + 1) * (NP + 1);
+  const pos = new Float32Array(nV * 3), nor = new Float32Array(nV * 3), col = new Float32Array(nV * 3), idx = [];
+  for (let i = 0; i < NH; i++) for (let j = 0; j < NP; j++) { const a = i * (NP + 1) + j, b = a + 1, c = a + NP + 1, d = c + 1; idx.push(a, b, c, b, d, c); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.setIndex(idx);
+  const skin = side => new THREE.MeshStandardMaterial({ vertexColors: true, transparent: true, opacity: 0.62, side, depthWrite: false, roughness: 0.9, metalness: 0 });
+  const back = new THREE.Mesh(geo, skin(THREE.BackSide)); back.renderOrder = 1; back.frustumCulled = false; scene.add(back);
+  const front = new THREE.Mesh(geo, skin(THREE.FrontSide)); front.renderOrder = 2; front.frustumCulled = false; scene.add(front);
+  function recolour() {
+    const lo = new THREE.Color(tok('--horn-low')), hi = new THREE.Color(tok('--horn-high')), c = new THREE.Color();
+    let p = 0;
+    for (let i = 0; i <= NH; i++) { c.copy(lo).lerp(hi, i / NH); for (let j = 0; j <= NP; j++) { col[p++] = c.r; col[p++] = c.g; col[p++] = c.b; } }
+    geo.attributes.color.needsUpdate = true;
+  }
+  themeFns.push(recolour); recolour();
+  const PAR = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], MER = 12, MSEG = 40;
+  const gridPos = new Float32Array((PAR.length * NP + MER * MSEG) * 6);
+  const gridGeo = new THREE.BufferGeometry(); gridGeo.setAttribute('position', new THREE.BufferAttribute(gridPos, 3));
+  const gridLines = new THREE.LineSegments(gridGeo, themed(new THREE.LineBasicMaterial({ transparent: true, opacity: 0.5 }), '--ink-soft'));
+  gridLines.frustumCulled = false; scene.add(gridLines);
+  const floorRim = makeLine(S, '--ink', 2.6), topRim = makeLine(S, '--ink', 2.6);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1, 12), themed(new THREE.MeshStandardMaterial({ roughness: 0.8 }), '--ink-soft')); scene.add(pole);
+  const floorLabel = label('floor', 'slow'), topLabel = label('1 light-year up', 'fast');
+  scene.add(floorLabel, topLabel);
+
+  // the ball on its little cart, its shadow on the pole, the two reference clocks
+  const car = new THREE.Group(); scene.add(car);
+  const inkMat = themed(new THREE.MeshStandardMaterial({ roughness: 0.6 }), '--ink');
+  const ballMesh = new THREE.Mesh(new THREE.SphereGeometry(0.2, 26, 18), themed(new THREE.MeshStandardMaterial({ roughness: 0.4 }), '--you')); ballMesh.position.y = 0.22; car.add(ballMesh);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.36, 16), inkMat); nose.rotation.z = -Math.PI / 2; nose.position.set(0.42, 0.09, 0); car.add(nose);
+  for (const z of [-0.21, 0.21]) { const w = new THREE.Mesh(new THREE.SphereGeometry(0.075, 14, 10), inkMat); w.position.set(-0.04, 0.075, z); car.add(w); }
+  const ballLabel = label('ball', 'you', 2.3); car.add(ballLabel);
+  const shadowBall = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 14), themed(new THREE.MeshStandardMaterial({ roughness: 0.4 }), '--you')); scene.add(shadowBall);
+  const link = makeLine(S, '--ink-soft', 1.5, { dashed: true, dash: 0.14, gap: 0.12 });
+  const floorClock = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 14), themed(new THREE.MeshStandardMaterial({ roughness: 0.5 }), '--trough')); scene.add(floorClock);
+  const topClock = new THREE.Mesh(new THREE.SphereGeometry(0.13, 20, 14), themed(new THREE.MeshStandardMaterial({ roughness: 0.5 }), '--crest')); scene.add(topClock);
+  const fcLabel = label('floor clock', 'slow', 1.9), tcLabel = label('top clock', 'fast', 1.9); floorClock.add(fcLabel); topClock.add(tcLabel);
+  const trailLine = makeLine(S, '--you', 3.6), ghost = makeLine(S, '--ink', 2.2, { dashed: true, dash: 0.2, gap: 0.16 });
+  const trail = [], lastTrail = new THREE.Vector3(1e9, 0, 0);
+
+  function rebuild() {
+    rebuildTable();
+    const k = st.k; let p = 0;
+    for (let i = 0; i <= NH; i++) {
+      const h = H * i / NH, q = 1 + k * h, rho = R0 / q, drho = -k * R0 / (q * q), qq = k * R0 / q, dz = Math.sqrt(Math.max(0, 1 - qq * qq)) / q, n = 1 / q, y = SC * zOf(h);
+      for (let j = 0; j <= NP; j++) {
+        const phi = 2 * Math.PI * j / NP, c = Math.cos(phi), s = Math.sin(phi);
+        pos[p] = SC * rho * c; pos[p + 1] = y; pos[p + 2] = -SC * rho * s;
+        nor[p] = dz * c / n; nor[p + 1] = -drho / n; nor[p + 2] = -dz * s / n; p += 3;
+      }
+    }
+    geo.attributes.position.needsUpdate = true; geo.attributes.normal.needsUpdate = true; geo.computeBoundingSphere();
+    let q = 0;
+    const put = (h, tau) => { frame(h, tau, G); gridPos[q++] = G.P.x + G.N.x * 0.012; gridPos[q++] = G.P.y + G.N.y * 0.012; gridPos[q++] = G.P.z + G.N.z * 0.012; };
+    for (const h of PAR) for (let j = 0; j < NP; j++) { put(h, P * j / NP); put(h, P * (j + 1) / NP); }
+    for (let m = 0; m < MER; m++) for (let i = 0; i < MSEG; i++) { put(H * i / MSEG, P * m / MER); put(H * (i + 1) / MSEG, P * m / MER); }
+    gridGeo.attributes.position.needsUpdate = true;
+    const loop = h => { const a = []; for (let j = 0; j <= NP; j++) { frame(h, P * j / NP, G); a.push(G.P.x + G.N.x * 0.02, G.P.y + G.N.y * 0.02, G.P.z + G.N.z * 0.02); } return a; };
+    setLine(floorRim, loop(0)); setLine(topRim, loop(H));
+    const top = SC * zOf(H);
+    pole.scale.y = top; pole.position.y = top / 2;
+    const side = -0.6 * R0;
+    frame(0, side, G); floorLabel.position.copy(G.P).addScaledVector(G.N, 0.55);
+    frame(H, side, G); topLabel.position.copy(G.P).addScaledVector(G.N, 0.75);
+    // keep the whole horn in frame as it changes shape
+    S.opt.fitHeight = Math.max(6.6, top + 3.6);
+    S.controls.target.y = top / 2 + 0.15;
+    S.fit();
+  }
+
+  function evalFree(b, dt) {
+    const k = st.k, s0 = Math.sqrt(1 - b.u0 * b.u0);
+    if (k < 1e-6) return { h: b.h0 + b.u0 * dt, tau: b.tau0 + s0 * dt, u: b.u0, s: s0 };
+    const a = Math.atanh(b.u0), y0 = b.h0 + 1 / k, g0 = 1 / s0, x = k * dt - a;
+    return { h: y0 * g0 / Math.cosh(x) - 1 / k, tau: b.tau0 + y0 * g0 * (b.u0 + Math.tanh(x)), u: -Math.tanh(x), s: 1 / Math.cosh(x) };
+  }
+  function evalBall(t) {
+    const b = st.ball;
+    if (b.mode === 'held') return { h: b.h, tau: b.tau0 + (1 + st.k * b.h) * (t - b.t0), u: 0, s: 1 };
+    return evalFree(b, t - b.t0);
+  }
+  // time (on the floor clock) until a free ball reaches the floor
+  function landIn(h0, u0) { const k = st.k, g0 = 1 / Math.sqrt(1 - u0 * u0); return (Math.atanh(u0) + Math.acosh(Math.max(1, (1 + k * h0) * g0))) / k; }
+  function advance(dy) {
+    st.t += dy;
+    const b = st.ball, k = st.k;
+    if (b.mode === 'free') {
+      const e = evalBall(st.t);
+      if (k >= 1e-6 && e.h <= 0 && e.u <= 0) {
+        const dtl = landIn(b.h0, b.u0), at = evalFree(b, dtl);
+        if (st.flight) st.result = { home: dtl, own: at.tau - b.tau0 };
+        st.flight = null;
+        st.ball = { mode: 'held', where: 'floor', h: 0, tau0: at.tau, t0: b.t0 + dtl };
+      } else if (e.h >= H) {
+        st.flight = null;
+        st.ball = { mode: 'held', where: 'top', h: H, tau0: e.tau, t0: st.t };
+      }
+    }
+    const f = Math.exp(k * WHEEL / 2), held = st.ball.mode === 'held';
+    st.up += dy * (held ? 1 / f : 1); st.low += dy * (held ? f : 1);
+  }
+  function ghostPts(e) {
+    const b = st.ball, k = st.k, u0 = st.throwU;
+    if (b.mode !== 'held') return null;
+    if (b.h <= 1e-4 && u0 <= 0) return null;
+    if (k < 1e-6 && u0 <= 0) return null;
+    const tEnd = k < 1e-6 ? (H - b.h) / u0 : landIn(b.h, u0);
+    if (!(tEnd > 1e-6)) return null;
+    const fake = { h0: b.h, tau0: e.tau, u0 }, pts = [], n = 72;
+    for (let i = 0; i <= n; i++) {
+      const ee = evalFree(fake, tEnd * i / n);
+      if (ee.h > H) break;
+      frame(Math.max(0, ee.h), ee.tau, G);
+      pts.push(G.P.x + G.N.x * 0.03, G.P.y + G.N.y * 0.03, G.P.z + G.N.z * 0.03);
+    }
+    return pts;
+  }
+
+  const T = new THREE.Vector3(), B = new THREE.Vector3(), tp = new THREE.Vector3(), look = new THREE.Vector3(), m4 = new THREE.Matrix4();
+  function place() {
+    const e = evalBall(st.t), h = Math.min(H, Math.max(0, e.h));
+    frame(h, e.tau, F);
+    T.copy(F.ePhi).multiplyScalar(e.s).addScaledVector(F.eM, e.u).normalize();
+    B.crossVectors(T, F.N);
+    m4.makeBasis(T, F.N, B);
+    car.quaternion.setFromRotationMatrix(m4);
+    car.position.copy(F.P).addScaledVector(F.N, 0.02);
+    tp.copy(F.P).addScaledVector(F.N, 0.035);
+    if (tp.distanceTo(lastTrail) > 0.045) {
+      trail.push(tp.x, tp.y, tp.z); lastTrail.copy(tp);
+      if (trail.length > 4500) trail.splice(0, 3);
+      setLine(trailLine, trail);
+    }
+    shadowBall.position.set(0, F.P.y, 0);
+    setLine(link, [F.P.x, F.P.y, F.P.z, 0, F.P.y, 0]);
+    setLine(ghost, ghostPts(e));
+    frame(0, st.t, G); floorClock.position.copy(G.P).addScaledVector(G.N, 0.14);
+    frame(H, (1 + st.k * H) * st.t, G); topClock.position.copy(G.P).addScaledVector(G.N, 0.14);
+    if (st.ride) {
+      camera.position.copy(F.P).addScaledVector(F.N, 1.7).addScaledVector(T, -2.6);
+      camera.up.copy(F.N);
+      look.copy(F.P).addScaledVector(T, 1.1);
+      camera.lookAt(look);
+    }
+  }
+
+  const out = document.getElementById('out-horn');
+  function write() {
+    const e = evalBall(st.t), b = st.ball, k = st.k, none = k < 1e-6;
+    let status;
+    if (b.mode === 'free') status = none ? 'Free, and with no gravity straight ahead stays level. It floats.' : "Free. Nobody is steering: this is the ball's straight line.";
+    else if (b.where === 'floor') status = none ? 'On the floor, weightless.' : "On the floor. The floor does the steering now, and that push is the ball's weight.";
+    else if (b.where === 'top') status = 'Caught at the top of the tower.';
+    else status = none ? 'Held, but with no gravity there is nothing to steer against. It is weightless.' : 'Held. The hand keeps steering it uphill to stay level. That push is its weight.';
+    const steered = b.mode === 'held' && !none;
+    let h = '<h3>The ball</h3><p class="status">' + status + '</p>' +
+      row('Floor clock', f2(st.t) + ' years', 'time at home') +
+      row('Top clock', f2((1 + k * H) * st.t) + ' years', none ? '' : 'runs faster') +
+      row("Ball's own clock", f2(e.tau) + ' years', f2(e.tau / P) + ' trips around') +
+      row('Height', f2(Math.max(0, Math.min(H, e.h))) + ' light-years') +
+      row('Through space', pct(Math.abs(e.u)), 'of light speed, measured at its height') +
+      row('Through time', pct(e.s), f2(Math.abs(e.u)) + '² + ' + f2(e.s) + '² = 1') +
+      row('Wheels rolled', 'upper ' + f2(st.up) + ' · lower ' + f2(st.low), steered ? 'right now the lower one rolls further: steered' : 'right now both roll the same: straight');
+    if (st.result) h += '<p class="big">That throw: floor clock ' + f2(st.result.home) + ' years, ball ' + f2(st.result.own) + '</p><p class="step">Same distance driven, but the straight path got further around: more own time.</p>';
+    out.innerHTML = h;
+  }
+
+  // controls
+  const letBtn = document.getElementById('horn-let'), pauseBtn = document.getElementById('horn-pause'), rideBtn = document.getElementById('horn-ride');
+  const syncPause = () => { pauseBtn.textContent = st.playing ? 'Pause' : 'Play'; };
+  function reset() {
+    st.t = 0; st.up = st.low = 0; st.flight = null; st.result = null;
+    st.ball = { mode: 'held', where: st.startH <= 1e-4 ? 'floor' : 'hand', h: st.startH, tau0: 0, t0: 0 };
+    trail.length = 0; lastTrail.set(1e9, 0, 0); setLine(trailLine, null);
+    place(); write();
+  }
+  function letGo() {
+    const b = st.ball;
+    if (b.mode !== 'held') return;
+    if (b.h <= 1e-4 && st.throwU <= 0) return;
+    const e = evalBall(st.t);
+    st.result = null;
+    st.flight = b.h <= 1e-4 ? { t0: st.t } : null;
+    st.ball = { mode: 'free', t0: st.t, h0: b.h, tau0: e.tau, u0: st.throwU };
+    if (!st.playing) { st.playing = true; syncPause(); }
+  }
+  function hold() {
+    const b = st.ball;
+    if (b.mode !== 'free') return;
+    const e = evalBall(st.t);
+    st.flight = null;
+    st.ball = { mode: 'held', where: 'hand', h: Math.max(0, Math.min(H, e.h)), tau0: e.tau, t0: st.t };
+  }
+  letBtn.addEventListener('click', () => { letGo(); write(); });
+  document.getElementById('horn-hold').addEventListener('click', () => { hold(); write(); });
+  document.getElementById('horn-reset').addEventListener('click', reset);
+  pauseBtn.addEventListener('click', () => { st.playing = !st.playing; syncPause(); });
+  const grav = document.getElementById('grav'), gravOut = document.getElementById('grav-out');
+  const starth = document.getElementById('starth'), starthOut = document.getElementById('starth-out');
+  const thr = document.getElementById('throw'), thrOut = document.getElementById('throw-out');
+  const syncThrow = () => { thrOut.textContent = pct(st.throwU); letBtn.textContent = st.throwU > 0 ? 'Throw' : 'Let go'; };
+  grav.addEventListener('input', () => { st.g = parseFloat(grav.value); st.k = st.g * K1; gravOut.textContent = st.g.toFixed(2); rebuild(); reset(); });
+  starth.addEventListener('input', () => { st.startH = parseFloat(starth.value); starthOut.textContent = st.startH.toFixed(2); reset(); });
+  thr.addEventListener('input', () => { st.throwU = parseFloat(thr.value); syncThrow(); });
+  document.getElementById('horn-throwfloor').addEventListener('click', () => {
+    st.startH = 0; starth.value = '0'; starthOut.textContent = '0.00';
+    st.throwU = 0.8; thr.value = '0.8'; syncThrow();
+    reset(); letGo(); write();
+  });
+  function setRide(on) {
+    if (on === st.ride) return;
+    if (on) { st.saved = S.angles(); S.tween = null; S.controls.enabled = false; S.manualCam = true; camera.fov = 62; camera.updateProjectionMatrix(); }
+    else { S.manualCam = false; S.controls.enabled = true; camera.fov = 36; camera.updateProjectionMatrix(); const a = st.saved || S.home; S.place(a.polar, a.az); }
+    st.ride = on; rideBtn.setAttribute('aria-pressed', String(on));
+    floorLabel.visible = topLabel.visible = fcLabel.visible = tcLabel.visible = !on;
+  }
+  rideBtn.addEventListener('click', () => setRide(!st.ride));
+  document.getElementById('horn-out').addEventListener('click', () => { setRide(false); S.goView(S.home.polar, S.home.az); });
+
+  S.update = dt => {
+    if (st.playing) advance(dt * RATE);
+    place();
+    st.acc += dt;
+    if (st.acc > 0.12) { st.acc = 0; write(); }
+  };
+  rebuild(); syncThrow(); syncPause(); reset();
+}
+
+initDome();
+initHorn();
+
+const clk = new THREE.Clock();
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(clk.getDelta(), 0.05);
+  if (document.hidden) return;
+  for (const S of stages) {
+    S.update(dt);          // keep the numbers live even when the scene is scrolled away
+    if (!S.visible) continue;
+    if (S.tween) {
+      const tw = S.tween; tw.t += dt;
+      const u = Math.min(1, tw.t / tw.dur), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      S.place(tw.p0 + (tw.p1 - tw.p0) * e, tw.a0 + (tw.a1 - tw.a0) * e);
+      if (u >= 1) { S.tween = null; S.controls.enabled = true; }
+    } else if (!S.manualCam) S.controls.update();
+    S.renderer.render(S.scene, S.camera);
+    S.labels.render(S.scene, S.camera);
+  }
+}
+loop();
+</script>
+
+<!-- End of the published page. -->
+</body>
+</html>
