@@ -4,6 +4,11 @@ Plan of 22 November 2026, written at the end of the session that produced this r
 Marks as in [SURVEY.md](SURVEY.md): **Measured**, **Worked out**, **Open**, **Not verified**.
 Effort is counted in agent-hours: one hour of one AI worker proving and compiling.
 
+## Status
+
+**Step 1 is done** (23 November 2026). It took 28 minutes and three builds, against an estimate of
+5 to 20 agent-hours. See "What step 1 showed" below. Step 2 is next.
+
 ## The short answer
 
 - **Go, on a smaller target: "one mass, from the definitions"** (steps 1 and 2 below). It is cheap,
@@ -28,6 +33,23 @@ Effort is counted in agent-hours: one hour of one AI worker proving and compilin
 A warning that belongs right here: these were the easy pieces, chosen to be easy. The pace will
 not hold higher up.
 
+## What step 1 showed
+
+| | | Mark |
+|---|---|---|
+| From "go" to a green build | 28 minutes, three builds | Measured |
+| Size now | 79 theorems, about 1,300 lines; all 189 declarations audited | Measured |
+| Model use | 8 model turns; roughly $10 at list prices for the top model | Measured |
+| Against the estimate | 5 to 20 agent-hours were estimated. The real figure was under half an hour. | Measured |
+
+Why the estimate was so far off: it assumed each of the sixteen parts would need a hand-made
+proof. Writing every entry as "a function of the distance times a function of the angle" let one
+short recipe do all of them. That is a gain from the design, not luck in the proving.
+
+What it means for the steps below: their hours are probably too high as well. But they contain
+kinds of work step 1 did not: arguments about whole stretches of space instead of single points,
+limits, and statements that first have to be invented. Read them as upper limits until measured.
+
 ## The steps
 
 ```mermaid
@@ -42,8 +64,8 @@ flowchart LR
 
 | Step | What would be proved | What it needs first | Effort | Will it work? | Verdict |
 |---|---|---|---|---|---|
-| **1. One mass, from the definitions** | Compute the curvature of Schwarzschild's space-time from the general formulas (the ones the probe already uses), all 16 parts. Add the general equation for free fall and show the round orbit obeys it. This removes the first two "taken on trust" items in the README. | Nothing new. It is the probe again with four coordinates instead of two. | 5 to 20, most likely about 10 | Very likely | **Go** |
-| **2. It is the only one** (Birkhoff's theorem, in coordinates) | Any round, empty space-time is Schwarzschild's, even if you allow it to change in time. In particular a round star that pulsates makes no gravity waves. | Step 1, plus arguments of the kind "slope zero everywhere means constant", which the standard library has. | 20 to 60 | Likely | **Go, after step 1** |
+| **1. One mass, from the definitions** | Compute the curvature of Schwarzschild's space-time from the general formulas (the ones the probe already uses), all 16 parts. Add the general equation for free fall and show the round orbit obeys it. This removes the first two "taken on trust" items in the README. | Nothing new. It is the probe again with four coordinates instead of two. | Estimated 5 to 20. Took under half an hour. | It did | **Done** |
+| **2. It is the only one** (Birkhoff's theorem, in coordinates) | Any round, empty space-time is Schwarzschild's, even if you allow it to change in time. In particular a round star that pulsates makes no gravity waves. | Step 1, plus arguments of the kind "slope zero everywhere means constant", which the standard library has. | 20 to 60 | Likely | **Go, next** |
 | **3. Weak gravity gives Newton** | Far from masses and at low speeds, Einstein's equations turn into Newton's law of gravity. | A careful way of saying "to first order". The statements need designing before anyone proves them. | 40 to 150 | Likely, once the statements are right | Decide after step 2 |
 | 3 extra: the two classic numbers | Light passing a mass bends by `4M/b`. Mercury's orbit turns by 43 arc-seconds a century. | Limits of integrals, which are slower work than algebra. | 50 to 150 each | Likely | Optional |
 | **4a. Two masses, approximately** | Take the Einstein-Infeld-Hoffmann equations of 1938 as the starting point and check what follows: the equations of motion, what stays conserved, the slow turning of the orbit. | Step 3 helps but is not required. | 60 to 200 | Likely | **The smaller target** |
@@ -102,8 +124,8 @@ extra assumption. That was tested with a planted hole. (Measured.)
 **Where a swarm does not help.** Choosing what to state, and stating it correctly. That is design
 work for one careful head. Nor does it speed up review by people upstream.
 
-**Size it honestly.** Step 1 needs no swarm; one worker finishes it in a session or two. Step 2 is
-the right size for a first trial with about five workers. A swarm really pays from step 3 on.
+**Size it honestly.** Step 1 needed no swarm: one worker finished it in half an hour. Step 2
+probably needs none either. A swarm starts to pay from step 3 on.
 
 **Machines.** Every worker needs its own copy of the ready-built standard library (about 3.4 GB)
 and a few GB of memory per build. This PC can run one build at a time, so a swarm cannot run here.
@@ -118,9 +140,8 @@ the regular one. The table uses $15 to $30 per agent-hour to leave room.
 
 | Step | Agent-hours | At list prices |
 |---|---|---|
-| 1 | 5 to 20 | $75 to $600 |
+| 1 (done) | under half an hour | about $10 |
 | 2 | 20 to 60 | $300 to $1,800 |
-| 1 and 2 together | 25 to 80 | about $400 to $2,400 |
 | 3 | 40 to 150 | $600 to $4,500 |
 | 4a | 60 to 200 | $900 to $6,000 |
 | 4b | thousands | tens of thousands of dollars or more, with no promise of a result |
@@ -128,10 +149,9 @@ the regular one. The table uses $15 to $30 per agent-hour to leave room.
 These are **Worked out, roughly**: the hourly figure is measured, the hours are estimates.
 
 On the subscription instead of list prices there is no extra bill, but there is a weekly
-allowance. After today the top-model allowance for this week stood at 92% used, and the Lean part
-was roughly a tenth of today's use. So step 1 does not fit into what is left this week on the top
-model. On the regular model it should fit into a normal week. (Rough; the exact link between
-hours and allowance is not something we can measure from here.)
+allowance. Step 1 was expected not to fit into what was left of the week's top-model allowance.
+It did fit, because it took a fraction of the estimated time. (The exact link between hours and
+allowance is not something we can measure from here.)
 
 Cloud machines for a swarm were **not priced** today.
 
@@ -149,12 +169,11 @@ Cloud machines for a swarm were **not priced** today.
 
 ## Recommendation
 
-**Do step 1 next, alone, on this PC, on the regular model.** No swarm, no cloud, no spending
-beyond the subscription. It is done when Pieces B and C no longer carry a "taken on trust" note
-and the build is green.
+**Step 1 is done.** Pieces B and C no longer carry a "taken on trust" note.
 
-Then decide about step 2 with real numbers in hand, and use it as the first swarm trial if FACTORY
-is to be tested with Lean as the judge.
+**Do step 2 next** (Birkhoff's theorem, in coordinates). Going by step 1 it may well fit into a
+single session on this PC, with no swarm and no cloud. If FACTORY is to be tried with Lean as the
+judge, step 3 is now the better first trial, because it has more independent pieces.
 
 Leave step 4b and everything beyond it alone. And keep one sentence in view: **there is no exact
 formula for two orbiting masses to find, so this project is not looking for one.**
@@ -163,5 +182,5 @@ formula for two orbiting masses to find, so this project is not looking for one.
 
 1. Ask the Lean community chat whether a machine-checked proof that Schwarzschild's solution
    solves Einstein's equations already exists. Five minutes for a person with an account.
-2. Step 1: turn the probe's method on Schwarzschild's space-time.
-3. Offer the result to the community physics library, and decide about step 2.
+2. Step 2: Birkhoff's theorem, in coordinates.
+3. Offer step 1 to the community physics library.

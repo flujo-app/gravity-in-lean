@@ -24,9 +24,10 @@ Two facts describe it. Write `tdot` for how many far seconds pass per second of 
 `√(1 - 3M/r)` of a far clock, and it circles at the rate Kepler found, `(φdot/tdot)² = M/r³`.
 This is the formula the page uses for the light mass.
 
-**What is NOT proved here (the gap):** that facts 1 and 2 are what "falling freely on a circle"
-means in Schwarzschild's space-time. That comes from the textbook equation for free fall; it needs
-the same missing piece of the standard library as the gap in Piece B.
+**Where the two facts come from:** this file takes them as given. `FreeFall.lean` then proves
+that they are exactly what the general equation of free fall says for a round orbit
+(`roundOrbit_isFreeFall_iff`, `roundOrbit_keepsOwnTime_iff`), and states the result once more
+without them (`roundOrbit_clockRate_of_freeFall`).
 
 The last theorem is the "budget" that started this whole project: how fast something goes through
 time, squared, plus how fast it goes through space, squared, always adds up to the same total.
