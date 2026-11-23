@@ -102,6 +102,17 @@ quietly go stale. -/
   GravityInLean.birkhoff_resetClocks GravityInLean.schwarzschild_setting
   GravityInLean.schwarzschild_isEmptyOn GravityInLean.relabelled_isEmptyOn
 
+-- Step 2, from symmetry: the general round shape, and Birkhoff's theorem without a starting shape
+#audit GravityInLean.christoffel_gen GravityInLean.genG_mul_genGinv GravityInLean.genG_diagonal
+  GravityInLean.gen_ricciFlat_iff GravityInLean.sizeEquations GravityInLean.exists_potential
+  GravityInLean.massFn_const GravityInLean.newTime_closed GravityInLean.relabel_path
+  GravityInLean.birkhoff_general GravityInLean.rotX_turns GravityInLean.rotY_turns
+  GravityInLean.rotZ_turns GravityInLean.shape_of_round GravityInLean.genG_isRound
+  GravityInLean.birkhoff_of_round GravityInLean.roundEmpty_genG
+  GravityInLean.eddington_isEmptyOn GravityInLean.eddington_mass
+  GravityInLean.eddington_roundEmpty GravityInLean.eddington_outside
+  GravityInLean.eddington_inside
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

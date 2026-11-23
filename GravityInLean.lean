@@ -8,3 +8,10 @@ import GravityInLean.FreeFall
 import GravityInLean.TwoSlopes
 import GravityInLean.RoundChanging
 import GravityInLean.Birkhoff
+import GravityInLean.GeneralShape
+import GravityInLean.GeneralCurvature
+import GravityInLean.Potential
+import GravityInLean.BirkhoffGeneral
+import GravityInLean.Symmetry
+import GravityInLean.BirkhoffFromSymmetry
+import GravityInLean.Eddington

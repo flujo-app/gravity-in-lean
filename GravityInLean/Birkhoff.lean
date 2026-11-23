@@ -87,9 +87,6 @@ theorem Setting.regular (h : Setting A B J I) {x : Coords 4} (ht : x 0 ∈ J) (h
   smoothA := h.smoothA _ ht _ hr
   smoothB := h.smoothB _ ht _ hr
 
-/-- The point at time `t` and distance `r` on the equator. -/
-noncomputable def onEquator (t r : ℝ) : Coords 4 := ![t, r, π / 2, 0]
-
 /-- On the region, "empty" means: the four formulas of `RoundChanging.lean` vanish at every time
 and distance. The angles do not matter. -/
 theorem isEmptyOn_iff (h : Setting A B J I) :

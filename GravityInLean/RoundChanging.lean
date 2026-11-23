@@ -7,6 +7,7 @@ module
 
 public import GravityInLean.TwoSlopes
 public import GravityInLean.RoundSpacetime
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 import Mathlib.Tactic
 
@@ -67,6 +68,9 @@ theorem slope_sep2_θ (F : ℝ → ℝ → ℝ) (h : ℝ → ℝ) (x : Coords 4)
 /-- Such a function does not change around the axis. -/
 theorem slope_sep2_φ (F : ℝ → ℝ → ℝ) (h : ℝ → ℝ) (x : Coords 4) : slope 3 (sep2 F h) x = 0 := by
   simp [slope, sep2]
+
+/-- The point at time `t` and distance `r` on the equator. -/
+noncomputable def onEquator (t r : ℝ) : Coords 4 := ![t, r, π / 2, 0]
 
 /-! ## The named pieces -/
 
