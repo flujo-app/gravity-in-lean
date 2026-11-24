@@ -61,7 +61,7 @@ Honest numbers:
   no line over 100, no name declared in two files, no worker id or outside folder in files or
   commit messages). Findings: one missing comment (fixed), two instances without comment in
   `Develop.lean` (fixed), and one `simp ... at` followed by `linarith` in
-  `ConverseRoundKruskal.lean` (line 190; given back to its author, see the last row of the
+  `ConverseRoundKruskal.lean` (given back to its author and fixed, see the last row of the
   table). Not checked: whether every `public import` is needed.
 * Not done: a second reading of each proof text, or a check by a second person that each
   comment says what its Lean statement says. The build and the audit are the judge of the
@@ -164,4 +164,4 @@ uniqueness statements.
 | `form-check` | (read only), `Develop.lean` | m0-a6 | 03:50 | 03:55 | merged |
 | `schw-radius` | `SchwRadius.lean` | m0-a7 | 03:54 | 03:56 | built; not merged (proved twice) |
 | lead | `Kretschmann.lean`, `TableHess.lean` (definitions), `Unique.lean`, `Converse.lean` (joining lines) | m0-a0 | | 03:27, 03:29, 03:38, 03:46 | |
-| `form-fix-round` | `ConverseRoundKruskal.lean` line 190 | m0-a4 | 03:59 | | open: say what the `simp ... at` produces |
+| `form-fix-round` | `ConverseRoundKruskal.lean` | m0-a4 | 03:59 | 04:01 | merged; the nine equations that the `simp ... at` produced are now stated |
