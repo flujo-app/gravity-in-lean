@@ -9,6 +9,8 @@ public import GravityInLean.Global.Checks
 public import GravityInLean.Global.TableHess
 public import GravityInLean.Global.HessKept
 public import GravityInLean.Global.KretschmannKept
+public import GravityInLean.Global.KretschmannKruskal
+public import GravityInLean.Global.HessKruskal
 public import GravityInLean.Rim.Table
 
 import Mathlib.Geometry.Manifold.Notation
@@ -479,16 +481,41 @@ theorem KeepsKruskalOn.split_of_value (hm : 0 < m) {c : ℝ} (hc : c ≠ 0)
   · exact h.tx_zero hm hH hRad hx a i ha hi
   · exact h.sphere_zero hm hH hRad hx a i ha hi
 
+/-! ## The two known values, and the two statements -/
+
+/-- The curvature scalar of Kruskal's table is `-48 m² / r⁶`. -/
+theorem kruskalCurvatureValue (hm : 0 < m) : KruskalCurvatureValue m (-48 * m ^ 2) :=
+  fun _ hy ↦ kretschmann_kruskal hm hy
+
+/-- The number `-48 m²` is not zero for a positive mass. -/
+theorem kruskalCurvature_ne_zero (hm : 0 < m) : -48 * m ^ 2 ≠ 0 :=
+  mul_ne_zero (by norm_num) (pow_pos hm 2).ne'
+
+/-- The second slope of the radius of Kruskal's table is `m / r²` times the table on the
+`(T, X)` plane and `(r - 2m) / r²` times the table on the sphere. -/
+theorem kruskalHessValue (hm : 0 < m) : KruskalHessValue m := fun y hy a b ↦ by
+  by_cases hab : a = b
+  · subst hab
+    by_cases ha : a.val < 2
+    · rw [ite_eq_left ha]
+      exact hessT_kruskalRad_plane hm hy a a ha ha
+    · rw [ite_eq_right ha]
+      exact hessT_kruskalRad_sphere hm hy a a (not_lt.mp ha) (not_lt.mp ha)
+  · have e := hessT_kruskalRad hm hy a b
+    rw [kruskalG_of_ne m y hab, mul_zero] at e ⊢
+    exact e
+
 /-- **The radius is kept:** a map that keeps Kruskal's table keeps `X² - T²`. -/
 theorem KeepsKruskalOn.radius (hm : 0 < m) (h : KeepsKruskalOn m f W) (hx : x ∈ W) :
-    f x 1 ^ 2 - f x 0 ^ 2 = x 1 ^ 2 - x 0 ^ 2 := by
-  sorry
+    f x 1 ^ 2 - f x 0 ^ 2 = x 1 ^ 2 - x 0 ^ 2 :=
+  h.radius_of_value hm (kruskalCurvature_ne_zero hm) (kruskalCurvatureValue hm) hx
 
 /-- **The split is kept:** a map that keeps Kruskal's table carries steps in the `(T, X)` plane
 to steps in the `(T, X)` plane, and steps along the sphere to steps along the sphere. -/
 theorem KeepsKruskalOn.split (hm : 0 < m) (h : KeepsKruskalOn m f W) (hx : x ∈ W)
     (a i : Fin 4) (hai : (a.val < 2 ∧ 2 ≤ i.val) ∨ (2 ≤ a.val ∧ i.val < 2)) :
-    jac f a i x = 0 := by
-  sorry
+    jac f a i x = 0 :=
+  h.split_of_value hm (kruskalCurvature_ne_zero hm) (kruskalCurvatureValue hm)
+    (kruskalHessValue hm) hx a i hai
 
 end GravityInLean.Curved
