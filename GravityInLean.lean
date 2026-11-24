@@ -85,3 +85,17 @@ import GravityInLean.Join.Patch
 import GravityInLean.Join.ResultA
 import GravityInLean.Join.ResultB
 import GravityInLean.Join.Goal
+import GravityInLean.BothWays.OffRim
+import GravityInLean.BothWays.AssumptionsMet
+import GravityInLean.BothWays.NotAlwaysEmpty
+import GravityInLean.BothWays.EmptyOfRelabelled
+import GravityInLean.BothWays.RelabelledOfEmpty
+import GravityInLean.BothWays.InCoordinates
+import GravityInLean.BothWays.OffRimKnown
+import GravityInLean.BothWays.Pull
+import GravityInLean.BothWays.PullConnection
+import GravityInLean.BothWays.PullRound
+import GravityInLean.BothWays.PullUsable
+import GravityInLean.BothWays.PullSpaceTime
+import GravityInLean.BothWays.PullEmpty
+import GravityInLean.BothWays.NoCoordinates

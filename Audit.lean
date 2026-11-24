@@ -190,6 +190,21 @@ example : GravityInLean.Curved.BirkhoffNoCoordinates := GravityInLean.birkhoffNo
   GravityInLean.Join.birkhoff_patch GravityInLean.Join.birkhoff_general_smooth
   GravityInLean.Join.exists_chart_of_localDiffeo
 
+-- Proved by the fourth team of workers: Birkhoff's theorem both ways. Each first line checks
+-- that what was proved is the statement as it was fixed in `Goals/ExactlyWhen.lean`.
+example : GravityInLean.Curved.SchwarzschildExactlyWhen := GravityInLean.schwarzschildExactlyWhen
+example : GravityInLean.Curved.SchwarzschildIsEmptyStatement := GravityInLean.schwarzschildIsEmpty
+example : GravityInLean.BirkhoffExactlyWhenInCoordinates :=
+  GravityInLean.birkhoffExactlyWhenInCoordinates
+example : GravityInLean.ExactlyWhenAssumptionsMet := GravityInLean.exactlyWhenAssumptionsMet
+example : GravityInLean.ExactlyWhenAssumptionsMetInside :=
+  GravityInLean.exactlyWhenAssumptionsMetInside
+example : GravityInLean.ExactlyWhenNotAlwaysEmpty := GravityInLean.exactlyWhenNotAlwaysEmpty
+
+#audit GravityInLean.schwarzschildExactlyWhen GravityInLean.schwarzschildIsEmpty
+  GravityInLean.birkhoffExactlyWhenInCoordinates GravityInLean.exactlyWhenAssumptionsMet
+  GravityInLean.exactlyWhenAssumptionsMetInside GravityInLean.exactlyWhenNotAlwaysEmpty
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean
