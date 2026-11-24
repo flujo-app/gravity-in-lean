@@ -179,6 +179,17 @@ example : GravityInLean.TurnsCoordinatesStatement := GravityInLean.turnsCoordina
   GravityInLean.Turns.exists_restSurface GravityInLean.Turns.contDiffOn_chart
   GravityInLean.Turns.chart_relations GravityInLean.Turns.turns_of_relations
 
+-- Proved by the third team of workers: Birkhoff's theorem with no coordinates at all, the goal
+-- that was fixed in `Curved/Goal.lean` before any of the teams started. The first line checks
+-- that what was proved is that statement.
+example : GravityInLean.Curved.BirkhoffNoCoordinates := GravityInLean.birkhoffNoCoordinates
+
+#audit GravityInLean.birkhoffNoCoordinates GravityInLean.Join.resultA GravityInLean.Join.resultB
+  GravityInLean.Join.isEmptyOn_carry_of GravityInLean.Join.ricciAt_carry
+  GravityInLean.Join.isRicciFlatAt_of_isEmptyOn GravityInLean.Join.shape_of_round_box
+  GravityInLean.Join.birkhoff_patch GravityInLean.Join.birkhoff_general_smooth
+  GravityInLean.Join.exists_chart_of_localDiffeo
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean
