@@ -44,8 +44,12 @@ when" form, in coordinates and with none, in 11 minutes. See "What the fourth te
 that the definitions can fail, one mass for a whole region, and "a length measure has a
 connection" from the textbook, in 14 minutes. See "What the fifth team run showed".
 
-**Next:** the rim (issue 39): Birkhoff's theorem at every point, with Kruskal's form as the
-target. Then the global theorem, on which a second chat is writing the statements.
+**The rim is in** (24 November 2026, 02:51 UTC). A sixth team proved Birkhoff's theorem at
+every point, with Kruskal's form as the target, in 29 minutes. See "What the sixth team run
+showed".
+
+**Next:** the theorem about a whole space-time at once (issue 39, second step). A second chat
+is writing its statements. Then the checks of issue 34 before any public claim.
 
 ## The short answer
 
@@ -435,6 +439,51 @@ reader compared the copies with the reviewers' text and judged the one-mass stat
 the length measure, and its curvature vanishes", with the connection assumed. It is now proved
 that there is one, and exactly one. And every notion in the goal now has a case where it fails.
 
+## What the sixth team run showed
+
+The job: the eleven statements of `Goals/EveryPoint.lean` (issue 39, first step): Kruskal's
+table and its known answers, then Birkhoff's theorem at every point, the rim included. This
+was the first job expected to need more than one run, because the rim needed mathematics the
+project did not have: two labels along the light rays in the time-distance part.
+
+| | | |
+|---|---|---|
+| Result | proved: all eleven, 24 files, about 4,700 lines, 155 theorems. None turned out false. | Measured |
+| Time, from "all ten are ready" to "the whole project builds with the proofs in it" | 28 minutes 43 seconds (02:22:05 to 02:50:48 UTC) | Measured |
+| How it went | The nine statements about Kruskal's table built after 18 minutes. The theorem was first proved from one lemma still open, then that lemma was closed. | Measured (the team's record, checked against the queue's log) |
+| Lean runs | 72 until the goal, 13 failed and repaired; longest wait after the set-up 25 seconds | Measured |
+| Model use until the stop | 47.4 million tokens read (45.7 million from the cache), 745,000 written | Measured |
+| Weekly allowance | "all models" from 56% to 61%, "Fable" from 61% to 72%, between the end of the fifth run and the end of this one, with two other chats busy. So: at most 5 and 11 points. | Measured |
+| Checked afterwards on this PC | only `GravityInLean/Rim/` and import lines changed; rebuilt from nothing, no warnings; all 2,004 declarations pass the audit; `Audit.lean` checks each of the eleven against its fixed statement | Measured |
+
+**What the team changed in the route.** The route solved an ordinary equation with a singular
+point to get the new labels. The team avoided that: a smooth function `Ω` of two labels with
+`Ω · Ω_uv = Ω_u · Ω_v` and `Ω_uv ≠ 0` is a product of a function of the one label and a function
+of the other, on the whole box and across its zeros (`Rim/Product.lean`). The new labels are
+read off from that product.
+
+**The six runs together.**
+
+| Run | Job | Lines | Lemmas | Minutes | Allowance, at most |
+|---|---|---|---|---|---|
+| 1 | paths depend smoothly on their start | 980 | 24 | 14 | 2 to 3 points |
+| 2 | coordinates that fit the turns | 2,070 | 62 | 17 | 2 to 4 points |
+| 3 | the goal: Birkhoff with no coordinates | 4,500 | 168 | 21 | 5 to 10 points |
+| 4 | the theorem both ways | 2,000 | 83 | 11 | 3 to 6 points |
+| 5 | failure tests, one mass, the connection | 3,800 | 134 | 14 | 5 to 8 points |
+| 6 | every point, the rim included | 4,700 | 155 | 29 | 5 to 11 points |
+
+Six jobs, about 18,000 lines of checked proof, 106 minutes of team time, in one night. Each
+statement was fixed and read by a second reader before its team started, and each result was
+rebuilt from nothing afterwards. The allowance figures are upper bounds: other chats were busy
+at the same time, and from the fourth run on they were busy most of the time.
+
+**What is not checked, said plainly.** The same list as after the third run, shorter by what
+the fifth run added: the definitions have now been read by three reviewers against the
+textbooks and have failure tests, but still not by someone who works in gravity; the roughly
+650 lemmas in between were read by nobody but their authors; the symmetry is assumed in its
+small-steps form; and nothing is said about a whole space-time at once.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -514,9 +563,10 @@ one head, read twice, and tested on known answers before any worker starts.
    "What the fourth team run showed").
 8. From the review of the definitions (`REVIEW.md`): the tests, one mass, the connection from
    the textbook. **Done** by the fifth team (see "What the fifth team run showed").
-9. **Next:** the rim included (issue 39): around every point, a chart onto a piece of Kruskal's
-   form (`Goals/EveryPoint.lean`, brief in `fleet/goal-every-point.md`). Then the global
-   theorem. The checks of issue 34 before any public claim.
+9. The rim included (issue 39, first step). **Done** by the sixth team (see "What the sixth
+   team run showed").
+10. **Next:** the theorem about a whole space-time at once (issue 39, second step), in a second
+    chat. The checks of issue 34 before any public claim.
 
 ## After Birkhoff: what could make a paper
 
