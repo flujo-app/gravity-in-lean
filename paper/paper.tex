@@ -33,15 +33,15 @@
 \emergencystretch=3em
 \setlength{\abovetopsep}{4pt}
 
-\hypersetup{pdftitle={Birkhoff's theorem without coordinates, machine-checked in Lean 4, and how teams of AI workers built it}, pdfauthor={Mario Andreschak, Claude Fable 5.2, Claude Opus 5.5}}
-\title{Birkhoff's theorem without coordinates, machine-checked in Lean 4, and how teams of AI workers built it}
+\hypersetup{pdftitle={Birkhoff's theorem without coordinates, machine-checked in Lean~4, and how teams of AI workers built it}, pdfauthor={Mario Andreschak, Claude Fable 5.2, Claude Opus 5.5}}
+\title{Birkhoff's theorem without coordinates, machine-checked in Lean~4, and how teams of AI workers built it}
 \author{Mario Andreschak \and Claude Fable 5.2 \and Claude Opus 5.5}
 \date{\small\itshape Claude Fable 5.2 and Claude Opus 5.5 are AI systems made by Anthropic. Section 10 sets out what each author did.\\[0.5ex]Draft of 24 November 2026. Not submitted. Every number below is a measurement recorded in \texttt{PLAN.\allowbreak{}md} or in the run logs of the repository; nothing is estimated unless it says so.}
 \begin{document}
 \maketitle
 \begin{abstract}
 
-We describe a formalisation in Lean 4 with mathlib of Birkhoff's theorem in a form that does not start from coordinates: a smooth Lorentzian metric on a 4-manifold that is Ricci-flat and carries three Killing fields with the brackets of so(3), two-dimensional spacelike orbits, is locally Schwarzschild. The formal statement holds at every point of the region, including the horizon and the bifurcation sphere, where the target is the Kruskal–Szekeres form; it gives one mass on each connected region; and it comes with its converse, as one “if and only if”. For a simply connected region the local charts are glued into one length-keeping map into the Kruskal–Szekeres space-time (or into Minkowski or negative-mass Schwarzschild space-time), unique up to a symmetry. The Levi-Civita connection of a metric of arbitrary signature is shown to exist and to be unique, so “Ricci-flat” carries no hidden assumption. The definitions were reviewed against the textbooks and are pinned by 25 tests in which a definition must fail. The development has about 1,550 theorems (2,605 declarations in the axiom audit, about 39,400 lines of Lean) and was produced in about 27 hours from the repository's first commit (23 November 2026, 01:08 UTC, to 24 November, 04:13 UTC). Most of the proofs were written by teams of ten AI workers in seven runs of 11 to 46 minutes each; the groundwork in coordinates, the definitions and the statements were written by single AI sessions. The statements were fixed in advance, read by an independent second reader, and checked afterwards by a rebuild from scratch and an audit of axioms. We report what this cost, where the time went, and what is not checked. To our knowledge no earlier machine-checked Birkhoff theorem starts from symmetry assumptions without coordinates; the mathematics itself is classical, except that we found no complete written proof for the bifurcation sphere or for the global statement.
+We describe a formalisation in Lean~4 with mathlib of Birkhoff's theorem in a form that does not start from coordinates: a smooth Lorentzian metric on a 4-manifold that is Ricci-flat and carries three Killing fields with the brackets of so(3), two-dimensional spacelike orbits, is locally Schwarzschild. The formal statement holds at every point of the region, including the horizon and the bifurcation sphere, where the target is the Kruskal–Szekeres form; it gives one mass on each connected region; and it comes with its converse, as one “if and only if”. For a simply connected region the local charts are glued into one length-keeping map into the Kruskal–Szekeres space-time (or into Minkowski or negative-mass Schwarzschild space-time), unique up to a symmetry. The Levi-Civita connection of a metric of arbitrary signature is shown to exist and to be unique, so “Ricci-flat” carries no hidden assumption. The definitions were reviewed against the textbooks and are pinned by 25 tests in which a definition must fail. The development has about 1,550 theorems (2,605 declarations in the axiom audit, about 39,400 lines of Lean) and was produced in about 27 hours from the repository's first commit (23 November 2026, 01:08 UTC, to 24 November, 04:13 UTC). Most of the proofs were written by teams of ten AI workers in seven runs of 11 to 46 minutes each; the groundwork in coordinates, the definitions and the statements were written by single AI sessions. The statements were fixed in advance, read by an independent second reader, and checked afterwards by a rebuild from scratch and an audit of axioms. We report what this cost, where the time went, and what is not checked. To our knowledge no earlier machine-checked Birkhoff theorem starts from symmetry assumptions without coordinates; the mathematics itself is classical, except that we found no complete written proof for the bifurcation sphere or for the global statement.
 
 \end{abstract}
 \section*{1. Introduction}
@@ -79,7 +79,7 @@ The second subject of the paper is the method. The proofs were not written by a 
 
 \begin{itemize}
 \item
-\emph{ProjectAinos} (\texttt{x-oai/\allowbreak{}Project\penalty300{}Ainos}) proved Birkhoff's theorem in Lean 4 from a fixed diagonal form −A(t,r)dt² + B(t,r)dr² + r²dΩ² with A, B > 0 (so outside the horizon only) on 19 November 2026, four days before the coordinate version in this repository. The coordinate result here is therefore not a first.
+\emph{ProjectAinos} (\texttt{x-oai/\allowbreak{}Project\penalty300{}Ainos}) proved Birkhoff's theorem in Lean~4 from a fixed diagonal form −A(t,r)dt² + B(t,r)dr² + r²dΩ² with A, B > 0 (so outside the horizon only) on 19 November 2026, four days before the coordinate version in this repository. The coordinate result here is therefore not a first.
 \item
 \emph{grlab} (\texttt{Brandon\penalty300{}MYates/\allowbreak{}grlab}, August 2026) has the last step of the static case.
 \item
@@ -93,17 +93,17 @@ Schwarzschild's solution itself had been verified in Lean at least twice before.
 \textbf{Side by side.} The two earlier Birkhoff statements, read in their source files on 24 November 2026 (ProjectAinos: \texttt{theorem birkhoff} in \texttt{Project\penalty300{}Ainos/\allowbreak{}General\penalty300{}Relativity/\allowbreak{}Birkhoff.\allowbreak{}lean}; grlab: \texttt{theorem exists\_\allowbreak{}mass\_\allowbreak{}of\_\allowbreak{}areal\_\allowbreak{}vacuum} in \texttt{GRLab/\allowbreak{}Birkhoff.\allowbreak{}lean}), against the two main statements here:
 
 \begingroup\footnotesize\setlength{\tabcolsep}{4pt}
-\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\hsize=0.48\hsize}X>{\raggedright\arraybackslash\hsize=1.05\hsize}X>{\raggedright\arraybackslash\hsize=1.01\hsize}X>{\raggedright\arraybackslash\hsize=1.84\hsize}X>{\raggedright\arraybackslash\hsize=0.61\hsize}X@{}}
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\hsize=0.60\hsize}X>{\raggedright\arraybackslash\hsize=0.93\hsize}X>{\raggedright\arraybackslash\hsize=1.02\hsize}X>{\raggedright\arraybackslash\hsize=1.64\hsize}X>{\raggedright\arraybackslash\hsize=0.80\hsize}X@{}}
 \toprule
  & \textbf{ProjectAinos, \texttt{birkhoff}} & \textbf{grlab, \texttt{exists\_\allowbreak{}mass\_\allowbreak{}of\_\allowbreak{}areal\_\allowbreak{}vacuum}} & \textbf{here, \texttt{birkhoff\penalty300{}No\penalty300{}Coordinates}} & \textbf{here, \texttt{birkhoff\penalty300{}At\penalty300{}Every\penalty300{}Point}} \\
 \midrule
 \endhead
-Space & an open box of (t, r, θ, φ) in ℝ⁴ & an open interval of r in ℝ & any smooth 4-manifold & any smooth 4-manifold \\
-Metric & −A(t,r)dt² + B(t,r)dr² + r²dΩ², smooth, A, B > 0 & one function f(r); the metric −f dt² + f⁻¹dr² + r²dΩ² appears only in comments & any smooth Lorentzian metric & the same \\
-Symmetry & built into the formula & built into the formula, and static & three Killing fields with so(3) brackets and two-dimensional spacelike orbits & the same \\
-Vacuum & every Ricci component of the coordinate table vanishes & the single equation 1 − f − r f′ = 0 & the Ricci tensor of the Levi-Civita connection vanishes; the connection is proved to exist & the same \\
-Coordinates in the hypotheses & yes & yes & none & none \\
-Conclusion & B = r/(r−2M) and A = f(t)(r−2M)/r, with r > 2M & f = 1 − 2M/r & a chart around p in which the metric is Schwarzschild's, r > 2m or 0 < r < 2m & a chart around p onto Kruskal's form (m > 0) or Schwarzschild's (m ≤ 0) \\
+Space & an open box of (t, r, θ, φ) in ℝ⁴ & an open interval of r in ℝ & any smooth 4-manifold & any smooth 4-manifold \\\addlinespace[3pt]
+Metric & −A(t,r)dt² + B(t,r)dr² + r²dΩ², smooth, A, B > 0 & one function f(r); the metric −f dt² + f⁻¹dr² + r²dΩ² appears only in comments & any smooth Lorentzian metric & the same \\\addlinespace[3pt]
+Symmetry & built into the formula & built into the formula, and static & three Killing fields with so(3) brackets and two-dimensional spacelike orbits & the same \\\addlinespace[3pt]
+Vacuum & every Ricci component of the coordinate table vanishes & the single equation 1 − f − r f′ = 0 & the Ricci tensor of the Levi-Civita connection vanishes; the connection is proved to exist & the same \\\addlinespace[3pt]
+Coordinates in the hypotheses & yes & yes & none & none \\\addlinespace[3pt]
+Conclusion & B = r/(r−2M) and A = f(t)(r−2M)/r, with r > 2M & f = 1 − 2M/r & a chart around p in which the metric is Schwarzschild's, r > 2m or 0 < r < 2m & a chart around p onto Kruskal's form (m > 0) or Schwarzschild's (m ≤ 0) \\\addlinespace[3pt]
 Where & outside the horizon & an interval avoiding r = 0 & every point where the gradient of the area radius is not null; includes the inside of the horizon & every point \\
 \bottomrule
 \end{xltabular}
@@ -119,19 +119,19 @@ The row that matters is the fifth. In both earlier theorems the coordinates, and
 The base is mathlib's manifolds, tangent bundle, Lie bracket of vector fields (\texttt{mlie\penalty300{}Bracket}) and covariant derivatives on vector bundles (\texttt{Is\penalty300{}Covariant\penalty300{}Derivative\penalty300{}On}). On top of these the project defines, in \texttt{Gravity\penalty300{}In\penalty300{}Lean/\allowbreak{}Curved/\allowbreak{}Basic.\allowbreak{}lean} and \texttt{Curved/\allowbreak{}Goal.\allowbreak{}lean}:
 
 \begingroup\small\setlength{\tabcolsep}{4pt}
-\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\hsize=0.48\hsize}X>{\raggedright\arraybackslash\hsize=0.62\hsize}X>{\raggedright\arraybackslash\hsize=1.89\hsize}X@{}}
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\hsize=0.40\hsize}X>{\raggedright\arraybackslash\hsize=0.66\hsize}X>{\raggedright\arraybackslash\hsize=1.94\hsize}X@{}}
 \toprule
 \textbf{Notion} & \textbf{Lean name} & \textbf{Definition, in short} \\
 \midrule
 \endhead
-Metric & \texttt{Length\penalty300{}Measure I M} & a continuous bilinear form on each tangent space \\
-Lorentzian & \texttt{Has\penalty300{}One\penalty300{}Time\penalty300{}Direction}, \texttt{Is\penalty300{}Space\penalty300{}Time\penalty300{}On g s} & symmetric, smooth, and there is a timelike vector whose orthogonal complement is positive definite \\
-Levi-Civita connection & \texttt{Is\penalty300{}Connection\penalty300{}Of g cov s} & on an open set: a covariant derivative, torsion-free, metric-compatible \\
-Curvature, Ricci & \texttt{curvature\penalty300{}At}, \texttt{ricci\penalty300{}At} & R(X,Y)Z on extensions of vectors; trace over the first slot in a basis \\
-Vacuum & \texttt{Is\penalty300{}Empty\penalty300{}On g s} & there is a connection of g on s whose Ricci tensor vanishes \\
-Killing field & \texttt{Leaves\penalty300{}Unchanged\penalty300{}At g ξ x} & ξ is differentiable at x and ξ(g(X,Y)) = g([ξ,X],Y) + g(X,[ξ,Y]) \\
-Spherical symmetry & \texttt{Is\penalty300{}Round\penalty300{}On g ξ s} & three smooth Killing fields with [ξ₀,ξ₁]=ξ₂ and cyclic, spanning a 2-plane at each point, on which g is positive \\
-Area radius squared & \texttt{size\penalty300{}Sq g ξ} & (g(ξ₀,ξ₀)+g(ξ₁,ξ₁)+g(ξ₂,ξ₂))/2 \\
+Metric & \texttt{Length\penalty300{}Measure I M} & a continuous bilinear form on each tangent space \\\addlinespace[3pt]
+Lorentzian & \texttt{Has\penalty300{}One\penalty300{}Time\penalty300{}Direction}, \texttt{Is\penalty300{}Space\penalty300{}Time\penalty300{}On g s} & symmetric, smooth, and there is a timelike vector whose orthogonal complement is positive definite \\\addlinespace[3pt]
+Levi-Civita connection & \texttt{Is\penalty300{}Connection\penalty300{}Of g cov s} & on an open set: a covariant derivative, torsion-free, metric-compatible \\\addlinespace[3pt]
+Curvature, Ricci & \texttt{curvature\penalty300{}At}, \texttt{ricci\penalty300{}At} & R(X,Y)Z on extensions of vectors; trace over the first slot in a basis \\\addlinespace[3pt]
+Vacuum & \texttt{Is\penalty300{}Empty\penalty300{}On g s} & there is a connection of g on s whose Ricci tensor vanishes \\\addlinespace[3pt]
+Killing field & \texttt{Leaves\penalty300{}Unchanged\penalty300{}At g ξ x} & ξ is differentiable at x and ξ(g(X,Y)) = g([ξ,X],Y) + g(X,[ξ,Y]) \\\addlinespace[3pt]
+Spherical symmetry & \texttt{Is\penalty300{}Round\penalty300{}On g ξ s} & three smooth Killing fields with [ξ₀,ξ₁]=ξ₂ and cyclic, spanning a 2-plane at each point, on which g is positive \\\addlinespace[3pt]
+Area radius squared & \texttt{size\penalty300{}Sq g ξ} & (g(ξ₀,ξ₀)+g(ξ₁,ξ₁)+g(ξ₂,ξ₂))/2 \\\addlinespace[3pt]
 Non-null gradient & \texttt{Usable\penalty300{}Distance\penalty300{}At g ξ p} & the gradient of \texttt{size\penalty300{}Sq} at p exists as a vector and is not null \\
 \bottomrule
 \end{xltabular}
@@ -210,18 +210,18 @@ What we did not state: a classification of all maximal or inextendible such spac
 The other statements, with their proofs' names:
 
 \begingroup\small\setlength{\tabcolsep}{4pt}
-\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\hsize=0.57\hsize}X>{\raggedright\arraybackslash\hsize=1.93\hsize}X>{\raggedright\arraybackslash\hsize=0.49\hsize}X@{}}
+\begin{xltabular}{\linewidth}{@{}>{\raggedright\arraybackslash\hsize=0.61\hsize}X>{\raggedright\arraybackslash\hsize=1.93\hsize}X>{\raggedright\arraybackslash\hsize=0.47\hsize}X@{}}
 \toprule
 \textbf{Statement} & \textbf{Content} & \textbf{Proof} \\
 \midrule
 \endhead
-\texttt{Schwarzschild\penalty300{}Exactly\penalty300{}When} & (∃ open s ∋ p and ξ: Lorentzian, vacuum, round, non-null gradient at p) ⇔ Schwarzschild in a chart around p & \texttt{schwarzschild\penalty300{}Exactly\penalty300{}When} \\
-\texttt{Schwarzschild\penalty300{}Is\penalty300{}Empty\penalty300{}Statement} & Schwarzschild in a chart ⇒ vacuum near p, exterior and interior, no symmetry assumed & \texttt{schwarzschild\penalty300{}Is\penalty300{}Empty} \\
-\texttt{Birkhoff\penalty300{}Exactly\penalty300{}When\penalty300{}In\penalty300{}Coordinates} & for a spherically symmetric table: Ricci-flat ⇔ Schwarzschild after a smooth relabelling of (t, r) & \texttt{birkhoff\penalty300{}Exactly\penalty300{}When\penalty300{}In\penalty300{}Coordinates} \\
-\texttt{One\penalty300{}Mass\penalty300{}Statement} & on an open connected region: one m for all points with non-null gradient, also across a horizon & \texttt{one\penalty300{}Mass} \\
-\texttt{Birkhoff\penalty300{}At\penalty300{}Every\penalty300{}Point\penalty300{}One\penalty300{}Mass} & the statement at every point with one m on a connected region & \texttt{birkhoff\penalty300{}At\penalty300{}Every\penalty300{}Point\penalty300{}One\penalty300{}Mass} \\
-\texttt{Connection\penalty300{}Exists\penalty300{}Statement}, \texttt{Connection\penalty300{}Unique\penalty300{}Statement} & Levi-Civita connection of a non-degenerate smooth metric on an open set: exists, is unique on differentiable fields & \texttt{connection\penalty300{}Exists}, \texttt{connection\penalty300{}Unique} \\
-\texttt{Smooth\penalty300{}Flow\penalty300{}Statement} & the local flow of a smooth vector field on a Banach space is jointly smooth in time and initial point & \texttt{smooth\penalty300{}Flow} \\
+\texttt{Schwarzschild\penalty300{}Exactly\penalty300{}When} & (∃ open s ∋ p and ξ: Lorentzian, vacuum, round, non-null gradient at p) ⇔ Schwarzschild in a chart around p & \texttt{schwarzschild\penalty300{}Exactly\penalty300{}When} \\\addlinespace[3pt]
+\texttt{Schwarzschild\penalty300{}Is\penalty300{}Empty\penalty300{}Statement} & Schwarzschild in a chart ⇒ vacuum near p, exterior and interior, no symmetry assumed & \texttt{schwarzschild\penalty300{}Is\penalty300{}Empty} \\\addlinespace[3pt]
+\texttt{Birkhoff\penalty300{}Exactly\penalty300{}When\penalty300{}In\penalty300{}Coordinates} & for a spherically symmetric table: Ricci-flat ⇔ Schwarzschild after a smooth relabelling of (t, r) & \texttt{birkhoff\penalty300{}Exactly\penalty300{}When\penalty300{}In\penalty300{}Coordinates} \\\addlinespace[3pt]
+\texttt{One\penalty300{}Mass\penalty300{}Statement} & on an open connected region: one m for all points with non-null gradient, also across a horizon & \texttt{one\penalty300{}Mass} \\\addlinespace[3pt]
+\texttt{Birkhoff\penalty300{}At\penalty300{}Every\penalty300{}Point\penalty300{}One\penalty300{}Mass} & the statement at every point with one m on a connected region & \texttt{birkhoff\penalty300{}At\penalty300{}Every\penalty300{}Point\penalty300{}One\penalty300{}Mass} \\\addlinespace[3pt]
+\texttt{Connection\penalty300{}Exists\penalty300{}Statement}, \texttt{Connection\penalty300{}Unique\penalty300{}Statement} & Levi-Civita connection of a non-degenerate smooth metric on an open set: exists, is unique on differentiable fields & \texttt{connection\penalty300{}Exists}, \texttt{connection\penalty300{}Unique} \\\addlinespace[3pt]
+\texttt{Smooth\penalty300{}Flow\penalty300{}Statement} & the local flow of a smooth vector field on a Banach space is jointly smooth in time and initial point & \texttt{smooth\penalty300{}Flow} \\\addlinespace[3pt]
 \texttt{Turns\penalty300{}Coordinates\penalty300{}Statement} & three fields on an open subset of ℝ⁴ with so(3) brackets and rank 2 are, in suitable coordinates and after one fixed rotation, the standard rotation fields & \texttt{turns\penalty300{}Coordinates} \\
 \bottomrule
 \end{xltabular}
@@ -289,12 +289,12 @@ None of the reviewers is a human expert. That remains to be done.
 \textbf{Run} & \textbf{Job} & \textbf{Files} & \textbf{Lines} & \textbf{Theorems} & \textbf{Minutes} & \textbf{Lean runs (failed)} \\
 \midrule
 \endhead
-1 & \texttt{smooth\penalty300{}Flow} & 11 & 980 & 24 & 14 & 20 (1) \\
-2 & \texttt{turns\penalty300{}Coordinates} & 20 & 2,070 & 62 & 17 & 52 (9) \\
-3 & \texttt{birkhoff\penalty300{}No\penalty300{}Coordinates} & 24 & 4,500 & 168 & 21 & 79 (17) \\
-4 & both directions (6 statements) & 14 & 2,000 & 83 & 11 & 46 (10) \\
-5 & 25 failure tests, one mass, the connection & 29 & 3,800 & 134 & 14 & 80 (10) \\
-6 & every point, horizon included (11 statements) & 24 & 4,700 & 155 & 29 & 72 (13) \\
+1 & \texttt{smooth\penalty300{}Flow} & 11 & 980 & 24 & 14 & 20 (1) \\\addlinespace[3pt]
+2 & \texttt{turns\penalty300{}Coordinates} & 20 & 2,070 & 62 & 17 & 52 (9) \\\addlinespace[3pt]
+3 & \texttt{birkhoff\penalty300{}No\penalty300{}Coordinates} & 24 & 4,500 & 168 & 21 & 79 (17) \\\addlinespace[3pt]
+4 & both directions (6 statements) & 14 & 2,000 & 83 & 11 & 46 (10) \\\addlinespace[3pt]
+5 & 25 failure tests, one mass, the connection & 29 & 3,800 & 134 & 14 & 80 (10) \\\addlinespace[3pt]
+6 & every point, horizon included (11 statements) & 24 & 4,700 & 155 & 29 & 72 (13) \\\addlinespace[3pt]
 7 & the whole space-time (7 statements) & 40 & 9,400 & 350 & 46 & 132 (19) \\
 \bottomrule
 \end{xltabular}
@@ -352,7 +352,7 @@ The independent checks 3 and 4 of Section 9.
 \item
 Repository: \texttt{github.\allowbreak{}com/\allowbreak{}flujo-app/\allowbreak{}gravity-in-lean}, public since 24 November 2026. The numbers in this draft refer to commit \texttt{3b816ea} (pull request 55), tagged \texttt{paper-1-numbers}.
 \item
-Lean 4.36.0, mathlib v4.36.0 (pinned). To check: \texttt{lake exe cache get}, then \texttt{lake build}. A full rebuild of the project (not of mathlib) takes 2 to 6 minutes on the PC described.
+Lean~4.36.0, mathlib v4.36.0 (pinned). To check: \texttt{lake exe cache get}, then \texttt{lake build}. A full rebuild of the project (not of mathlib) takes 2 to 6 minutes on the PC described.
 \item
 The build ends with lines of the form “all 2605 declarations under GravityInLean checked: none rests on more than [propext, Classical.choice, Quot.sound]” (\texttt{Audit.\allowbreak{}lean}).
 \item
@@ -360,7 +360,7 @@ CI: the workflow “Check the proofs” runs the same build on a clean machine o
 \item
 The briefs given to the teams, the scripts that ran them, and each team's own record (\texttt{STATUS.\allowbreak{}md} in \texttt{Flows/}, \texttt{Turns/}, \texttt{Join/}, \texttt{Both\penalty300{}Ways/}, \texttt{Checks/}, \texttt{Rim/}) are in the repository.
 \item
-The Xena blog (12 November 2026) asks four questions of a Lean proof written by AI: does the Lean statement match the informal statement; does the code compile; does it prove the theorem as stated; does it exploit a bug in Lean's kernel. What was done for each, at commit \texttt{3b816ea} with the tools that ship with Lean 4.36.0:
+The Xena blog (12 November 2026) asks four questions of a Lean proof written by AI: does the Lean statement match the informal statement; does the code compile; does it prove the theorem as stated; does it exploit a bug in Lean's kernel. What was done for each, at commit \texttt{3b816ea} with the tools that ship with Lean~4.36.0:
 \begin{enumerate}
 \item
 \emph{The statement.} Each Lean excerpt in this paper was compared with the source by a script. Whether the definitions say what the textbooks mean was checked by three AI reviewers (Section 6), not yet by a person who works in gravity.
@@ -415,7 +415,7 @@ K. Schleich and D. M. Witt, “What does Birkhoff's theorem really tell us?”, 
 \item
 The mathlib Community, “The Lean mathematical library”, CPP 2020.
 \item
-L. de Moura and S. Ullrich, “The Lean 4 theorem prover and programming language”, CADE 2021.
+L. de Moura and S. Ullrich, “The Lean~4 theorem prover and programming language”, CADE 2021.
 \item
 Xena Project blog, “…and the proof is checked in Lean”, 12 November 2026, xenaproject.wordpress.com.
 \item

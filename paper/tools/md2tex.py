@@ -107,7 +107,7 @@ def text(s):
             out.append(r"\textsubscript{" + escape(m.group(3)) + "}")
         pos = m.end()
     out.append(escape(s[pos:]))
-    return "".join(out)
+    return "".join(out).replace("Lean 4", "Lean~4")
 
 
 def code(s):
@@ -141,21 +141,47 @@ def inline(s):
     return "".join(out)
 
 
+def unbreakable(cell):
+    """Length of the longest piece of a cell that cannot be broken across lines."""
+    pieces = []
+    for m in re.finditer(r"`([^`]+)`|([^`]+)", cell):
+        if m.group(1) is not None:
+            pieces += re.split(r"(?<=[./_])|(?<=[a-z])(?=[A-Z])|\s+", m.group(1))
+        else:
+            pieces += m.group(2).replace("*", "").split()
+    return max((len(p) for p in pieces), default=0)
+
+
 def table(rows):
     """A pipe table as a booktabs table that may break across pages."""
     cells = [[c.strip() for c in re.split(r"(?<!\\)\|", r.strip().strip("|"))] for r in rows]
     head, body = cells[0], cells[2:]
     n = len(head)
-    lengths = [max(len(r[j]) if j < len(r) else 0 for r in [head] + body) for j in range(n)]
-    widths = [sum(len(r[j]) for r in body if j < len(r)) / max(len(body), 1) for j in range(n)]
+    column = [[r[j] if j < len(r) else "" for r in [head] + body] for j in range(n)]
+    lengths = [max(len(c) for c in col) for col in column]
     wide = [j for j in range(n) if lengths[j] > 18]
-    total = sum(widths[j] for j in wide) or 1
-    factors = {j: min(max(widths[j] * len(wide) / total, 0.5), 2.0) for j in wide}
-    scale = len(wide) / (sum(factors.values()) or 1)
+    # Width of each wide column, in characters: shared by the average and longest cell, but
+    # never narrower than its longest word, so that short labels are not hyphenated.
+    budget = (100 if n > 3 else 90) - sum(lengths[j] + 2 for j in range(n) if j not in wide)
+    weight = {j: sum(map(len, column[j][1:])) / max(len(body), 1) + lengths[j] / 4 for j in wide}
+    need = {j: max(unbreakable(c) for c in column[j]) + 1 for j in wide}
+    width, free = {}, set(wide)
+    while free:
+        total = sum(weight[j] for j in free)
+        share = {j: budget * weight[j] / total for j in free}
+        low = [j for j in free if share[j] < need[j]]
+        if not low:
+            width.update(share)
+            break
+        for j in low:
+            width[j] = need[j]
+            budget -= need[j]
+            free.remove(j)
     spec = []
     for j in range(n):
-        if j in factors:
-            spec.append(r">{\raggedright\arraybackslash\hsize=%.2f\hsize}X" % (factors[j] * scale))
+        if j in width:
+            factor = width[j] * len(wide) / sum(width.values())
+            spec.append(r">{\raggedright\arraybackslash\hsize=%.2f\hsize}X" % factor)
         elif all(re.fullmatch(r"[\d,.]+", r[j]) for r in body if j < len(r) and r[j]):
             spec.append("r")
         else:
@@ -169,9 +195,10 @@ def table(rows):
         r"\midrule",
         r"\endhead",
     ]
-    for r in body:
+    for k, r in enumerate(body):
         r = r + [""] * (n - len(r))
-        lines.append(" & ".join(inline(c) for c in r) + r" \\")
+        gap = r"\addlinespace[3pt]" if wide and k + 1 < len(body) else ""
+        lines.append(" & ".join(inline(c) for c in r) + r" \\" + gap)
     lines += [r"\bottomrule", r"\end{xltabular}", r"\endgroup"]
     return "\n".join(lines)
 
