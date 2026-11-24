@@ -47,8 +47,10 @@ structure Sym (Γ : Set (X → X)) where
   /-- It is one of the symmetries. -/
   mem : val ∈ Γ
 
+/-- The symmetries as a space: every set of symmetries is open. -/
 instance (Γ : Set (X → X)) : TopologicalSpace (Sym Γ) := ⊥
 
+/-- In the space of symmetries every point stands alone. -/
 instance (Γ : Set (X → X)) : DiscreteTopology (Sym Γ) := ⟨rfl⟩
 
 /-- A map with a domain on which it is good. -/
