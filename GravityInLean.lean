@@ -30,6 +30,9 @@ import GravityInLean.Curved.Goal
 import GravityInLean.Goals.Turns
 import GravityInLean.Goals.Connection
 import GravityInLean.Goals.ExactlyWhen
+import GravityInLean.Goals.Tests
+import GravityInLean.Goals.OneMass
+import GravityInLean.Goals.EveryPoint
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate

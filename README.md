@@ -85,9 +85,12 @@ proved by `x-oai/ProjectAinos` on 19 November 2026, four days before the version
 `BrandonMYates/grlab` has the static last step (August 2026). `LightLikeProject/lightlike`
 builds charts from the fields of a symmetry for the case of cosmology, and
 `TauCetiProject/TauCeti` proves that a length measure of any signature has a connection. What we
-have not found elsewhere, as far as we looked: Birkhoff's theorem from the symmetry alone, with
-no starting shape, and with no coordinates given. "Not found" is not "first". Details and dates:
-[SURVEY.md](SURVEY.md), [TARGETS.md](TARGETS.md).
+have not found elsewhere, as far as we looked: a machine check of Birkhoff's theorem from the
+symmetry alone, with no starting shape, and with no coordinates given. On paper a proof that
+avoids coordinates is known (H.-J. Schmidt, "A new proof of Birkhoff's theorem", 1997,
+arXiv gr-qc/9709071), so what is added here is the machine check. "Not found" is not "first".
+Details and dates: [SURVEY.md](SURVEY.md), [TARGETS.md](TARGETS.md). Three independent reviewers
+read the definitions and the goal against the textbooks: [REVIEW.md](REVIEW.md).
 
 ## Stated, not yet proved
 
@@ -146,7 +149,9 @@ of Piece C. Both are now proved. What is left:
    ([Curved/Basic.lean](GravityInLean/Curved/Basic.lean), `IsRoundOn`). That is "looks the same
    from every side" in its small-steps form. A group of turns acting on the whole space is not
    used and not assumed.
-3. **The blind spots.** The two poles and the centre are left out of every statement. The rim of
+3. **The blind spots.** The two poles and the centre are left out of every statement in
+   coordinates. (The theorem with no coordinates leaves out no point of the space-time for that
+   reason: only the picture its chart draws avoids the poles.) The rim of
    the black hole is left out of the statements about new labels, because there the size of the
    spheres cannot serve as a distance; the statements "the mass is the same everywhere" and
    "Eddington's form is empty" do hold across it. The new labels are shown to be coordinates near

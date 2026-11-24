@@ -77,14 +77,8 @@ get `r ≠ 0` and `1 - 2 M / r ≠ 0`), and every name in the goals file means w
 7. `schwarzschildIsEmpty` from 5 and 6. `schwarzschildExactlyWhen`: one direction is
    `birkhoffNoCoordinates`, the other is 5 and 6.
 
-**Part 3. A length measure has a connection (`connectionExists`). Lower priority.** Not needed
-for the other six. Another project has proved this on a newer version of Lean, so it cannot be
-imported: TauCeti, `github.com/TauCetiProject/TauCeti`, file
-`TauCeti/Geometry/Manifold/VectorBundle/CovariantDerivative/LeviCivita/Nondegenerate/Existence.lean`
-(Apache-2.0, 149 lines, cites O'Neill). Read it and port its route to the statement here. Say
-in the header comment of your file and in `STATUS.md` that the route is theirs. This result is
-not new and must not be presented as new. Give it to one or two workers at the start; if it
-turns out to need much more than the rest, report that and leave it.
+**Part 3. A length measure has a connection (`connectionExists`).** This part was withdrawn
+during the run and is not part of this brief any more: see `GravityInLean/BothWays/STATUS.md`.
 
 Things that are easy to get wrong: the statements with no coordinates are about a small region
 around one point, so choose regions small. Inside the rim the time label and the distance label
