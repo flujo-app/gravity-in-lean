@@ -11,6 +11,7 @@ public import GravityInLean.Global.TwoPieces
 public import GravityInLean.Global.SchwSym
 public import GravityInLean.Global.UniqueKruskal
 public import GravityInLean.Global.UniqueSchw
+public import GravityInLean.Global.UniqueFlat
 public import GravityInLean.Rim.Goal
 
 import Mathlib.Geometry.Manifold.Notation
@@ -216,5 +217,57 @@ theorem exists_schwMap_of_simplyConnected_neg (hm : m < 0) (hs : IsOpen s)
     obtain ⟨rfl, rfl, rfl⟩ := h.sym_unique hm (isSpaceTimeOn_sub hg hU) hq
       (Filter.eventually_of_mem (h.1.mem_nhds hq) heq)
     rfl
+
+/-- The symmetries of flat space-time, as a set of maps: a Lorentz transformation followed by
+a shift. -/
+def lorentzMaps : Set (Coords 4 → Coords 4) :=
+  {σ | ∃ (Λ : Matrix (Fin 4) (Fin 4) ℝ) (b : Coords 4),
+    Λ.transpose * lightSign4 * Λ = lightSign4 ∧ σ = fun x ↦ Λ.mulVec x + b}
+
+/-- **Flat space-time around every point of a region without holes gives one length-keeping
+map of the whole region into flat space-time.** -/
+theorem exists_flatMap_of_simplyConnected (hs : IsOpen s) (hsc : IsSimplyConnected s)
+    (hg : IsSpaceTimeOn g s) (hloc : ∀ p ∈ s, IsSchwarzschildWith 0 g p) :
+    ∃ D : M → Coords 4, IsSchwarzschildMapOn 0 g D s := by
+  have : SimplyConnectedSpace s := hsc
+  have : LocallyPathConnectedSpace M := ChartedSpace.locallyPathConnectedSpace (Coords 4) M
+  have : LocallyPathConnectedSpace s := hs.locallyPathConnectedSpace
+  refine exists_global_map_on hs (0 : Coords 4) (fun D U ↦ IsSchwarzschildMapOn 0 g D U)
+    lorentzMaps (fun D U h ↦ h.1) (fun D U V h hV hVU ↦ h.mono hV hVU)
+    (fun D D' U h heq ↦ h.congr heq) (fun D 𝒰 h ↦ IsSchwarzschildMapOn.sUnion h)
+    (fun q hq ↦ (hloc q hq).exists_map le_rfl) ?_ ?_ ?_
+  · rintro σ ⟨Λ, b, hΛ, rfl⟩ D U h
+    exact h.lorentz hΛ b
+  · intro D D' U hU hpre h h'
+    obtain ⟨Λ, b, hΛ, hΛb⟩ := unique_flat g U hpre (isSpaceTimeOn_sub hg hU) D D' h h'
+    exact ⟨fun x ↦ Λ.mulVec x + b, ⟨Λ, b, hΛ, rfl⟩, hΛb⟩
+  · rintro σ ⟨Λ, b, hΛ, rfl⟩ τ ⟨Λ', b', hΛ', rfl⟩ D U hU h ⟨q, hq⟩ heq
+    obtain ⟨rfl, rfl⟩ := h.lorentz_unique (D' := fun q' ↦ Λ.mulVec (D q') + b)
+      (isSpaceTimeOn_sub hg hU) hq (Filter.Eventually.of_forall fun _ ↦ rfl)
+      (Filter.eventually_of_mem (h.1.mem_nhds hq) heq)
+    rfl
+
+/-- **Schwarzschild's of a mass that is zero or negative around every point of a region
+without holes gives one length-keeping map of the whole region into Schwarzschild's whole
+space-time** (flat space-time for mass zero). -/
+theorem exists_schwMap_of_simplyConnected (hm : m ≤ 0) (hs : IsOpen s)
+    (hsc : IsSimplyConnected s) (hg : IsSpaceTimeOn g s)
+    (hloc : ∀ p ∈ s, IsSchwarzschildWith m g p) :
+    ∃ D : M → Coords 4, IsSchwarzschildMapOn m g D s := by
+  rcases hm.lt_or_eq with h | rfl
+  · exact exists_schwMap_of_simplyConnected_neg h hs hsc hg hloc
+  · exact exists_flatMap_of_simplyConnected hs hsc hg hloc
+
+/-! ## The theorem -/
+
+/-- **Birkhoff's theorem for a whole space-time.** A round, empty space-time on a region
+without holes has a length-keeping map into Kruskal's whole space-time of a positive mass, or
+into Schwarzschild's whole space-time of a mass that is zero or negative. -/
+theorem globalBirkhoff : GlobalBirkhoff := by
+  intro M _ _ _ g ξ s hs hsc hg he hr
+  have hpre : IsPreconnected s := hsc.isPathConnected.isConnected.isPreconnected
+  rcases birkhoffAtEveryPointOneMass M g ξ s hs hpre hg he hr with ⟨m, hm, h⟩ | ⟨m, hm, h⟩
+  · exact Or.inl ⟨m, hm, exists_kruskalMap_of_simplyConnected hm hs hsc hg h⟩
+  · exact Or.inr ⟨m, hm, exists_schwMap_of_simplyConnected hm hs hsc hg h⟩
 
 end GravityInLean.Curved
