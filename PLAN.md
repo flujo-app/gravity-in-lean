@@ -37,9 +37,12 @@ with no coordinates at all, `birkhoffNoCoordinates`, in 21 minutes. About four h
 since the work on it began; the estimate was one to three weeks. See "What the third team run
 showed" below.
 
-**Next:** the "exactly when" form of the theorem, the one statement still open (a length
-measure has a connection), and the checks listed in issue 34 before anything is claimed in
-public.
+**The theorem runs both ways** (24 November 2026, 01:19 UTC). A fourth team proved the "exactly
+when" form, in coordinates and with none, in 11 minutes. See "What the fourth team run showed".
+
+**Next:** what three independent reviewers of the definitions asked for (`REVIEW.md`): tests
+that the definitions can fail, one mass for a whole region, the rim included (issue 39), and
+"a length measure has a connection" proved from the textbook.
 
 ## The short answer
 
@@ -382,6 +385,33 @@ on a small patch; joining the two.
 - The theorem is a statement around a point. It says nothing at the rim and nothing about the
   whole space-time at once.
 
+## What the fourth team run showed
+
+The job: the six statements of `Goals/ExactlyWhen.lean` (issue 41). They were written by one
+head in about twenty minutes and read by a second, independent reader in twelve, who judged all
+of them true as written, checked in Lean that Schwarzschild's table is empty inside the rim
+too, and asked for two more checks; both were added before the statements were fixed.
+
+| | | |
+|---|---|---|
+| Result | proved: all six, 14 files, about 2,000 lines, 83 theorems | Measured |
+| Time, from "all ten are ready" to "the whole project builds with the proofs in it" | 10 minutes 54 seconds (01:08:35 to 01:19:29 UTC) | Measured |
+| Lean runs | 46 until the goal, 10 failed and repaired; longest wait after the set-up 6 seconds | Measured |
+| Model use until the stop | 23.4 million tokens read (22.2 million from the cache), 361,000 written | Measured |
+| Weekly allowance | "all models" from 48% to 51%, "Fable" from 47% to 53%, with this chat, a second reader and another chat busy at the same time. So: at most 3 and 6 points. | Measured |
+| Checked afterwards on this PC | only `GravityInLean/BothWays/` and import lines changed; rebuilt from nothing, no warnings; all 1,557 declarations pass the audit; `Audit.lean` checks each of the six against its fixed statement | Measured |
+| Changed afterwards | nothing in the Lean files | Measured |
+
+**A side job was withdrawn.** The brief also asked the team to port another project's proof
+that a length measure has a connection. During the run the project's owner asked for it to be
+proved from the textbook instead, without reading that proof. A worker had already read it, so
+the item was stopped and its files were left out of the repository. The statement stays open.
+
+**What it adds to the picture.** The lead gave out seven pieces within two minutes of starting
+(the brief now asks for that), and the workers' files came back in the project's form with no
+warnings (the brief now asks for that too). The fourth run was the shortest although it had
+six targets.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -457,11 +487,13 @@ one head, read twice, and tested on known answers before any worker starts.
 6. Streams 2 to 4 and the goal itself. **Done** by the third team in one run (see "What the
    third team run showed"): the team wrote the statements of the join itself, from the route in
    the brief. Only the goal's statement was fixed beforehand.
-7. **Next:**
-   - The "exactly when" form: empty exactly when Schwarzschild's, in coordinates and with no
-     coordinates. Statements first, with a second reader, then a team.
-   - `ConnectionExistsStatement`, the one statement still open. Another project has a proof
-     (TauCeti, on a newer Lean): port that route with credit, and do not present it as new.
+7. The "exactly when" form, in coordinates and with none. **Done** by the fourth team (see
+   "What the fourth team run showed").
+8. **Next,** from the review of the definitions (`REVIEW.md`):
+   - tests that the definitions can fail (`Goals/Tests.lean`), and one mass for a whole region
+     (`Goals/OneMass.lean`);
+   - `ConnectionExistsStatement`, from the textbook, without reading another project's proof;
+   - the rim included (issue 39): around every point, a chart onto a piece of Kruskal's form.
    - The checks of issue 34 before any public claim.
 
 ## After Birkhoff: what could make a paper
