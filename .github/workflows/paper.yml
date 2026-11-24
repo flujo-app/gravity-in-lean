@@ -1,0 +1,49 @@
+name: Build the paper
+
+# Turns paper/paper.md into paper/paper.tex and builds paper/paper.pdf with LuaLaTeX.
+# Fails if paper.tex is out of date or if a symbol is missing from every font.
+# The PDF is kept as the artifact "paper-pdf".
+on:
+  push:
+    paths:
+      - "paper/**"
+      - ".github/workflows/paper.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pdf:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: paper.tex matches paper.md
+        run: python3 paper/tools/md2tex.py --check
+      - name: Install LuaLaTeX and fonts from Ubuntu
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends \
+            texlive-luatex texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended lmodern fonts-dejavu-core
+      - name: Build the PDF
+        working-directory: paper
+        run: |
+          for pass in 1 2; do
+            if ! lualatex -interaction=nonstopmode -halt-on-error paper.tex > /dev/null; then
+              grep -n -A 12 "^!" paper.log || tail -n 60 paper.log
+              exit 1
+            fi
+          done
+      - name: No symbol missing, report overfull lines
+        working-directory: paper
+        run: |
+          grep -n "Overfull" paper.log || true
+          if grep -n "Missing character" paper.log; then exit 1; fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: paper-pdf
+          path: |
+            paper/paper.pdf
+            paper/paper.log
