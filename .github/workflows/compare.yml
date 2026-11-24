@@ -1,0 +1,84 @@
+name: Compare statements
+
+# Lean's own check that every proved result has exactly the statement fixed for it:
+# `lake comparator --paranoid`, inside Lake's sandbox, on a clean Linux machine.
+#
+# The question is comparator/Challenge.lean: every statement that Audit.lean checks, with a hole
+# (`sorry`) in place of each proof. The answer is Audit.lean. Lake builds both inside its sandbox
+# (no network, nothing written outside the build folder), checks that each named result in the
+# answer has exactly the question's statement and uses no axiom beyond propext, Classical.choice
+# and Quot.sound, and runs the answer's export through Lean's kernel and the five other checkers
+# that ship with Lean. The full log is kept as the artifact "compare-log".
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.lean"
+      - "comparator.json"
+      - "lakefile.toml"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - "scripts/comparator/**"
+      - ".github/workflows/compare.yml"
+  pull_request:
+    paths:
+      - "**.lean"
+      - "comparator.json"
+      - "lakefile.toml"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+      - "scripts/comparator/**"
+      - ".github/workflows/compare.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compare-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: The question matches Audit.lean
+        run: python3 scripts/comparator/make_challenge.py --check
+
+      - name: Lake's sandbox (bubblewrap)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bubblewrap time
+          # Ubuntu's AppArmor stops ordinary users from making the namespaces the sandbox is built
+          # from; allow it on this throw-away machine.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          bwrap --ro-bind / / --unshare-all true && echo "bwrap works"
+
+      - name: Lean, from elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -o elan-init.sh
+          sh elan-init.sh -y --no-modify-path --default-toolchain none
+          rm elan-init.sh
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: mathlib's prebuilt files
+        # Outside the sandbox. Every mathlib declaration the answer uses is checked again by the
+        # checkers below. The project's own code is built only inside the sandbox.
+        run: lake exe cache get
+
+      - name: lake comparator --paranoid
+        run: |
+          set -o pipefail
+          /usr/bin/time -v lake comparator --paranoid 2>&1 | tee compare.log
+
+      - name: Keep the log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: compare-log
+          path: compare.log
+          if-no-files-found: ignore
