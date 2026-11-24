@@ -12,6 +12,7 @@ public import GravityInLean.Global.KretschmannKept
 public import GravityInLean.Global.KretschmannKruskal
 public import GravityInLean.Global.HessKept
 public import GravityInLean.Global.HessKruskal
+public import GravityInLean.Global.SchwScalars
 public import GravityInLean.Join.CarryPointwise
 
 import Mathlib.Geometry.Manifold.Notation
@@ -277,11 +278,15 @@ theorem exists_kruskalRad_ne {m : ℝ} (hm : 0 < m) {W : Set (Coords 4)} (hW : I
   rw [heq', kruskalF_kruskalR hm (hWsub hx).1] at h1
   linarith
 
-/-- Schwarzschild's table of a mass that is zero or negative has the radius `r` (the second
-label) and the mass `m`, outside. -/
-theorem schw_hasRadius {m : ℝ} (hm : m ≤ 0) :
-    ∃ Sinv, HasRadius (roundG (schwA m) (schwB m)) Sinv (outside m) (fun y ↦ y 1) m := by
-  sorry
+/-- Schwarzschild's table has the radius `r` (the second label) and the mass `m`, outside. -/
+theorem schw_hasRadius (m : ℝ) :
+    HasRadius (roundG (schwA m) (schwB m)) (roundGinv (schwA m) (schwB m)) (outside m)
+      (fun y ↦ y 1) m where
+  regular := schwarzschild_regularTable_outside m
+  smooth := fun _ _ ↦ (contDiff_apply ℝ (fun _ : Fin 4 ↦ ℝ) 1).contDiffAt
+  pos := fun _ hx ↦ hx.1
+  scalar := fun _ hx ↦ kretschmann_schw (BothWays.mem_offRim (Or.inl hx))
+  slopeSq := fun x _ ↦ gradSq_schwRad m x
 
 /-! ## The three cases, for maps of coordinate space -/
 
@@ -311,8 +316,8 @@ theorem mass_eq_of_carries_schw {m m' : ℝ} (hm : m ≤ 0) (hm' : m' ≤ 0)
     (hf : ∀ x ∈ W,
       CarriesTableAt (roundG (schwA m) (schwB m)) (roundG (schwA m') (schwB m')) f x) :
     m = m' := by
-  obtain ⟨Sinv, hρ⟩ := schw_hasRadius hm
-  obtain ⟨Sinv', hρ'⟩ := schw_hasRadius hm'
+  have hρ := schw_hasRadius m
+  have hρ' := schw_hasRadius m'
   have hsq : ∀ y ∈ W, (m * f y 1 ^ 3) ^ 2 = (m' * y 1 ^ 3) ^ 2 := fun y hy ↦
     hρ.scalar_kept hρ' (hWsub hy) (hfW y hy) (hf y hy)
   have hr : ∀ y ∈ W, 0 < y 1 := fun y hy ↦ (hWsub hy).1
@@ -346,7 +351,7 @@ theorem not_carries_kruskal_schw {m m' : ℝ} (hm : 0 < m) (hm' : m' ≤ 0)
     (hWsub : W ⊆ kruskalRegion) (hfW : ∀ x ∈ W, f x ∈ outside m')
     (hf : ∀ x ∈ W, CarriesTableAt (kruskalG m) (roundG (schwA m') (schwB m')) f x) : False := by
   have hρ := kruskal_hasRadius hm
-  obtain ⟨Sinv', hρ'⟩ := schw_hasRadius hm'
+  have hρ' := schw_hasRadius m'
   have hsq : ∀ y ∈ W, (m * f y 1 ^ 3) ^ 2 = (m' * kruskalRad m y ^ 3) ^ 2 := fun y hy ↦
     hρ.scalar_kept hρ' (hWsub hy) (hfW y hy) (hf y hy)
   have hr : ∀ y ∈ W, 0 < kruskalRad m y := fun y hy ↦ hρ.pos y (hWsub hy)
@@ -450,6 +455,7 @@ theorem carriesTableAt_changeOfCharts {c c' : OpenPartialHomeomorph M (Coords 4)
     rw [hread (c.symm y) hp, Join.mfderiv_symm_comp hc hyt u, Join.mfderiv_symm_comp hc hyt v]
   exact e2.trans (e3.trans (key _ (c.right_inv hyt)))
 
+omit [IsManifold 𝓘(ℝ, Coords 4) ∞ M] in
 /-- **Two readings of the length measure around one point give a map that carries one table to
 the other** on an open set that is not empty. -/
 theorem exists_carries_of_readsNear {G G' : Fin 4 → Fin 4 → Coords 4 → ℝ}
