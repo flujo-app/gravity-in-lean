@@ -153,6 +153,8 @@ download or build any of it.
   machine adds is that every step has been checked, by a judge that cannot be talked round.
 - The far end, two masses, is not a gap in machine-checking. It is a gap in mathematics itself.
   No proof checker can check a formula that does not exist.
+- Which of all this could make a real paper, and where to publish it: [TARGETS.md](TARGETS.md)
+  (research of 23 November 2026).
 - Everything marked "Not verified" above should be read before anyone builds on it. In
   particular, before calling anything here a first, someone should ask in the Lean community
   chat whether Birkhoff's theorem from the symmetry, or without coordinates, has been checked by
