@@ -231,7 +231,7 @@ def convert(md):
     out.append(r"\hypersetup{pdftitle={" + text(title) + "}, pdfauthor={" + text(", ".join(names)) + "}}")
     out.append(r"\title{" + inline(title) + "}")
     out.append(r"\author{" + r" \and ".join(text(n) for n in names) + "}")
-    out.append(r"\date{\small\itshape" + r"\\[0.5ex]".join(inline(n) for n in notes) + "}")
+    out.append(r"\date{\small\itshape " +r"\\[0.5ex]".join(inline(n) for n in notes) + "}")
     out.append(r"\begin{document}")
     out.append(r"\maketitle")
 
