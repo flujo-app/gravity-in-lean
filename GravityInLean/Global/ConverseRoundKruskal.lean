@@ -87,7 +87,7 @@ theorem fderiv_kruskalWrap_turns_zero {x : Coords 4} (hs : sin (x 2) ≠ 0) :
   refine coords5_ext ?_ ?_ ?_ ?_ ?_ <;>
     simp only [sphereTurn, kruskalWrap, Matrix.cons_val, a0, a1, a2, a3] <;>
     first
-    | ring
+    | ring1
     | linear_combination cos (x 2) * h1 + sin (x 3) ^ 2 * hc
     | linear_combination (-(sin (x 3) * cos (x 3))) * hc
 
@@ -114,7 +114,7 @@ theorem fderiv_kruskalWrap_turns_one {x : Coords 4} (hs : sin (x 2) ≠ 0) :
   refine coords5_ext ?_ ?_ ?_ ?_ ?_ <;>
     simp only [sphereTurn, kruskalWrap, Matrix.cons_val, a0, a1, a2, a3] <;>
     first
-    | ring
+    | ring1
     | linear_combination (sin (x 3) * cos (x 3)) * hc
     | linear_combination (-(cos (x 3) ^ 2)) * hc - cos (x 2) * h1
 
@@ -138,7 +138,7 @@ theorem fderiv_kruskalWrap_turns_two (x : Coords 4) :
   refine coords5_ext ?_ ?_ ?_ ?_ ?_ <;>
     simp only [sphereTurn, kruskalWrap, Matrix.cons_val, a0, a1, a2, a3] <;>
     first
-    | ring
+    | ring1
 
 /-- **Wrapping carries the three standard turns of Kruskal's table to the three turns of the
 sphere,** off the poles. -/
@@ -214,15 +214,49 @@ theorem frameMix_orthogonal (hR : R.transpose * R = 1) :
   have P01 : R 0 0 * R 1 0 + R 0 1 * R 1 1 + R 0 2 * R 1 2 = 0 := p01
   have P02 : R 0 0 * R 2 0 + R 0 1 * R 2 1 + R 0 2 * R 2 2 = 0 := p02
   have P12 : R 1 0 * R 2 0 + R 1 1 * R 2 1 + R 1 2 * R 2 2 = 0 := p12
+  have a00 : frameMix R 0 0 = R.det * R 1 1 := rfl
+  have a01 : frameMix R 0 1 = R.det * R 1 0 := rfl
+  have a02 : frameMix R 0 2 = R.det * R 1 2 := rfl
+  have a10 : frameMix R 1 0 = R.det * R 0 1 := rfl
+  have a11 : frameMix R 1 1 = R.det * R 0 0 := rfl
+  have a12 : frameMix R 1 2 = R.det * R 0 2 := rfl
+  have a20 : frameMix R 2 0 = R.det * R 2 1 := rfl
+  have a21 : frameMix R 2 1 = R.det * R 2 0 := rfl
+  have a22 : frameMix R 2 2 = R.det * R 2 2 := rfl
+  have key : ∀ a b : Fin 3, (frameMix R * (frameMix R).transpose) a b
+      = frameMix R a 0 * frameMix R b 0 + frameMix R a 1 * frameMix R b 1
+        + frameMix R a 2 * frameMix R b 2 := fun a b ↦ by
+    rw [Matrix.mul_apply, Fin.sum_univ_three]
+    rfl
+  -- on the diagonal: a row of `R` has length one, and `det R * det R = 1`
+  have dia : ∀ a : Fin 3, a = 0 ∨ a = 1 ∨ a = 2 →
+      (frameMix R * (frameMix R).transpose) a a = (1 : Matrix (Fin 3) (Fin 3) ℝ) a a := by
+    rintro a (rfl | rfl | rfl) <;> rw [key, Matrix.one_apply_eq] <;>
+      simp only [a00, a01, a02, a10, a11, a12, a20, a21, a22] <;>
+      first
+      | linear_combination (R.det * R.det) * P00 + hdd
+      | linear_combination (R.det * R.det) * P11 + hdd
+      | linear_combination (R.det * R.det) * P22 + hdd
+  -- off the diagonal: two different rows of `R` are at right angles
+  have off : ∀ a b : Fin 3, a ≠ b →
+      (frameMix R * (frameMix R).transpose) a b = (1 : Matrix (Fin 3) (Fin 3) ℝ) a b := by
+    intro a b hab
+    rw [key, Matrix.one_apply_ne hab]
+    have ha : a = 0 ∨ a = 1 ∨ a = 2 := by fin_cases a <;> decide
+    have hb : b = 0 ∨ b = 1 ∨ b = 2 := by fin_cases b <;> decide
+    rcases ha with rfl | rfl | rfl <;> rcases hb with rfl | rfl | rfl <;>
+      first
+      | exact absurd rfl hab
+      | (simp only [a00, a01, a02, a10, a11, a12, a20, a21, a22]
+         first
+         | linear_combination (R.det * R.det) * P01
+         | linear_combination (R.det * R.det) * P02
+         | linear_combination (R.det * R.det) * P12)
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [frameMix, Matrix.mul_apply, Fin.sum_univ_three] <;>
-    first
-    | linear_combination (R.det * R.det) * P00 + hdd
-    | linear_combination (R.det * R.det) * P11 + hdd
-    | linear_combination (R.det * R.det) * P22 + hdd
-    | linear_combination (R.det * R.det) * P01
-    | linear_combination (R.det * R.det) * P02
-    | linear_combination (R.det * R.det) * P12
+  by_cases hij : i = j
+  · rw [hij]
+    exact dia j (by fin_cases j <;> decide)
+  · exact off i j hij
 
 /-- The mix that goes with a turn or mirror is a turn: its determinant is `1`. -/
 theorem frameMix_det (hR : R.transpose * R = 1) : (frameMix R).det = 1 := by
@@ -267,7 +301,7 @@ theorem kruskalSym_sphereTurn (hR : R.transpose * R = 1) (L : Matrix (Fin 2) (Fi
       simp only [kruskalSym, sphereTurn, Matrix.cons_val, Pi.add_apply, Pi.smul_apply,
         smul_eq_mul, a00, a01, a02, a10, a11, a12, a20, a21, a22] <;>
       first
-      | ring
+      | ring1
       | linear_combination (R.det * p 2) * K00 + (R.det * p 3) * K01 + (R.det * p 4) * K02
           + (p 2 * R 0 0 + p 3 * R 0 1 + p 4 * R 0 2) * hdd
       | linear_combination (R.det * p 2) * K10 + (R.det * p 3) * K11 + (R.det * p 4) * K12
