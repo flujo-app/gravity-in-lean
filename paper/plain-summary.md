@@ -54,10 +54,15 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
 
 1. "Every final theorem has exactly the statement that was fixed before it was proved." *Why it
    holds:* each build checks this (`Audit.lean`), and the public build on GitHub shows it.
+   *And:* Lean's own comparison tool (`lake comparator`) confirms it for the sixteen main
+   theorems, from outside the build.
 2. "The proofs rest on nothing but Lean's three standard assumptions." *Why:* the same audit,
    for all 2,605 declarations. *And:* six separate checking programs that ship with Lean
-   accept the main theorems (Section 9). *Weak point:* that run was not inside Lake's
-   protective sandbox, which needs Linux; this PC runs Windows.
+   accept the main theorems, also inside Lake's protective sandbox on Linux (Section 9).
+   Over the whole project, five of the six accept everything; the sixth (`nanoda`) crashed
+   partway through, on a fixed limit of its own, and accepts everything the project uses
+   when given only that. *Weak point:* the Linux machine was a container on the same PC, with one
+   of Docker's safety filters switched off so that the sandbox could start.
 3. "To our knowledge no earlier machine-checked Birkhoff theorem starts without coordinates or
    covers the rim." *Why:* searches on the dates given in `SURVEY.md`. *Weak point:* this field
    moves by the day. Search again on the day of submission.

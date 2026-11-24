@@ -36,8 +36,12 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
       the proofs").
 - [x] **It proves the theorem as stated:** `Audit.lean` holds `example : Statement := theorem`
       for every final statement, checked by every build.
-- [ ] **Lean's own `lake comparator`** on the same question, with the statements (in `Goals/`
-      and `Curved/Goal.lean`) as the challenge. Not run.
+- [x] **Lean's own `lake comparator`** on the same question, with the statements (in `Goals/`
+      and `Curved/Goal.lean`) as the challenge: `comparator/Challenge.lean` (the sixteen
+      headline statements, each with a hole for its proof) and `comparator.json`.
+      `lake comparator --paranoid`, inside Lake's sandbox on Linux (the setting below), accepted
+      all sixteen against `Audit`: same statements, only the three standard axioms, all six
+      checkers. A question changed by hand was rejected. Section 9, item 3.
 - [x] **A kernel re-check outside the build:** `leanchecker` over all 200 modules at tag
       `paper-1-numbers`: 199 passed; the checker itself crashed twice on
       `GravityInLean.OneMass`, whose declarations then passed the six checkers below.
@@ -45,9 +49,16 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
       `leanchecker-paranoid`, `lean4lean`, `nanoda`, `con-leche`, `con-ron`) on an export of
       the sixteen headline theorems and one of `GravityInLean.OneMass`: all six accept both,
       with only the three standard axioms.
-- [ ] **The same inside Lake's sandbox, on Linux,** over the whole project: `lake check
-      --paranoid` without `--inadvisably-no-sandbox`. This PC runs Windows, where the sandbox
-      (`bwrap`) does not exist, so the run above is one Lake labels "not trustworthy".
+- [x] **The same inside Lake's sandbox, on Linux,** over the whole project: `lake check
+      --paranoid` without `--inadvisably-no-sandbox`, in a Linux container on this PC
+      (`scripts/sandbox-check/`; Docker ran it with `--security-opt seccomp=unconfined` so that
+      the sandbox could start, and nothing else was loosened). On the export of everything in
+      scope (464,847 declarations, mathlib and Lean's own library included) five checkers
+      accept; `nanoda` crashed with a stack overflow. `nanoda` accepts the project's own 2,605
+      declarations with everything they depend on, also inside the sandbox. Section 9, item 4.
+- [ ] **`nanoda` on the whole export.** Tell nanoda's authors about the stack overflow (it
+      needs only the public repository and `scripts/sandbox-check/run.sh` to repeat), and run it
+      again with a version that gets through.
 - [ ] **Axioms printout** for the main theorems in the paper's appendix or repository
       (`#print axioms`). The audit already checks this for every declaration; a printed list for
       the named theorems is still to be added.

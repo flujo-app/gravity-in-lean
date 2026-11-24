@@ -20,3 +20,10 @@ name = "GravityInLean"
 # The judge: fails the build if any result rests on a hole or an extra assumption.
 [[lean_lib]]
 name = "Audit"
+
+# The question for `lake comparator` (see `comparator.json`): the headline statements with a hole
+# in place of each proof. Not a default target and imported by nothing, so `lake build` and the
+# audit never see it.
+[[lean_lib]]
+name = "Challenge"
+srcDir = "comparator"
