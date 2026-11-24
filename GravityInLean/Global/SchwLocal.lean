@@ -79,7 +79,7 @@ theorem KeepsSchwOn.keeps_sphere (hm : m < 0) (h : KeepsSchwOn m f W) (hx : x âˆ
   apply mul_left_cancelâ‚€ hx1
   rw [key]
   rcases fin_four_two_or_three i hi with rfl | rfl <;>
-    rcases fin_four_two_or_three j hj with rfl | rfl <;> simp [Pi.single_apply]
+    rcases fin_four_two_or_three j hj with rfl | rfl <;> simp
 
 /-- **A map that keeps Schwarzschild's table of negative mass is, near each point, a symmetry of
 Schwarzschild's whole space-time.** In ordinary space labels, near every point of the set the
