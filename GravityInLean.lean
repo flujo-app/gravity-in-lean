@@ -62,6 +62,10 @@ import GravityInLean.Global.SphereRigid
 import GravityInLean.Global.RoundTools
 import GravityInLean.Global.ConverseRoundKruskal
 import GravityInLean.Global.Converse
+import GravityInLean.Global.KruskalKept
+import GravityInLean.Global.KruskalPlane
+import GravityInLean.Global.UniqueKruskal
+import GravityInLean.Global.LocalMaps
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate
