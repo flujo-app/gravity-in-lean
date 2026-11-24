@@ -38,8 +38,9 @@ second, then a team for each. See "Next: Birkhoff's theorem with no coordinates 
 ## The short answer
 
 - **Go, on a smaller target: "one mass, from the definitions"** (steps 1 and 2 below). It is cheap
-  and very likely to work. As far as we could find, nobody has done step 2 by machine. Step 1 had
-  been done in Lean before; this plan first missed that (see [SURVEY.md](SURVEY.md)).
+  and very likely to work. Both had been done in Lean before, which this plan first missed:
+  step 1 at least twice, and step 2 in its simplest form (starting from the diagonal shape) by
+  another project four days earlier (see [SURVEY.md](SURVEY.md)).
 - **No-go on an exact formula for two masses circling each other.** Such a formula almost
   certainly does not exist. It is not the goal of this project and should not become it.
 - **Not now: deriving the two-body equations from Einstein's equations by machine** (step 4b).
@@ -525,9 +526,14 @@ time. **Not verified** on the provider's own page, and nothing was rented.
 - **The pace will drop.** Today's pieces were picked because they were easy.
 - **Right proof, wrong statement.** This is the real danger in all machine-checked work, and no
   tool removes it. Only reading does.
-- **"First" is not verified, and for step 1 it is wrong.** Step 1 had been done in Lean before
-  (see [SURVEY.md](SURVEY.md), section 2). For Birkhoff's theorem, step 2, we found no earlier
-  machine-checked proof. Before saying so in public, ask in the Lean community chat.
+- **"First" is not verified, and for steps 1 and 2 it is wrong.** Step 1 had been done in Lean
+  before (see [SURVEY.md](SURVEY.md), section 2). Birkhoff's theorem from the diagonal starting
+  shape, outside the rim, was proved in Lean on 19 November 2026 by another project
+  (`x-oai/ProjectAinos`, file `GeneralRelativity/Birkhoff.lean`; found on 24 November, four
+  days after it was written). What we have not found elsewhere, as far as we looked: the
+  version that starts from symmetry with no starting shape, and the one with no coordinates.
+  That is "not found", not "first". Before saying anything of the kind in public, ask in the
+  Lean community chat.
 - **Coordinates have blind spots.** The poles are left out of every statement, and the rim of the
   black hole out of most. That is normal in textbooks too, but it must be said.
 - **Estimates are estimates.** Step 1 is well understood. From step 3 on, the ranges are wide on
