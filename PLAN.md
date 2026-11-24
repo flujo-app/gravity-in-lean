@@ -28,8 +28,12 @@ took about an hour. See "What the definitions showed" below. A build queue is in
 container on this PC, proved the first statement of stream 1 (paths along a field depend
 smoothly on where they start) in 14 minutes. See "What the first team trial showed" below.
 
-**Next, before step 3:** the second statement of stream 1 (coordinates that fit the turns), with
-the same kind of team. See "Next: Birkhoff's theorem with no coordinates at all" below.
+**A second team has run** (23 November 2026, late evening). It proved the second statement of
+stream 1, coordinates that fit the turns, in 17 minutes. Stream 1 is complete. See "What the
+second team run showed" below.
+
+**Next, before step 3:** the statements of streams 2 to 4, written by one head and read by a
+second, then a team for each. See "Next: Birkhoff's theorem with no coordinates at all" below.
 
 ## The short answer
 
@@ -250,6 +254,58 @@ machines: nothing here was short of memory or processors. A second team only mak
 there is a second goal that does not touch the first one's files, and the cost that matters is
 the weekly allowance, not machines.
 
+## What the second team run showed
+
+The job: prove `TurnsCoordinatesStatement`, fixed beforehand in `Goals/Turns.lean`. Called "a
+large job" in that file, and expected to take hours. Same kind of team as before: one lead and
+nine workers, Claude Fable 5.2 at effort "high", one container on this PC. Two things were
+different from the first run: the brief held a route worked out on paper (marked "not checked
+in Lean"), and the workers' copies of the repository shared one build of the project.
+
+| | | |
+|---|---|---|
+| Result | proved: `turnsCoordinates`, 20 files, about 2,070 lines, 62 theorems | Measured |
+| Time, from "all ten are ready" to "the whole project builds with the proof in it" | 16 minutes 42 seconds (23:24:36 to 23:41:18 UTC) | Measured |
+| How it went | 4 minutes: the lead reads and checks the route on paper. Then nine lemmas given out, built within 4 minutes. Then the goal proved from nine further lemmas still open. Then those nine given out, built within 3 minutes. | Measured (the team's record, checked against the queue's log) |
+| Jobs | 20 pieces: 18 by workers in two rounds of nine, 2 by the lead. No statement had to be changed. Nobody was stuck. | Measured |
+| Lean runs | 52 until the goal, 9 of them failed and were repaired (6 in the first round, 1 in the second, 2 by the lead) | Measured |
+| The queue | After the set-up, the longest wait was 12 seconds. The set-up itself: one copy built the project (68 seconds), the other nine waited for it and took the result. | Measured |
+| Memory | about 5.4 GB at the one moment sampled; the limit was 18 GB | Measured |
+| Model use until the stop (13 minutes after the goal) | 16.6 million tokens read (15.8 million of them from the cache), 319,000 written. The lead: 40% of it. | Measured |
+| Weekly allowance | "all models" went from 39% to 41%, "Fable" from 32% to 36%, between start and stop. That includes this chat's own use. So: at most 2 and 4 points. | Measured |
+| Checked afterwards on this PC | only `GravityInLean/Turns/` and twenty import lines changed; whole project rebuilt from nothing through the queue, no warnings; all 1,243 declarations pass the audit; `Audit.lean` checks that `turnsCoordinates` proves the statement as it was fixed | Measured |
+| Full rebuild now | 128 seconds with the library's files fresh in memory, 275 seconds straight after the run, when they were not; 7.8 GB at the peak, eight Lean processes | Measured |
+
+**What the team did better than the route it was given.** The route found the place where the
+resting field is zero through a unit vector that is only fixed up to its sign. The team used two
+ordinary dot products instead: no division and no choice of sign. And it found that two of the
+five assumptions are not needed: that the fields leave lengths unchanged, and that lengths are
+positive. The statement is true with them and without them.
+
+**What changed against the first run, and what it did.**
+
+- The shared build: a worker's first Lean run took 3 to 5 seconds, not a minute, and after the
+  set-up nobody waited more than 12 seconds. In the first run the waiting was three times the
+  running. One run at a time is enough when the runs are short.
+- The route in the brief: the lead needed 4 minutes before the first jobs went out, not 8, and
+  the nine workers had work from then on.
+- The files came back in the project's form, with no warnings. Nothing had to be tidied.
+
+**What this says, and what it does not.**
+
+- "A large job, several hours" took 17 minutes. Every estimate so far has been wrong in the
+  same direction, by a factor of ten or more, so the estimates further down this page for the
+  remaining streams should be read as "too high".
+- An honest rate, at last: about 2,000 lines of checked proof and 20 lemmas in a quarter of an
+  hour, for at most 4 points of the weekly allowance. But both runs ended because the job was
+  finished, not because the time was up, so "per hour" is still an extrapolation.
+- The team is no longer the slow part in any sense. What takes time is what comes before it:
+  definitions, exact statements, a route, and the checking afterwards. Those were one head's
+  work and took longer than the proving.
+- Not checked: whether each lemma's comment says what its Lean statement says. The final
+  theorem is safe, because its statement was fixed and read by two readers beforehand. The
+  twenty lemmas in between were read by nobody but their authors.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -320,9 +376,13 @@ one head, read twice, and tested on known answers before any worker starts.
    **Done** (see "What the first team trial showed"): the first statement of stream 1 is proved.
 4. Then decide how many teams, and whether any run in the cloud. **Decided:** one team at a
    time on this PC, no cloud machines.
-5. **Next:** the second statement of stream 1, `TurnsCoordinatesStatement`, with the same kind
-   of team. It is a much larger job, so it will also give the figure that the first trial could
-   not: how much a team gets through in an hour.
+5. The second statement of stream 1, `TurnsCoordinatesStatement`, with the same kind of team.
+   **Done** (see "What the second team run showed"). Stream 1 is complete.
+6. **Next:** the one statement of stream 2 that is still open (`ConnectionExistsStatement`) can
+   go to a team as it stands. Streams 3 and 4 have no exact statements yet: writing them, with
+   a second reader, is the next work for one head. Among them are the two lemmas that join
+   `turnsCoordinates` to `shape_of_round`: the shape of a round table on a small patch, and its
+   continuation to all angles.
 
 ## The steps
 

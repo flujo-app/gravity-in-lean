@@ -25,9 +25,10 @@ npm install https://github.com/flujo-app/FACTORY/releases/download/v0.11.0/flujo
 cp <this repository>/fleet/*.mjs <this repository>/fleet/goal-flows.md .
 ```
 
-Two settings, as environment variables:
+Three settings, as environment variables:
 
 - `GRAVITY_FLEET_ROOT`: that private folder. Runs are kept in `runs/` inside it.
+- `GRAVITY_REVISION`: the commit the team starts from, by its full name. It must be on GitHub.
 - `CLAUDE_TOKEN_FILE`: a file holding a token from `claude setup-token`. Never commit it.
 
 Then:
@@ -38,7 +39,7 @@ mkdir ctx && cp <this repository>/{lean-toolchain,lakefile.toml,lake-manifest.js
 docker build -f <this repository>/fleet/Dockerfile -t gravity-worker:lean-4.36.0-r2 ctx
 
 node smoke.mjs            # a small check; removes itself
-node trial.mjs 90 trial1  # the team, for at most 90 minutes
+node trial.mjs 90 trial1 goal-flows.md   # the team, for at most 90 minutes, on that brief
 node finish.mjs trial1    # after the bundle in runs/trial1/flows.bundle has been checked
 ```
 
