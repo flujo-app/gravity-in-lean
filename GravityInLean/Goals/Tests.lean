@@ -118,7 +118,8 @@ def ZeroNotRound : Prop :=
   ¬ IsRoundOn (flatMeasure (tableMeasure flatG)) (fun _ ↦ 0) (Set.univ : Set (Coords 4))
 
 /-- ... although the zero field leaves lengths unchanged, and its bracket with itself is zero.
-Only the clause "they span two directions" stops them. -/
+(These are the clauses "unchanged" and "combine the way turns do". What stops zero fields is the
+clause "they span two directions".) -/
 def ZeroMeetsOtherClauses : Prop :=
   ∀ x : Coords 4, LeavesUnchangedAt (flatMeasure (tableMeasure flatG)) 0 x
     ∧ mlieBracket 𝓘(ℝ, Coords 4) (0 : Arrows 𝓘(ℝ, Coords 4) (Coords 4)) 0 x = 0
@@ -236,10 +237,10 @@ def KinkNotSmooth : Prop :=
 
 /-- Turning all signs of a length measure round does not change whether space is empty, on any
 curved space. -/
-def IsEmptyOnNegIff : Prop :=
-  ∀ (E H : Type) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+def IsEmptyOnNegIff.{u, v, w} : Prop :=
+  ∀ (E : Type u) (H : Type v) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
     [TopologicalSpace H] (I : ModelWithCorners ℝ E H)
-    (M : Type) [TopologicalSpace M] [ChartedSpace H M] [IsManifold I ∞ M]
+    (M : Type w) [TopologicalSpace M] [ChartedSpace H M] [IsManifold I ∞ M]
     (g : LengthMeasure I M) (s : Set M), IsEmptyOn (-g) s ↔ IsEmptyOn g s
 
 end Tests

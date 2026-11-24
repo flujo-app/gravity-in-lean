@@ -31,13 +31,19 @@ mirror image cross. Kruskal's form is good everywhere away from the centre. So K
 
 Statements, in the order in which they build on each other:
 
-* `KruskalRadiusSpec`: the radius is well defined: for a positive mass and `X² - T² > -1` there
-  is exactly the one positive `r`, and `kruskalR` is it.
+* `KruskalRadiusSpec`, `KruskalRadiusSmooth`: the radius is well defined and smooth: for a
+  positive mass and `X² - T² > -1` there is exactly the one positive `r`, and `kruskalR` is it.
 * `KruskalIsSpaceTime`, `KruskalIsEmpty`, `KruskalIsRound`: known answers. Kruskal's table, for a
   positive mass, is a space-time, is empty, and looks the same from every side, on all of its
   region, the rim included.
-* `KruskalHoldsSchwarzschild`: Schwarzschild's space-time, outside the rim and inside it, is a
-  piece of Kruskal's: around each of its points there is a chart into Kruskal's.
+* `KruskalNotUsableOnRim`: on the rim, and where the two rims cross, the size of the spheres is
+  not a usable distance. So the theorem below reaches points that `birkhoffNoCoordinates` cannot.
+* `KruskalMeetsConclusion`: Kruskal's own table is "Kruskal's in a chart", with the chart that
+  does nothing. So the conclusion below is formed the right way round.
+* `KruskalHoldsSchwarzschild`: Schwarzschild's space-time, outside the rim and inside it, is,
+  near each of its points, a piece of Kruskal's: there is a chart into Kruskal's.
+* `DeSitterNotKruskal`: de Sitter's space-time is Kruskal's in no chart. So "Kruskal's in a
+  chart" can fail.
 * `BirkhoffAtEveryPoint`: the theorem. Around **every** point of a round, empty space-time there
   is a chart in which it is Kruskal's for a positive mass, or Schwarzschild's for a mass that is
   zero or negative (where there is no rim). "Usable distance" is not assumed.
@@ -62,8 +68,8 @@ For a positive mass it grows with `r`, from `-1` at the centre through `0` at th
 noncomputable def kruskalF (m r : ℝ) : ℝ := (r / (2 * m) - 1) * Real.exp (r / (2 * m))
 
 /-- The radius that belongs to the number `u = X² - T²` in Kruskal's form: the positive `r` with
-`kruskalF m r = u`. (Written as the smallest such `r`; `KruskalRadiusSpec` says there is exactly
-one when the mass is positive and `u > -1`. Outside that range the value means nothing.) -/
+`kruskalF m r = u`. (Written as the infimum of such `r`; `KruskalRadiusSpec` says there is
+exactly one when the mass is positive and `u > -1`. Outside that range the value means nothing.) -/
 noncomputable def kruskalR (m u : ℝ) : ℝ := sInf {r : ℝ | 0 < r ∧ kruskalF m r = u}
 
 /-- The factor in front of `-dT² + dX²` in Kruskal's form: `(32 m³ / r) · exp (-r / 2m)`. -/
@@ -106,6 +112,11 @@ def KruskalRadiusSpec : Prop :=
     0 < kruskalR m u ∧ kruskalF m (kruskalR m u) = u ∧
       ∀ r : ℝ, 0 < r → kruskalF m r = u → r = kruskalR m u
 
+/-- **Statement: the radius is smooth.** For a positive mass, `kruskalR m` is smooth of every
+order on all numbers `u > -1`. Every other statement about Kruskal's table needs this. -/
+def KruskalRadiusSmooth : Prop :=
+  ∀ m : ℝ, 0 < m → ContDiffOn ℝ ∞ (kruskalR m) (Ioi (-1))
+
 /-! ## Known answers for Kruskal's table -/
 
 /-- **Statement: Kruskal's is a space-time,** rim included. -/
@@ -121,7 +132,25 @@ turns. -/
 def KruskalIsRound : Prop :=
   ∀ m : ℝ, 0 < m → IsRoundOn (flatMeasure (tableMeasure (kruskalG m))) turns kruskalRegion
 
-/-- **Statement: Schwarzschild's is a piece of Kruskal's.** For a positive mass, around every
+/-- **Statement: on the rim the size of the spheres is not a usable distance.** At every point
+of Kruskal's region with `X² = T²` (the rim, and the place where the two rims cross, `X = T = 0`)
+`UsableDistanceAt` fails. -/
+def KruskalNotUsableOnRim : Prop :=
+  ∀ m : ℝ, 0 < m → ∀ x ∈ kruskalRegion, x 1 ^ 2 = x 0 ^ 2 →
+    ¬ UsableDistanceAt (flatMeasure (tableMeasure (kruskalG m))) turns x
+
+/-- **Statement: Kruskal's own table is "Kruskal's in a chart"** around each of its points. -/
+def KruskalMeetsConclusion : Prop :=
+  ∀ m : ℝ, 0 < m → ∀ p ∈ kruskalRegion,
+    IsKruskalNear m (flatMeasure (tableMeasure (kruskalG m))) p
+
+/-- **Statement: de Sitter's space-time is Kruskal's in no chart,** for any positive mass. -/
+def DeSitterNotKruskal : Prop :=
+  ∀ L : ℝ, 0 < L → ∀ m : ℝ, 0 < m → ∀ p ∈ deSitterRegion L,
+    ¬ IsKruskalNear m (flatMeasure (tableMeasure (roundG (dsA L) (dsB L)))) p
+
+/-- **Statement: Schwarzschild's is, near each of its points, a piece of Kruskal's.** For a
+positive mass, around every
 point outside the rim and around every point inside it, Schwarzschild's length measure is
 Kruskal's in some chart. -/
 def KruskalHoldsSchwarzschild : Prop :=
@@ -133,7 +162,7 @@ def KruskalHoldsSchwarzschild : Prop :=
 /-- **Statement: Birkhoff's theorem at every point, the rim included.** Take a curved space of
 four dimensions with a length measure that, on an open region, is a space-time, is empty, and
 looks the same from every side. Then around **every** point `p` of the region, with nothing
-asked of the size of the spheres there, one of two things holds:
+asked of the size of the spheres there, at least one of two things holds (in fact never both):
 
 * there is a positive mass `m` such that the length measure is Kruskal's of mass `m` in some
   chart around `p`; or

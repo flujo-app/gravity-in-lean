@@ -94,15 +94,19 @@ read the definitions and the goal against the textbooks: [REVIEW.md](REVIEW.md).
 
 ## Stated, not yet proved
 
-One target is written down in exact form and **not proved**. It is a definition of a
-statement. The build checks that the statement is well-formed and rests on nothing extra. It
-does not check that it is true. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
+These targets are written down in exact form and **not proved**. Each is a definition of a
+statement. The build checks that the statements are well-formed and rest on nothing extra. It
+does not check that they are true. A second, independent reader judged the first two rows true
+as written before they were fixed; the tests come from the reviewers of the definitions. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
 and the goal `BirkhoffNoCoordinates`, were proved on 23 and 24 November 2026 by teams of
 workers: see the table above. Fixing the statements beforehand is what made it safe to hand
 the proofs to a team.)
 
 | Statement | In plain words | File, and the check that it is not about nothing |
 |---|---|---|
+| `BirkhoffAtEveryPoint`, `BirkhoffAtEveryPointOneMass` | Birkhoff's theorem at every point, the rim of a black hole included: around every point of a round, empty space-time there is a chart in which it is Kruskal's form of Schwarzschild's space-time for a positive mass, or Schwarzschild's own form for a mass that is zero or negative. And the mass is the same on a region in one piece. | [Goals/EveryPoint.lean](GravityInLean/Goals/EveryPoint.lean), with its own checks as statements: Kruskal's table is a space-time, empty and round; the rim is where the distance is not usable; Schwarzschild's is a piece of it; de Sitter's is not. |
+| `OneMassStatement` | One mass for a whole region: on a region in one piece, the charts of Birkhoff's theorem all have the same mass, also across a rim. | [Goals/OneMass.lean](GravityInLean/Goals/OneMass.lean) |
+| 25 tests | Cases where a definition should fail, and say which one: the rim fails only "usable distance"; zero fields are not "round"; two time directions are not one; a squashed sphere is not round; de Sitter's universe is Schwarzschild's in no chart; and more. Proposed by three independent reviewers. | [Goals/Tests.lean](GravityInLean/Goals/Tests.lean), [REVIEW.md](REVIEW.md) |
 | `ConnectionExistsStatement` | A length measure on a curved space has a connection. The standard library has this only when all lengths are positive. (That it has only one is proved: see the table above.) | [Goals/Connection.lean](GravityInLean/Goals/Connection.lean). Holds for every good table: `IsRegularTableOn.isConnectionOf`. |
 
 Two independent readers went through the definitions and these statements before anything was
@@ -274,6 +278,9 @@ GravityInLean/Curved/Goal.lean      the goal, as a statement: Birkhoff with no c
 GravityInLean/Goals/Turns.lean      statements to prove: coordinates that fit the turns
 GravityInLean/Goals/Connection.lean statements to prove: a length measure has one connection
 GravityInLean/Goals/ExactlyWhen.lean statements to prove: Birkhoff's theorem both ways
+GravityInLean/Goals/Tests.lean      statements to prove: tests that the definitions can fail
+GravityInLean/Goals/OneMass.lean    statement to prove: one mass for a whole region
+GravityInLean/Goals/EveryPoint.lean statements to prove: the theorem at every point, rim included
 GravityInLean/Flows/                paths along a field depend smoothly on where they start
                                     (eleven files; SmoothFlow.lean holds the theorem)
 GravityInLean/Turns/                coordinates that fit the turns exist
