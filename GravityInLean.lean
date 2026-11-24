@@ -66,6 +66,10 @@ import GravityInLean.Global.KruskalKept
 import GravityInLean.Global.KruskalPlane
 import GravityInLean.Global.UniqueKruskal
 import GravityInLean.Global.LocalMaps
+import GravityInLean.Global.SchwScalars
+import GravityInLean.Global.SchwSplit
+import GravityInLean.Global.SchwTime
+import GravityInLean.Global.MassCharts
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate
