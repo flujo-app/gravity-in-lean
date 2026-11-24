@@ -385,6 +385,22 @@ one head, read twice, and tested on known answers before any worker starts.
    `turnsCoordinates` to `shape_of_round`: the shape of a round table on a small patch, and its
    continuation to all angles.
 
+## After Birkhoff: what could make a paper
+
+Decided on 23 November 2026, from the research in [TARGETS.md](TARGETS.md). It changes the order
+of the steps below: step 3 (Newton) stays useful, but these come first where they lead to a paper.
+
+| Order | Target | Issue | Why |
+|---|---|---|---|
+| 1 | **Paper 1: the coordinate-free Birkhoff theorem and how the AI teams built it** | #34 | Not found elsewhere in that form. The coordinate version is not a first (ProjectAinos, 19 November 2026). |
+| 2 | **A black hole that does not change in time is Schwarzschild's** (Israel, 1967) | #35 | Not found anywhere, no other project plans it, and its last step is our Birkhoff theorem. |
+| 3 | **A singularity theorem, together with Lightlike** | #36 | Lightlike has most of the groundwork and lists it as its own goal. Racing it would likely lose. |
+| 4 | **Check whether Lean has tools for exact error bounds** | #37 | The only realistic route to new mathematics found: computer-checked certificates for special solutions. |
+
+Not now: positive mass, Penrose's inequality, the area theorem, stability of black holes, and the
+famous open problems. Either another team is ahead (TauCeti, Lightlike) or years of foundations are
+missing. The repository is public since 24 November 2026, 00:26 UTC, so our work is dated from then.
+
 ## The steps
 
 ```mermaid
