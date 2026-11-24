@@ -276,6 +276,28 @@ example : GravityInLean.Curved.BirkhoffAtEveryPointOneMass :=
   GravityInLean.Curved.kruskalIsEmpty GravityInLean.Curved.kruskalNotUsableOnRim
   GravityInLean.Curved.kruskalHoldsSchwarzschild GravityInLean.Curved.kruskalRadiusSmooth
 
+-- Statements for a whole space-time (issue 39, second step; not proofs of them), and the checks
+-- that they are not about nothing: the assumptions can be met, the conclusion holds where it
+-- should, the model tables are the project's tables, and the symmetries keep lengths.
+#audit GravityInLean.Curved.GlobalBirkhoff GravityInLean.Curved.GlobalBirkhoffUnique
+  GravityInLean.Curved.GlobalBirkhoffConverse GravityInLean.Curved.GlobalMassUnique
+  GravityInLean.Curved.KruskalMapOfSchwarzschild GravityInLean.Curved.GlobalDeSitterNoMap
+  GravityInLean.Curved.GlobalUniqueNeedsOnePiece
+  GravityInLean.Curved.kruskalWrap_isKruskalMapOn
+  GravityInLean.Curved.sphericalToSpace_isSchwarzschildMapOn
+  GravityInLean.Curved.IsKruskalMapOn.mfderiv_injective
+  GravityInLean.Curved.IsSchwarzschildMapOn.mfderiv_injective
+  GravityInLean.Curved.IsKruskalMapOn.not_const GravityInLean.Curved.schwarzschild_meets_global
+  GravityInLean.Curved.schwarzschild_global GravityInLean.Curved.kruskal_meets_global
+  GravityInLean.Curved.kruskalBox_conclusion GravityInLean.Curved.IsKruskalMapOn.sym
+  GravityInLean.Curved.kruskal_map_reaches_pole
+
+-- The assumptions of `GlobalBirkhoff` met across the rim, now without conditions: the known
+-- answers that `kruskal_meets_global` asks for are proved by the sixth team.
+example (m : ℝ) (hm : 0 < m) := GravityInLean.Curved.kruskal_meets_global
+  GravityInLean.Curved.kruskalIsSpaceTime GravityInLean.Curved.kruskalIsEmpty
+  GravityInLean.Curved.kruskalIsRound m hm
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

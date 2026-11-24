@@ -36,7 +36,7 @@ Tags used for every fact:
      seen". Szenthe (2004) writes that a general global theory of spherically symmetric
      spacetimes "is lacking".
 3. **What can realistically be proved.**
-   - A "developing map" version of the global theorem looks both true and new as an explicit
+   - A "developing map" version of the global theorem looks true and was not found written down as an explicit
      statement: the universal cover of any connected spherically symmetric vacuum spacetime maps
      into Kruskal (or Minkowski, or negative-mass Schwarzschild) by a map that preserves the metric.
    - Adding one completeness condition gives a finite list: Kruskal and its four Z₂ quotients.

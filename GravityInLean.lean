@@ -33,6 +33,8 @@ import GravityInLean.Goals.ExactlyWhen
 import GravityInLean.Goals.Tests
 import GravityInLean.Goals.OneMass
 import GravityInLean.Goals.EveryPoint
+import GravityInLean.Goals.Global
+import GravityInLean.Global.Checks
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate
