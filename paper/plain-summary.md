@@ -23,9 +23,12 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
    the rim. We use Kruskal's labels, which do not.
 3. **One mass.** A space-time in one piece gets one mass, not a different one at each point.
 4. **Both directions.** Round and empty means Schwarzschild's, and Schwarzschild's means round
-   and empty.
+   and empty: as one "exactly when" at points off the rim, and for the whole space-time (for
+   mass zero the map must miss the centre). The every-point theorem of item 2 has no such
+   reverse direction of its own.
 5. **No hidden assumption in "empty".** The tool that measures curvature (the connection)
-   is proved to exist and to be the only one.
+   is proved to exist and to be the only one, for space-times; the standard library already
+   had this for ordinary (Riemannian) spaces.
 6. **The whole space-time.** On a region with no holes a loop could wind round, the pieces fit
    together into one map onto Kruskal's black hole (or flat space-time, or negative-mass
    Schwarzschild), unique up to a symmetry. A full list of all possible shapes is not claimed.
