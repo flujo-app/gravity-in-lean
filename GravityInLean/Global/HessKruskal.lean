@@ -212,10 +212,10 @@ theorem hessT_conf_tt :
             * dr F (x 0) (x 1)) := by
   have e0 : genΓ A A zero2 S 0 0 0 x
       = A (x 0) (x 1) * dt A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n000, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n000, det2, zero2, constOne, dt_zero2]
   have e1 : genΓ A A zero2 S 1 0 0 x
       = A (x 0) (x 1) * dr A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n100, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n100, det2, zero2, constOne, dt_zero2]
   rw [hessT_gen_sep2, slope_tt_sep2_one, e0, e1]
 
 /-- The second slope, entry "`T`, `X`". -/
@@ -228,10 +228,10 @@ theorem hessT_conf_tx :
             * dr F (x 0) (x 1)) := by
   have e0 : genΓ A A zero2 S 0 0 1 x
       = A (x 0) (x 1) * dr A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n001, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n001, det2, zero2, constOne]
   have e1 : genΓ A A zero2 S 1 0 1 x
       = A (x 0) (x 1) * dt A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n101, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n101, det2, zero2, constOne]
   rw [hessT_gen_sep2, slope_tx_sep2_one, e0, e1]
 
 /-- The second slope, entry "`X`, `T`". -/
@@ -244,10 +244,10 @@ theorem hessT_conf_xt :
             * dr F (x 0) (x 1)) := by
   have e0 : genΓ A A zero2 S 0 1 0 x
       = A (x 0) (x 1) * dr A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n001, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n001, det2, zero2, constOne]
   have e1 : genΓ A A zero2 S 1 1 0 x
       = A (x 0) (x 1) * dt A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n101, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n101, det2, zero2, constOne]
   rw [hessT_gen_sep2, slope_xt_sep2_one, e0, e1]
 
 /-- The second slope, entry "`X`, `X`". -/
@@ -260,10 +260,10 @@ theorem hessT_conf_xx :
             * dr F (x 0) (x 1)) := by
   have e0 : genΓ A A zero2 S 0 1 1 x
       = A (x 0) (x 1) * dt A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n011, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n011, det2, zero2, constOne, dr_zero2]
   have e1 : genΓ A A zero2 S 1 1 1 x
       = A (x 0) (x 1) * dr A (x 0) (x 1) / (2 * (A (x 0) (x 1) * A (x 0) (x 1))) := by
-    simp [genΓ_apply, trPartG, θPartG, half, n111, det2, zero2, constOne, dt_zero2, dr_zero2]
+    simp [genΓ_apply, trPartG, θPartG, half, n111, det2, zero2, constOne, dr_zero2]
   rw [hessT_gen_sep2, slope_xx_sep2_one, e0, e1]
 
 /-- The second slope, entry "pole angle, pole angle". -/
@@ -692,14 +692,11 @@ theorem hessT_kruskalRad (hm : 0 < m) (hx : x ∈ kruskalRegion) (a b : Fin 4) :
       = (if a.val < 2 ∧ b.val < 2 then m / kruskalRad m x ^ 2
           else if 2 ≤ a.val ∧ 2 ≤ b.val then (kruskalRad m x - 2 * m) / kruskalRad m x ^ 2
           else 0) * kruskalG m a b x := by
-  by_cases h1 : a.val < 2 ∧ b.val < 2
-  · rw [if_pos h1]
-    exact hessT_kruskalRad_plane hm hx a b h1.1 h1.2
-  · by_cases h2 : 2 ≤ a.val ∧ 2 ≤ b.val
-    · rw [if_neg h1, if_pos h2]
-      exact hessT_kruskalRad_sphere hm hx a b h2.1 h2.2
-    · rw [if_neg h1, if_neg h2, zero_mul]
-      exact hessT_kruskalRad_mixed m x a b (by omega)
+  split_ifs with h1 h2
+  · exact hessT_kruskalRad_plane hm hx a b h1.1 h1.2
+  · exact hessT_kruskalRad_sphere hm hx a b h2.1 h2.2
+  · rw [zero_mul]
+    exact hessT_kruskalRad_mixed m x a b (by omega)
 
 end KruskalHess
 
