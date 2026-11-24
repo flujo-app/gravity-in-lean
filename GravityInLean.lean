@@ -57,6 +57,11 @@ import GravityInLean.Global.ConverseRoundSchw
 import GravityInLean.Global.RiemannGen
 import GravityInLean.Global.KretschmannGen
 import GravityInLean.Global.KretschmannKruskal
+import GravityInLean.Global.HessKruskal
+import GravityInLean.Global.SphereRigid
+import GravityInLean.Global.RoundTools
+import GravityInLean.Global.ConverseRoundKruskal
+import GravityInLean.Global.Converse
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate
