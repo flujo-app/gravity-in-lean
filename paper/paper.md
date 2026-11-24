@@ -16,8 +16,10 @@ mass on each connected region; and it comes with its converse, as one "if and on
 Levi-Civita connection of a metric of arbitrary signature is shown to exist and to be unique,
 so "Ricci-flat" carries no hidden assumption. The definitions were reviewed against the
 textbooks and are pinned by 25 tests in which a definition must fail. The development has
-1,151 theorems and was produced within about a day. The proofs were written by teams of ten AI
-workers in six runs of 11 to 29 minutes each. The statements were fixed in advance, read by an
+1,151 theorems and was produced in about 26 hours from the repository's first commit (23
+November 2026, 01:08 UTC, to 24 November, 03:03 UTC). Most of the proofs were written by teams of
+ten AI workers in six runs of 11 to 29 minutes each; the groundwork in coordinates, the
+definitions and the statements were written by single AI sessions. The statements were fixed in advance, read by an
 independent second reader, and checked afterwards by a rebuild from scratch and an audit of
 axioms. We report what this cost, where the time went, and what is not checked. To our
 knowledge no earlier machine-checked Birkhoff theorem starts from symmetry assumptions without
@@ -74,16 +76,19 @@ sentence; see `review/global-birkhoff.md` in the repository for what was read an
 documented with dates in `SURVEY.md` and `TARGETS.md`.
 
 - *ProjectAinos* (`x-oai/ProjectAinos`) proved Birkhoff's theorem in Lean 4 from a fixed
-  diagonal form −A(t,r)dt² + B(t,r)dr² + r²dΩ² on 19 November 2026, four days before the
-  coordinate version in this repository. The coordinate result here is therefore not a first.
+  diagonal form −A(t,r)dt² + B(t,r)dr² + r²dΩ² with A, B > 0 (so outside the horizon only)
+  on 19 November 2026, four days before the coordinate version in this repository. The coordinate result here is therefore not a first.
 - *grlab* (`BrandonMYates/grlab`, August 2026) has the last step of the static case.
 - *Lightlike* (`LightLikeProject/lightlike`) builds orbit charts from a Killing algebra and uses
   them for homogeneous and isotropic 3-metrics (the cosmological case), not for so(3) with
-  two-dimensional orbits.
+  two-dimensional orbits. It also develops Lorentzian metrics, the Levi-Civita connection and
+  curvature on manifolds (reported by a research helper; we read only its orbit-chart files).
 - *TauCeti* (`TauCetiProject/TauCeti`) proved, earlier than this repository and independently,
   that a non-degenerate metric of any signature has a Levi-Civita connection. The proof here was
   made from the textbook (Koszul's formula; O'Neill 1983, Chapter 3) by workers instructed not to
-  read any other project's proof, and the run's log shows no access to the network.
+  read any other project's proof, and the run's log shows no access to the network. An
+  earlier team run had begun to port TauCeti's proof; it was stopped before anything was merged
+  and its files were discarded, so the proof in the repository comes from a later, fresh team.
 - Schwarzschild's solution itself had been verified in Lean at least twice before.
 
 **To our knowledge**, no machine-checked Birkhoff theorem in any proof assistant starts from
@@ -353,7 +358,8 @@ that is part of every build; the whole development compiles from scratch on a cl
 
 All Lean code, all proofs, the definitions, the statements, the second readings, the reviews
 and the first draft of this text were written by AI systems: Claude Fable 5.2 (supervisor and
-workers) and Claude Opus 5.5 (second readers), through Claude Code and the FACTORY framework.
+workers) and Claude Opus 5.5 (second readers, the review in `REVIEW.md`, and the literature
+research), through Claude Code and the FACTORY framework.
 The human author chose the goal and its order of priority, decided the working rules (one build
 at a time; no porting of another project's recent proof; when to make the repository public),
 [the author describes here what he read, checked and decided, and confirms that he stands
