@@ -32,8 +32,14 @@ smoothly on where they start) in 14 minutes. See "What the first team trial show
 stream 1, coordinates that fit the turns, in 17 minutes. Stream 1 is complete. See "What the
 second team run showed" below.
 
-**Next, before step 3:** the statements of streams 2 to 4, written by one head and read by a
-second, then a team for each. See "Next: Birkhoff's theorem with no coordinates at all" below.
+**The goal is reached** (24 November 2026, 00:30 UTC). A third team proved Birkhoff's theorem
+with no coordinates at all, `birkhoffNoCoordinates`, in 21 minutes. About four hours had passed
+since the work on it began; the estimate was one to three weeks. See "What the third team run
+showed" below.
+
+**Next:** the "exactly when" form of the theorem, the one statement still open (a length
+measure has a connection), and the checks listed in issue 34 before anything is claimed in
+public.
 
 ## The short answer
 
@@ -307,6 +313,75 @@ positive. The statement is true with them and without them.
   theorem is safe, because its statement was fixed and read by two readers beforehand. The
   twenty lemmas in between were read by nobody but their authors.
 
+## What the third team run showed
+
+The job: prove `Curved.BirkhoffNoCoordinates`, the goal fixed in `Curved/Goal.lean` before any
+team started. Same kind of team: one lead and nine workers, Claude Fable 5.2 at effort "high",
+one container on this PC. The brief held a route in three parts, worked out on paper and marked
+"not checked in Lean": from the curved space to a table in a chart; Birkhoff inside coordinates
+on a small patch; joining the two.
+
+| | | |
+|---|---|---|
+| Result | proved: `birkhoffNoCoordinates`, 24 files, about 4,500 lines, 168 theorems | Measured |
+| Time, from "all ten are ready" to "the whole project builds with the proof in it" | 21 minutes 19 seconds (00:08:49 to 00:30:08 UTC) | Measured |
+| How it went | Three rounds of ten, eight and five lemmas. After 9 minutes the goal was proved from its two halves with both still open, so every later lemma was known to be needed. | Measured (the team's record, checked against the queue's log) |
+| Lean runs | 79 until the goal, 10 of them the set-up; 17 failed and were repaired | Measured |
+| The queue | After the set-up, the longest wait was 34 seconds. The set-up: one copy built the project (109 seconds), the others took the result. | Measured |
+| Idle hands | Four of the nine workers had nothing to do for the last five to seven minutes: nothing was left that the goal needed. One lemma was given to two workers as a hedge; the second copy was not needed. | Measured (the team's record) |
+| Memory | 6.9 GB at the one moment sampled; the limit was 18 GB | Measured |
+| Model use until the stop (7 minutes after the goal) | 39.2 million tokens read (37.6 million of them from the cache), 569,000 written. The lead: a third of it. | Measured |
+| Weekly allowance | "all models" went from 42% to 47%, "Fable" from 36% to 46%, between start and stop. That includes this chat and a second chat that was busy at the same time. So: at most 5 and 10 points. | Measured |
+| Checked afterwards on this PC | only `GravityInLean/Join/` and 24 import lines changed; whole project rebuilt from nothing through the queue; all 1,436 declarations pass the audit; `Audit.lean` checks that `birkhoffNoCoordinates` proves the goal as it was fixed | Measured |
+| Changed afterwards | three loosely written steps in one file (`Signature.lean`) that gave style warnings. Nothing else. | Measured |
+| Full rebuild now | 138 seconds with the library's files fresh in memory, 328 seconds straight after the run; 7.3 GB at the peak, eight Lean processes | Measured |
+
+**What the team changed in the route it was given.**
+
+- From the curved space to a table in two stops, not one: first to flat coordinate space in the
+  curved-space language, then to tables. The chart lemmas need no tables, and the table
+  dictionary needs no chart.
+- "The shape on a small patch": the old proof reads one of the turns at a quarter turn around
+  the axis, which lies outside any small patch. A worker found this and redid the proof at
+  angle zero.
+- The general theorem now gives a new time label that is smooth of every order
+  (`birkhoff_general_smooth`). The old one was only shown differentiable once. That removes what
+  stood in the way of the "exactly when" form.
+
+**What the three runs say together.**
+
+| Run | Job | Lines | Lemmas | Minutes | Allowance, at most |
+|---|---|---|---|---|---|
+| 1 | paths depend smoothly on their start | 980 | 24 | 14 | 2 to 3 points |
+| 2 | coordinates that fit the turns | 2,070 | 62 | 17 | 2 to 4 points |
+| 3 | the goal: Birkhoff with no coordinates | 4,500 | 168 | 21 | 5 to 10 points |
+
+- The time hardly grew with the size of the job: the lead splits a larger job into more lemmas
+  and more rounds, and the rounds take three to five minutes each. The cost grew roughly with
+  the lines written.
+- All of "Birkhoff with no coordinates" took about four hours from the request to the goal: 80
+  minutes for one head to write, test and have read the definitions and statements; about an
+  hour to set up the fleet and find its faults; three runs of 14, 17 and 21 minutes; the rest
+  was checking, tidying and writing up. The estimate was one to three weeks.
+- Where the time went is the lesson: not into proving. The slow parts were deciding what to
+  prove, in exact words, and checking afterwards that what came back is what was asked for.
+- What made it safe to go this fast: the statement of every final theorem was fixed in a file
+  the teams could not change, was read by two readers and tested on known answers before any
+  team started, and `Audit.lean` checks that the theorem proved is that statement and rests on
+  nothing extra. A team could not have proved something else and called it the goal.
+
+**What is not checked, said plainly.**
+
+- Whether the definitions in `Curved/Basic.lean` and the goal say what a physicist means. Two
+  readers and the known answers speak for it. Nobody who works in gravity has read them.
+- The roughly 250 lemmas the teams wrote in between: their comments were read by nobody but
+  their authors.
+- Still no test that "looks the same from every side" or "usable distance" can fail.
+- The symmetry is assumed in its small-steps form (three fields of arrows), not as a group of
+  turns acting on the space.
+- The theorem is a statement around a point. It says nothing at the rim and nothing about the
+  whole space-time at once.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -379,11 +454,15 @@ one head, read twice, and tested on known answers before any worker starts.
    time on this PC, no cloud machines.
 5. The second statement of stream 1, `TurnsCoordinatesStatement`, with the same kind of team.
    **Done** (see "What the second team run showed"). Stream 1 is complete.
-6. **Next:** the one statement of stream 2 that is still open (`ConnectionExistsStatement`) can
-   go to a team as it stands. Streams 3 and 4 have no exact statements yet: writing them, with
-   a second reader, is the next work for one head. Among them are the two lemmas that join
-   `turnsCoordinates` to `shape_of_round`: the shape of a round table on a small patch, and its
-   continuation to all angles.
+6. Streams 2 to 4 and the goal itself. **Done** by the third team in one run (see "What the
+   third team run showed"): the team wrote the statements of the join itself, from the route in
+   the brief. Only the goal's statement was fixed beforehand.
+7. **Next:**
+   - The "exactly when" form: empty exactly when Schwarzschild's, in coordinates and with no
+     coordinates. Statements first, with a second reader, then a team.
+   - `ConnectionExistsStatement`, the one statement still open. Another project has a proof
+     (TauCeti, on a newer Lean): port that route with credit, and do not present it as new.
+   - The checks of issue 34 before any public claim.
 
 ## After Birkhoff: what could make a paper
 
