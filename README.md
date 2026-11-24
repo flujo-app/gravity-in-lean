@@ -100,10 +100,28 @@ read the definitions and the goal against the textbooks: [REVIEW.md](REVIEW.md).
 
 ## Stated, not yet proved
 
-Nothing in the files of fixed statements (`GravityInLean/Goals/`) is open at the moment: every
-statement there has a proof, and `Audit.lean` checks each proof against its statement. The next
-target, which Kruskal's space-time and its four quotients by a reflection are the only complete
-ones, is not stated yet: it needs paths of free fall on a curved space.
+**Which whole space-times are round and empty (G2 of the research notes).** Fixed in
+[Goals/GlobalComplete.lean](GravityInLean/Goals/GlobalComplete.lean), read by a second reader,
+not proved. A round, empty space-time that is in one piece and Hausdorff, with a positive mass,
+in which every path of free fall that cannot be continued either runs for all times or ends where
+the spheres shrink to nothing, is Kruskal's whole space-time or Kruskal's folded in two in one of
+four ways (one of them is the RP³ geon); if it is also orientable and can tell future from past,
+it is Kruskal's or the RP³ geon. With it: the other way round, that Kruskal's whole space-time
+and its foldings exist as curved spaces, that the equation of free fall does not depend on the
+chart (proved), and failure tests (without "Hausdorff", without the condition on paths of free
+fall, or without "in one piece", the statement is false). The steps of the route are stated too;
+two of them are proved (a turn of the sphere leaves a point where it is; the only symmetry of the
+sphere of order two that moves every point is the opposite-point map). The folded space-times are said without dividing anything: a
+length-keeping map from Kruskal's whole space-time onto the space, whose points meet in pairs
+exactly as the fold says. This project had no paths of free fall on a curved space before; they
+are said through charts, with the coordinate equation of free fall used since step 1, and tested
+in [Global/FreeFallChecks.lean](GravityInLean/Global/FreeFallChecks.lean): straight lines in
+flat space-time are paths of free fall, a bent line and a kinked one are not, a ray of light
+falling into Schwarzschild's mass is one and the same ray run at a wrong clock is not, a ray
+inside the rim reaches the centre at a finite time while the spheres shrink to nothing, flat
+space-time meets the condition, and the charts used for Kruskal's whole space-time reach every
+point of it. Every other file of fixed statements (`GravityInLean/Goals/`) has a proof, and
+`Audit.lean` checks each proof against its statement.
 
 ## What is still taken on trust
 
@@ -269,6 +287,11 @@ GravityInLean/Goals/OneMass.lean    statement to prove: one mass for a whole reg
 GravityInLean/Goals/EveryPoint.lean statements to prove: the theorem at every point, rim included
 GravityInLean/Goals/Global.lean     statements to prove: the theorem for a whole space-time
 GravityInLean/Global/Checks.lean    checks of those statements: assumptions met, known answers
+GravityInLean/Goals/GlobalComplete.lean  statements to prove: which whole space-times are round
+                                    and empty (G2), with paths of free fall on a curved space
+GravityInLean/Global/FreeFallChecks.lean  checks of those definitions: free fall, foldings
+GravityInLean/Global/FreeFallChart.lean   proof: free fall does not depend on the chart
+GravityInLean/Global/FoldChecks.lean      more checks of the foldings; two facts on the sphere
 GravityInLean/Flows/                paths along a field depend smoothly on where they start
                                     (eleven files; SmoothFlow.lean holds the theorem)
 GravityInLean/Turns/                coordinates that fit the turns exist

@@ -317,6 +317,43 @@ example : GravityInLean.Curved.GlobalUniqueNeedsOnePiece :=
   GravityInLean.Curved.kruskalMapOfSchwarzschild GravityInLean.Curved.globalDeSitterNoMap
   GravityInLean.Curved.globalUniqueNeedsOnePiece
 
+-- Statements for G2, which whole space-times are round and empty (not proofs of them), and the
+-- checks of the definitions they use: paths of free fall on a curved space, the completeness
+-- condition, orientation, and Kruskal's whole space-time with its four foldings.
+#audit GravityInLean.Curved.GlobalComplete GravityInLean.Curved.GlobalCompleteOriented
+  GravityInLean.Curved.GlobalCompleteConverse GravityInLean.Curved.KruskalWholeExists
+  GravityInLean.Curved.KruskalFoldsExist GravityInLean.Curved.FreeFallAnyChart
+  GravityInLean.Curved.GlobalCompleteNeedsHausdorff
+  GravityInLean.Curved.GlobalCompleteNeedsCompleteness
+  GravityInLean.Curved.isFreeFallPath_self_iff GravityInLean.Curved.line_isFreeFallPath
+  GravityInLean.Curved.bent_not_isFreeFallPath GravityInLean.Curved.kink_falls
+  GravityInLean.Curved.kink_not_isFreeFallPath GravityInLean.Curved.inRay_isFreeFallPath
+  GravityInLean.Curved.inRaySlow_not_isFreeFallPath GravityInLean.Curved.line_isInextendible
+  GravityInLean.Curved.line_short_not_isInextendible
+  GravityInLean.Curved.minkowski_path_eq_line GravityInLean.Curved.minkowski_freeFallComplete
+  GravityInLean.Curved.coords_isOrientable GravityInLean.Curved.minkowski_isTimeOrientable
+  GravityInLean.Curved.kruskalChart_isKruskalMapOn GravityInLean.Curved.kruskalChart_covers
+  GravityInLean.Curved.kruskalFold_mem GravityInLean.Curved.kruskalFold_measure
+  GravityInLean.Curved.kruskalFold_fold GravityInLean.Curved.kruskalFold_ne
+  GravityInLean.Curved.SizeSqIsRadius GravityInLean.Curved.FreeFallMaximal
+  GravityInLean.Curved.FreeFallUnique GravityInLean.Curved.KruskalOntoSym
+  GravityInLean.Curved.FoldsUpToSymmetry GravityInLean.Curved.TurnFixesPoint
+  GravityInLean.Curved.SphereFreeInvolution GravityInLean.Curved.KruskalFoldsDistinct
+  GravityInLean.Curved.GlobalCompleteNeedsConnected
+  GravityInLean.Curved.inRayIn_isFreeFallPath GravityInLean.Curved.inRayIn_sizeSq
+  GravityInLean.Curved.kruskalFold_comm GravityInLean.Curved.kruskalFolds_table
+  GravityInLean.Curved.IsKruskalOnto.not_const
+  GravityInLean.Curved.fallsFreelyIn_iff_of_mem_maximalAtlas
+
+-- Proved in this chat, before any team run: three of the statements of
+-- `Goals/GlobalComplete.lean`. Each line checks that what was proved is the statement as fixed.
+example : GravityInLean.Curved.FreeFallAnyChart := GravityInLean.Curved.freeFallAnyChart
+example : GravityInLean.Curved.TurnFixesPoint := GravityInLean.Curved.turnFixesPoint
+example : GravityInLean.Curved.SphereFreeInvolution := GravityInLean.Curved.sphereFreeInvolution
+
+#audit GravityInLean.Curved.freeFallAnyChart GravityInLean.Curved.turnFixesPoint
+  GravityInLean.Curved.sphereFreeInvolution
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean
