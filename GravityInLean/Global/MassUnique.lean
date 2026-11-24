@@ -31,19 +31,21 @@ open Real Set
 
 open scoped Manifold ContDiff Topology
 
-/-- **Kruskal's tables of two positive masses:** a map that carries one to the other near a
-point has equal masses. -/
+/-- **Kruskal's tables of two positive masses:** a map that carries one to the other on an open
+set that is not empty has equal masses. -/
 theorem mass_eq_of_carries_kruskal {m m' : ℝ} (hm : 0 < m) (hm' : 0 < m')
-    {f : Coords 4 → Coords 4} {x : Coords 4} (hx : x ∈ kruskalRegion)
-    (hfx : f x ∈ kruskalRegion) (hf : CarriesTableAt (kruskalG m) (kruskalG m') f x) :
-    m = m' := by
+    {f : Coords 4 → Coords 4} {W : Set (Coords 4)} (hW : IsOpen W) (hne : W.Nonempty)
+    (hWsub : W ⊆ kruskalRegion) (hfW : ∀ x ∈ W, f x ∈ kruskalRegion)
+    (hf : ∀ x ∈ W, CarriesTableAt (kruskalG m) (kruskalG m') f x) : m = m' := by
   sorry
 
 /-- **Schwarzschild's tables of two masses that are zero or negative:** a map that carries one
-to the other near a point has equal masses. -/
+to the other on an open set that is not empty has equal masses. -/
 theorem mass_eq_of_carries_schw {m m' : ℝ} (hm : m ≤ 0) (hm' : m' ≤ 0)
-    {f : Coords 4 → Coords 4} {x : Coords 4} (hx : x ∈ outside m) (hfx : f x ∈ outside m')
-    (hf : CarriesTableAt (roundG (schwA m) (schwB m)) (roundG (schwA m') (schwB m')) f x) :
+    {f : Coords 4 → Coords 4} {W : Set (Coords 4)} (hW : IsOpen W) (hne : W.Nonempty)
+    (hWsub : W ⊆ outside m) (hfW : ∀ x ∈ W, f x ∈ outside m')
+    (hf : ∀ x ∈ W,
+      CarriesTableAt (roundG (schwA m) (schwB m)) (roundG (schwA m') (schwB m')) f x) :
     m = m' := by
   sorry
 
