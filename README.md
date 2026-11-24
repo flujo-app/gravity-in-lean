@@ -71,23 +71,24 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **Curved space: known answers** | The definitions, tested before anything is built on them. Flat space-time: one time direction, empty. A sphere: no time direction, curvature equal to its own length measure. De Sitter's space-time: one time direction, curvature `3/L²` times its length measure, and so not empty. Schwarzschild's: one time direction outside the rim and inside it (inside, it is the distance label), empty, and it looks the same from every side. | [Curved/KnownAnswers.lean](GravityInLean/Curved/KnownAnswers.lean), `flat_isEmptyOn`, `sphere_noTime`, `sphere_curvature`, `deSitter_curvature`, `deSitter_not_isEmptyOn`, `schwarzschild_isSpaceTimeOn_inside`, `schwarzschild_isEmptyOn`, `schwarzschild_isRoundOn` |
 | **Curved space: only one connection** | A length measure has at most one connection: two of them agree on every field of arrows that can be differentiated. So curvature belongs to the length measure, and "empty" cannot be reached by picking a convenient connection. For tables of functions, empty in the new sense and empty in coordinates are the same thing, in both directions. | [Curved/Unique.lean](GravityInLean/Curved/Unique.lean), `IsConnectionOf.unique`, `connectionUnique`, `ricciAt_eq_of_isConnectionOf`, `IsRegularTableOn.isEmptyOn_iff` |
 | **Paths along a field depend smoothly on where they start** | Follow a smooth field of arrows for a time `t` from a point `x`: where you end up is a smooth function of `t` and `x` together. Lean's standard library has the paths, and that they depend continuously on the start, but not this. Proved by a team of ten workers in the first fleet trial, in 14 minutes; the statement was fixed beforehand and the result was rebuilt and checked on this PC afterwards. The route: the paths are the solutions of one smooth equation on the space of all paths, and the library's theorem on solving smooth equations does the rest. | [Flows/SmoothFlow.lean](GravityInLean/Flows/SmoothFlow.lean), `smoothFlow`; the pieces are in [Flows/](GravityInLean/Flows/), the team's own record in [Flows/STATUS.md](GravityInLean/Flows/STATUS.md) |
+| **Coordinates that fit the turns exist** | Start from any coordinates, and three fields of arrows that combine the way turns do and span two directions at every point. Then around every point there are new coordinates in which the three fields, after one fixed rotation among themselves, are exactly the three standard turns of a globe. This is the step the textbooks take for granted. Proved by a second team of ten workers in 17 minutes, from a route worked out on paper beforehand, which the team improved in one step; rebuilt and checked on this PC afterwards. It turned out to need less than was assumed: neither "the fields leave lengths unchanged" nor "lengths are positive" is used. | [Turns/TurnsCoordinates.lean](GravityInLean/Turns/TurnsCoordinates.lean), `turnsCoordinates`; the pieces are in [Turns/](GravityInLean/Turns/), the team's own record in [Turns/STATUS.md](GravityInLean/Turns/STATUS.md) |
 | **Probes** | Two tests of the definitions on curvatures that are known and not zero. A sphere: its curvature comes out equal to its own length measure. De Sitter's space-time, an empty universe with a cosmological constant: its curvature comes out as `3/L²` times its own length measure, with the textbooks' sign, in the time direction too. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere`; [Probe/DeSitter.lean](GravityInLean/Probe/DeSitter.lean), `ricci_deSitter` |
 
-In numbers: 547 theorems in about 11,300 lines.
+In numbers: 609 theorems in about 13,400 lines.
 
 ## Stated, not yet proved
 
 The next piece of work is Birkhoff's theorem with no coordinates at all
 ([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all"). Its targets are
-written down in exact form, so that nobody proving them can quietly change them. **None of these
-three is proved.** (A fourth, `SmoothFlowStatement`, was proved on 23 November 2026 by the first
-team of workers: see the table above.) Each is a definition of a statement. The build checks that the statements are
+written down in exact form, so that nobody proving them can quietly change them. **Neither of
+these two is proved.** (Two more, `SmoothFlowStatement` and `TurnsCoordinatesStatement`, were
+proved on 23 November 2026 by teams of workers: see the table above.) Each is a definition of a
+statement. The build checks that the statements are
 well-formed and rest on nothing extra. It does not check that they are true.
 
 | Statement | In plain words | File, and the check that it is not about nothing |
 |---|---|---|
 | `BirkhoffNoCoordinates` | A space-time with four dimensions that is empty and looks the same from every side is, around every point where the size of the spheres is a usable distance, Schwarzschild's in a suitable chart. | [Curved/Goal.lean](GravityInLean/Curved/Goal.lean). Schwarzschild's space-time meets every assumption, and the conclusion holds for it: `schwarzschild_meets_goal`, `schwarzschild_meets_conclusion`. |
-| `TurnsCoordinatesStatement` | Three fields of arrows that leave a table unchanged, combine the way turns do and sweep out surfaces are, in suitable coordinates and after one fixed rotation among themselves, exactly the three standard turns. This removes the last shortcut of step 2. | [Goals/Turns.lean](GravityInLean/Goals/Turns.lean). `schwarzschild_turnsOn`, `turnsCoordinates_schwarzschild`. |
 | `ConnectionExistsStatement` | A length measure on a curved space has a connection. The standard library has this only when all lengths are positive. (That it has only one is proved: see the table above.) | [Goals/Connection.lean](GravityInLean/Goals/Connection.lean). Holds for every good table: `IsRegularTableOn.isConnectionOf`. |
 
 Two independent readers went through the definitions and these statements before anything was
@@ -128,10 +129,12 @@ of Piece C. Both are now proved. What is left:
    from "looks the same from every side" (`shape_of_round`), and the cross term and the choice of
    distance label are dealt with by new labels inside the proof (`birkhoff_of_round`). What is
    still assumed lies one step earlier: that there are coordinates in which turning space moves
-   only the two angles, in the usual way. The textbooks get such coordinates from an abstract
-   description of the symmetry. That needs space-time geometry the standard library does not have
-   yet. Building it here, and so removing this item and item 1 together, is the next piece of
-   work ([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all").
+   only the two angles, in the usual way. **The main step of this is now proved**
+   (`turnsCoordinates`): such coordinates exist around every point. It is not yet joined to
+   `shape_of_round`: that theorem asks for its assumptions at all angles, and the new
+   coordinates cover a small patch. Two lemmas are still missing for the join (the shape of a
+   round table on a small patch, and its continuation to all angles). Until they are proved,
+   this item stands ([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all").
 3. **The blind spots.** The two poles and the centre are left out of every statement. The rim of
    the black hole is left out of the statements about new labels, because there the size of the
    spheres cannot serve as a distance; the statements "the mass is the same everywhere" and
@@ -160,7 +163,7 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and thirteen lines that end in
+You should see `Build completed successfully` and fourteen lines that end in
 `none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about two
 minutes.
 
@@ -180,7 +183,7 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 1,142 declarations in the project rests on (every definition and theorem, plus the helper
+of the 1,243 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
@@ -249,6 +252,8 @@ GravityInLean/Goals/Turns.lean      statements to prove: coordinates that fit th
 GravityInLean/Goals/Connection.lean statements to prove: a length measure has one connection
 GravityInLean/Flows/                paths along a field depend smoothly on where they start
                                     (eleven files; SmoothFlow.lean holds the theorem)
+GravityInLean/Turns/                coordinates that fit the turns exist
+                                    (twenty files; TurnsCoordinates.lean holds the theorem)
 scripts/queued-build.sh             one build at a time, for several workers on one machine
 scripts/setup-worktree.sh           gives a fresh copy of the repository the ready-built library
 fleet/                              a team of workers: the image, the brief, the scripts that

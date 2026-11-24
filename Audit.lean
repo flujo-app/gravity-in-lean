@@ -169,6 +169,16 @@ example : GravityInLean.SmoothFlowStatement := GravityInLean.smoothFlow
   GravityInLean.Flows.exists_implicit_smooth GravityInLean.Flows.exists_primL
   GravityInLean.Flows.exists_appL
 
+-- Proved by the second team of workers: coordinates that fit the turns exist. Again the first
+-- line checks that what was proved is the statement as it was fixed in `Goals/Turns.lean`.
+example : GravityInLean.TurnsCoordinatesStatement := GravityInLean.turnsCoordinates
+
+#audit GravityInLean.turnsCoordinates GravityInLean.Turns.exists_unit_kernel
+  GravityInLean.Turns.exists_rotation_row GravityInLean.Turns.likeTurns_rotate
+  GravityInLean.Turns.linear_ode_unique GravityInLean.Turns.fderiv_flow_pair
+  GravityInLean.Turns.exists_restSurface GravityInLean.Turns.contDiffOn_chart
+  GravityInLean.Turns.chart_relations GravityInLean.Turns.turns_of_relations
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

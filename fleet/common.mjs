@@ -8,8 +8,9 @@ import { FactoryDockerLiteFleet, ClaudeSubscriptionBroker } from 'flujo-factory'
 // and, until a run is removed, its staged logins.
 export const ROOT = required('GRAVITY_FLEET_ROOT');
 export const REPOSITORY = 'flujo-app/gravity-in-lean';
-// main after pull request 25 (definitions, statements to prove, and the fleet fixes).
-export const REVISION = '392c64aa2ba40e2a2a96d4d32dd2c41060fa5af9';
+// The commit the team starts from: any commit that is on GitHub. Set GRAVITY_REVISION to its full
+// name (`git rev-parse origin/main`).
+export const REVISION = required('GRAVITY_REVISION');
 export const IMAGE = 'gravity-worker:lean-4.36.0-r2';
 export const MODEL = 'claude-fable-5-2';
 
