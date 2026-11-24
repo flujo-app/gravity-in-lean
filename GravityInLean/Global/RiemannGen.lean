@@ -97,8 +97,10 @@ variable {x : Coords 4}
 time-distance part by itself. -/
 theorem riemM_gen_tr (h : RegularG A B C S x) :
     riemM (genΓ A B C S) 0 1 x
-      = !![curv2 A B C (x 0) (x 1) * C (x 0) (x 1), curv2 A B C (x 0) (x 1) * B (x 0) (x 1), 0, 0;
-          curv2 A B C (x 0) (x 1) * A (x 0) (x 1), -(curv2 A B C (x 0) (x 1) * C (x 0) (x 1)), 0, 0;
+      = !![curv2 A B C (x 0) (x 1) * C (x 0) (x 1),
+            curv2 A B C (x 0) (x 1) * B (x 0) (x 1), 0, 0;
+          curv2 A B C (x 0) (x 1) * A (x 0) (x 1),
+            -(curv2 A B C (x 0) (x 1) * C (x 0) (x 1)), 0, 0;
           0, 0, 0, 0;
           0, 0, 0, 0] := by
   have hs := h.sin_ne
@@ -118,14 +120,14 @@ theorem riemM_gen_tr (h : RegularG A B C S x) :
   have d10 := dr_half h.smoothS.slopeTR h.smoothS.slopeR hS0
   refine matrix_ext_fin4 ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
     simp only [riemM, dtab, tab, dirT, Matrix.sub_apply, Matrix.add_apply, Matrix.mul_apply,
-      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r, slope_genΓ_θ, slope_genΓ_φ,
+      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r,
       genΓ_apply] <;>
     (conv_lhs => simp [trPartG, θPartG, dt_zero2, dr_zero2, deriv_constOne, constOne, zero2,
       d1, d2, d3, d4, d5, d6, d7, d8, d9, d10]) <;>
     (conv_rhs => simp) <;>
-    (try simp only [h.smoothA.swap, h.smoothB.swap, h.smoothC.swap, h.smoothS.swap, half, n000,
+    (simp only [h.smoothA.swap, h.smoothB.swap, h.smoothC.swap, h.smoothS.swap, half, n000,
       n001, n011, n100, n101, n111, oneθ, curv2]) <;>
-    (try field_simp) <;>
+    field_simp <;>
     (try simp only [det2]) <;>
     ring
 
@@ -151,15 +153,15 @@ theorem riemM_gen_tθ (h : RegularG A B C S x) :
   have d6 := dt_oneS h.smoothS hS0
   refine matrix_ext_fin4 ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
     simp only [riemM, dtab, tab, dirT, Matrix.sub_apply, Matrix.add_apply, Matrix.mul_apply,
-      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r, slope_genΓ_θ, slope_genΓ_φ,
+      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_θ,
       genΓ_apply] <;>
     (conv_lhs => simp [trPartG, θPartG, dt_zero2, dr_zero2, deriv_constOne, constOne, zero2,
       d1, d2, d3, d4, d5, d6]) <;>
     (conv_rhs => simp) <;>
-    (try simp only [h.smoothA.swap, h.smoothB.swap, h.smoothC.swap, h.smoothS.swap, half, n000,
-      n001, n011, n100, n101, n111, m0, m1, oneS, oneθ, cotF, scF, sin2, bendTT, bendTR,
+    (simp only [h.smoothS.swap, half, n000,
+      n001, n100, n101, m0, m1, oneS, oneθ, cotF, bendTT, bendTR,
       hessTT, hessTR]) <;>
-    (try field_simp) <;>
+    field_simp <;>
     (try simp only [det2]) <;>
     ring
 
@@ -185,15 +187,15 @@ theorem riemM_gen_rθ (h : RegularG A B C S x) :
   have d6 := dr_oneS h.smoothS hS0
   refine matrix_ext_fin4 ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
     simp only [riemM, dtab, tab, dirT, Matrix.sub_apply, Matrix.add_apply, Matrix.mul_apply,
-      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r, slope_genΓ_θ, slope_genΓ_φ,
+      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_r, slope_genΓ_θ,
       genΓ_apply] <;>
     (conv_lhs => simp [trPartG, θPartG, dt_zero2, dr_zero2, deriv_constOne, constOne, zero2,
       d1, d2, d3, d4, d5, d6]) <;>
     (conv_rhs => simp) <;>
-    (try simp only [h.smoothA.swap, h.smoothB.swap, h.smoothC.swap, h.smoothS.swap, half, n000,
-      n001, n011, n100, n101, n111, m0, m1, oneS, oneθ, cotF, scF, sin2, bendTR, bendRR,
+    (simp only [half,
+      n001, n011, n101, n111, m0, m1, oneS, oneθ, cotF, bendTR, bendRR,
       hessTR, hessRR]) <;>
-    (try field_simp) <;>
+    field_simp <;>
     (try simp only [det2]) <;>
     ring
 
@@ -201,10 +203,12 @@ theorem riemM_gen_rθ (h : RegularG A B C S x) :
 time and pole angle, with the size of the circle around the axis. -/
 theorem riemM_gen_tφ (h : RegularG A B C S x) :
     riemM (genΓ A B C S) 0 3 x
-      = !![0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2 * (-(B (x 0) (x 1) * bendTT A B C S (x 0) (x 1))
-              + C (x 0) (x 1) * bendTR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
-          0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2 * (C (x 0) (x 1) * bendTT A B C S (x 0) (x 1)
-              + A (x 0) (x 1) * bendTR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
+      = !![0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2
+              * (-(B (x 0) (x 1) * bendTT A B C S (x 0) (x 1))
+                + C (x 0) (x 1) * bendTR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
+          0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2
+              * (C (x 0) (x 1) * bendTT A B C S (x 0) (x 1)
+                + A (x 0) (x 1) * bendTR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
           0, 0, 0, 0;
           bendTT A B C S (x 0) (x 1), bendTR A B C S (x 0) (x 1), 0, 0] := by
   have hs := h.sin_ne
@@ -219,15 +223,15 @@ theorem riemM_gen_tφ (h : RegularG A B C S x) :
   have d6 := dt_oneS h.smoothS hS0
   refine matrix_ext_fin4 ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
     simp only [riemM, dtab, tab, dirT, Matrix.sub_apply, Matrix.add_apply, Matrix.mul_apply,
-      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r, slope_genΓ_θ, slope_genΓ_φ,
+      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_φ,
       genΓ_apply] <;>
     (conv_lhs => simp [trPartG, θPartG, dt_zero2, dr_zero2, deriv_constOne, constOne, zero2,
       d1, d2, d3, d4, d5, d6]) <;>
     (conv_rhs => simp) <;>
-    (try simp only [h.smoothA.swap, h.smoothB.swap, h.smoothC.swap, h.smoothS.swap, half, n000,
-      n001, n011, n100, n101, n111, m0, m1, oneS, oneθ, cotF, scF, sin2, bendTT, bendTR,
+    (simp only [h.smoothS.swap, half, n000,
+      n001, n100, n101, m0, m1, oneS, oneθ, cotF, scF, sin2, bendTT, bendTR,
       hessTT, hessTR]) <;>
-    (try field_simp) <;>
+    field_simp <;>
     (try simp only [det2]) <;>
     ring
 
@@ -235,10 +239,12 @@ theorem riemM_gen_tφ (h : RegularG A B C S x) :
 for distance and pole angle, with the size of the circle around the axis. -/
 theorem riemM_gen_rφ (h : RegularG A B C S x) :
     riemM (genΓ A B C S) 1 3 x
-      = !![0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2 * (-(B (x 0) (x 1) * bendTR A B C S (x 0) (x 1))
-              + C (x 0) (x 1) * bendRR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
-          0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2 * (C (x 0) (x 1) * bendTR A B C S (x 0) (x 1)
-              + A (x 0) (x 1) * bendRR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
+      = !![0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2
+              * (-(B (x 0) (x 1) * bendTR A B C S (x 0) (x 1))
+                + C (x 0) (x 1) * bendRR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
+          0, 0, 0, -(S (x 0) (x 1) * sin (x 2) ^ 2
+              * (C (x 0) (x 1) * bendTR A B C S (x 0) (x 1)
+                + A (x 0) (x 1) * bendRR A B C S (x 0) (x 1)) / det2 A B C (x 0) (x 1));
           0, 0, 0, 0;
           bendTR A B C S (x 0) (x 1), bendRR A B C S (x 0) (x 1), 0, 0] := by
   have hs := h.sin_ne
@@ -253,15 +259,15 @@ theorem riemM_gen_rφ (h : RegularG A B C S x) :
   have d6 := dr_oneS h.smoothS hS0
   refine matrix_ext_fin4 ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
     simp only [riemM, dtab, tab, dirT, Matrix.sub_apply, Matrix.add_apply, Matrix.mul_apply,
-      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r, slope_genΓ_θ, slope_genΓ_φ,
+      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_r, slope_genΓ_φ,
       genΓ_apply] <;>
     (conv_lhs => simp [trPartG, θPartG, dt_zero2, dr_zero2, deriv_constOne, constOne, zero2,
       d1, d2, d3, d4, d5, d6]) <;>
     (conv_rhs => simp) <;>
-    (try simp only [h.smoothA.swap, h.smoothB.swap, h.smoothC.swap, h.smoothS.swap, half, n000,
-      n001, n011, n100, n101, n111, m0, m1, oneS, oneθ, cotF, scF, sin2, bendTR, bendRR,
+    (simp only [half,
+      n001, n011, n101, n111, m0, m1, oneS, oneθ, cotF, scF, sin2, bendTR, bendRR,
       hessTR, hessRR]) <;>
-    (try field_simp) <;>
+    field_simp <;>
     (try simp only [det2]) <;>
     ring
 
@@ -281,14 +287,14 @@ theorem riemM_gen_θφ (h : RegularG A B C S x) :
   have d3 := (hasDerivAt_scF (x 2)).deriv
   refine matrix_ext_fin4 ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ <;>
     simp only [riemM, dtab, tab, dirT, Matrix.sub_apply, Matrix.add_apply, Matrix.mul_apply,
-      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_t, slope_genΓ_r, slope_genΓ_θ, slope_genΓ_φ,
+      Matrix.of_apply, Fin.sum_univ_four, slope_genΓ_θ, slope_genΓ_φ,
       genΓ_apply] <;>
     (conv_lhs => simp [trPartG, θPartG, dt_zero2, dr_zero2, deriv_constOne, deriv_sin2, constOne,
       zero2, d1, d2, d3]) <;>
     (conv_rhs => simp) <;>
-    (try simp only [half, n000, n001, n011, n100, n101, n111, m0, m1, oneS, oneθ, cotF, scF,
+    (simp only [half, m0, m1, oneS, oneθ, cotF, scF,
       sin2, radiusSlopeSq, sizeSlopeSq]) <;>
-    (try field_simp) <;>
+    field_simp <;>
     (try simp only [det2]) <;>
     ring
 
