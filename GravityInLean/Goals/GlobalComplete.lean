@@ -42,9 +42,9 @@ the standard library says "smooth" and "slope" through the chart at the point:
   `J` it obeys the equation in the chart that the curved space provides at `γ τ`.
 
 That the equation does not depend on the chart is the statement `FreeFallAnyChart` below, proved
-in four dimensions in `Global/FreeFallChart.lean` (`freeFallAnyChart`; in coordinates it is `isFreeFallAt_inNewCoords`
-of `SamePath.lean`). Asking it in the provided chart is how the standard library itself defines
-slopes (`mfderiv` reads the map in the charts at the point).
+in four dimensions in `Global/FreeFallChart.lean` (`freeFallAnyChart`; in coordinates it is
+`isFreeFallAt_inNewCoords` of `SamePath.lean`). Asking it in the provided chart is how the
+standard library itself defines slopes (`mfderiv` reads the map in the charts at the point).
 
 **The clock is fixed by the path.** The equation fixes the clock along the path up to a shift
 and a constant rate (for a path through time this clock is its own time; for light and for paths
