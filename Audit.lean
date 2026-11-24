@@ -205,6 +205,56 @@ example : GravityInLean.ExactlyWhenNotAlwaysEmpty := GravityInLean.exactlyWhenNo
   GravityInLean.birkhoffExactlyWhenInCoordinates GravityInLean.exactlyWhenAssumptionsMet
   GravityInLean.exactlyWhenAssumptionsMetInside GravityInLean.exactlyWhenNotAlwaysEmpty
 
+-- Proved by the fifth team of workers. First, the tests that three independent reviewers of the
+-- definitions asked for (`Goals/Tests.lean`): most of them cases where a definition must fail.
+-- Each line checks that what was proved is the test as it was fixed.
+example : GravityInLean.Curved.Tests.EfIsSpaceTimeOn := GravityInLean.Curved.Tests.efIsSpaceTimeOn
+example : GravityInLean.Curved.Tests.EfIsEmptyOn := GravityInLean.Curved.Tests.efIsEmptyOn
+example : GravityInLean.Curved.Tests.EfIsRoundOn := GravityInLean.Curved.Tests.efIsRoundOn
+example : GravityInLean.Curved.Tests.EfNotUsableOnRim := GravityInLean.Curved.Tests.efNotUsableOnRim
+example : GravityInLean.Curved.Tests.CylIsRoundOn := GravityInLean.Curved.Tests.cylIsRoundOn
+example : GravityInLean.Curved.Tests.CylNotUsable := GravityInLean.Curved.Tests.cylNotUsable
+example : GravityInLean.Curved.Tests.CylNotEmpty := GravityInLean.Curved.Tests.cylNotEmpty
+example : GravityInLean.Curved.Tests.ZeroNotRound := GravityInLean.Curved.Tests.zeroNotRound
+example : GravityInLean.Curved.Tests.ZeroMeetsOtherClauses :=
+  GravityInLean.Curved.Tests.zeroMeetsOtherClauses
+example : GravityInLean.Curved.Tests.SchwFlippedNotSpaceTime :=
+  GravityInLean.Curved.Tests.schwFlippedNotSpaceTime
+example : GravityInLean.Curved.Tests.SchwFlippedNotRound :=
+  GravityInLean.Curved.Tests.schwFlippedNotRound
+example : GravityInLean.Curved.Tests.SchwFlippedIsEmpty :=
+  GravityInLean.Curved.Tests.schwFlippedIsEmpty
+example : GravityInLean.Curved.Tests.TwoTimeNotSpaceTime :=
+  GravityInLean.Curved.Tests.twoTimeNotSpaceTime
+example : GravityInLean.Curved.Tests.FlatDegNotOneTime :=
+  GravityInLean.Curved.Tests.flatDegNotOneTime
+example : GravityInLean.Curved.Tests.SquashNotUnchanged :=
+  GravityInLean.Curved.Tests.squashNotUnchanged
+example : GravityInLean.Curved.Tests.SquashUnchangedAxis :=
+  GravityInLean.Curved.Tests.squashUnchangedAxis
+example : GravityInLean.Curved.Tests.SquashNotRound := GravityInLean.Curved.Tests.squashNotRound
+example : GravityInLean.Curved.Tests.DeSitterIsRoundOn :=
+  GravityInLean.Curved.Tests.deSitterIsRoundOn
+example : GravityInLean.Curved.Tests.DeSitterUsable := GravityInLean.Curved.Tests.deSitterUsable
+example : GravityInLean.Curved.Tests.DeSitterNotSchwarzschild :=
+  GravityInLean.Curved.Tests.deSitterNotSchwarzschild
+example : GravityInLean.Curved.Tests.MinkowskiIsRoundOn :=
+  GravityInLean.Curved.Tests.minkowskiIsRoundOn
+example : GravityInLean.Curved.Tests.MinkowskiUsable := GravityInLean.Curved.Tests.minkowskiUsable
+example : GravityInLean.Curved.Tests.KinkNotUnchanged := GravityInLean.Curved.Tests.kinkNotUnchanged
+example : GravityInLean.Curved.Tests.KinkNotSmooth := GravityInLean.Curved.Tests.kinkNotSmooth
+example : GravityInLean.Curved.Tests.IsEmptyOnNegIff.{0, 0, 0} :=
+  GravityInLean.Curved.Tests.isEmptyOnNegIff
+
+-- One mass for a whole region, and: a length measure has a connection (proved from the textbook).
+example : GravityInLean.Curved.OneMassStatement := GravityInLean.oneMass
+example : GravityInLean.Curved.ConnectionExistsStatement := GravityInLean.connectionExists
+
+#audit GravityInLean.oneMass GravityInLean.connectionExists
+  GravityInLean.Curved.Tests.efNotUsableOnRim GravityInLean.Curved.Tests.zeroNotRound
+  GravityInLean.Curved.Tests.deSitterNotSchwarzschild GravityInLean.Curved.Tests.minkowskiIsRoundOn
+  GravityInLean.Curved.Tests.isEmptyOnNegIff
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

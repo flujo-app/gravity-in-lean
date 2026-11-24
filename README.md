@@ -74,9 +74,12 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **Coordinates that fit the turns exist** | Start from any coordinates, and three fields of arrows that combine the way turns do and span two directions at every point. Then around every point there are new coordinates in which the three fields, after one fixed rotation among themselves, are exactly the three standard turns of a globe. This is the step the textbooks take for granted. Proved by a second team of ten workers in 17 minutes, from a route worked out on paper beforehand, which the team improved in one step; rebuilt and checked on this PC afterwards. It turned out to need less than was assumed: neither "the fields leave lengths unchanged" nor "lengths are positive" is used. | [Turns/TurnsCoordinates.lean](GravityInLean/Turns/TurnsCoordinates.lean), `turnsCoordinates`; the pieces are in [Turns/](GravityInLean/Turns/), the team's own record in [Turns/STATUS.md](GravityInLean/Turns/STATUS.md) |
 | **Birkhoff's theorem, with no coordinates given** | Take a curved space of four dimensions with a length measure that has one time direction, is empty, and looks the same from every side. Then around every point where the size of the spheres can serve as a distance, there are a mass and a chart in which the length measure is Schwarzschild's, outside the rim or inside it. Nothing is said in coordinates at the start: no time label, no distance label, no angles. This was the goal fixed before any team started. A third team of ten workers proved it in 21 minutes from the pieces above and a route worked out on paper; it was rebuilt and checked on this PC afterwards. | [Join/Goal.lean](GravityInLean/Join/Goal.lean), `birkhoffNoCoordinates`; the statement is in [Curved/Goal.lean](GravityInLean/Curved/Goal.lean); the pieces are in [Join/](GravityInLean/Join/), the team's own record in [Join/STATUS.md](GravityInLean/Join/STATUS.md) |
 | **Birkhoff's theorem, both ways** | The theorem as one "exactly when". With no coordinates: around a point, a length measure is a round, empty space-time whose spheres give a usable distance exactly when it is Schwarzschild's in some chart. On its own: Schwarzschild's in a chart is empty, outside the rim and inside it, with no symmetry assumed. In coordinates: a round table whose spheres give a usable distance is empty exactly when it is Schwarzschild's after new labels for time and distance. With checks that the assumptions can be met on both sides of the rim, and that "empty" can fail (de Sitter's universe). Proved by a fourth team in 11 minutes; statements fixed and read by a second reader beforehand; rebuilt and checked on this PC. | [BothWays/NoCoordinates.lean](GravityInLean/BothWays/NoCoordinates.lean), `schwarzschildExactlyWhen`, `schwarzschildIsEmpty`; [BothWays/InCoordinates.lean](GravityInLean/BothWays/InCoordinates.lean), `birkhoffExactlyWhenInCoordinates`; the statements are in [Goals/ExactlyWhen.lean](GravityInLean/Goals/ExactlyWhen.lean), the team's record in [BothWays/STATUS.md](GravityInLean/BothWays/STATUS.md) |
+| **The definitions can fail where they should** | Twenty-five tests asked for by three independent reviewers of the definitions. On the rim of a black hole, in coordinates that are good there, every assumption of Birkhoff's theorem holds except "usable distance". Spheres of one fixed size are round but give no distance and are not empty. Three zero fields are not "round". Schwarzschild's with all signs turned round is empty but no space-time in the sense used here. Two time directions are not one. A squashed sphere is not round. De Sitter's universe meets every assumption except "empty", and is Schwarzschild's in no chart at all. Flat space-time with the turns written in ordinary `x`, `y`, `z` is round, poles included. No test turned out false. | [Checks/](GravityInLean/Checks/); the statements are in [Goals/Tests.lean](GravityInLean/Goals/Tests.lean), the reviewers' reasons in [REVIEW.md](REVIEW.md) |
+| **One mass for a whole region** | On a region in one piece, the charts of Birkhoff's theorem all have the same mass, also on the two sides of a rim. The mass is said without coordinates. | [OneMass/Goal.lean](GravityInLean/OneMass/Goal.lean), `oneMass`; [OneMass/Mass.lean](GravityInLean/OneMass/Mass.lean), `MassAt` |
+| **A length measure has a connection** | On any curved space, a length measure (of any signature) has a connection that belongs to it. With "at most one" from before: exactly one. So "empty" no longer rests on an assumed connection. Proved from the textbook (Koszul's formula). Another project, TauCeti, had proved the same earlier and independently; its proof was not read for this one. | [Connection/Exists.lean](GravityInLean/Connection/Exists.lean), `connectionExists` |
 | **Probes** | Two tests of the definitions on curvatures that are known and not zero. A sphere: its curvature comes out equal to its own length measure. De Sitter's space-time, an empty universe with a cosmological constant: its curvature comes out as `3/L²` times its own length measure, with the textbooks' sign, in the time direction too. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere`; [Probe/DeSitter.lean](GravityInLean/Probe/DeSitter.lean), `ricci_deSitter` |
 
-In numbers: 861 theorems in about 20,200 lines.
+In numbers: 996 theorems in about 24,600 lines.
 
 **What others did, and did first.** None of the physics here is new: it is textbook material
 from 1916 to 1923. In Lean, Schwarzschild's solution had been checked before this repository,
@@ -84,7 +87,8 @@ at least twice. Birkhoff's theorem in coordinates, starting from a fixed diagona
 proved by `x-oai/ProjectAinos` on 19 November 2026, four days before the version here, and
 `BrandonMYates/grlab` has the static last step (August 2026). `LightLikeProject/lightlike`
 builds charts from the fields of a symmetry for the case of cosmology, and
-`TauCetiProject/TauCeti` proves that a length measure of any signature has a connection. What we
+`TauCetiProject/TauCeti` proved, earlier than this repository and independently of it, that a
+length measure of any signature has a connection. What we
 have not found elsewhere, as far as we looked: a machine check of Birkhoff's theorem from the
 symmetry alone, with no starting shape, and with no coordinates given. On paper a proof that
 avoids coordinates is known (H.-J. Schmidt, "A new proof of Birkhoff's theorem", 1997,
@@ -94,10 +98,10 @@ read the definitions and the goal against the textbooks: [REVIEW.md](REVIEW.md).
 
 ## Stated, not yet proved
 
-These targets are written down in exact form and **not proved**. Each is a definition of a
-statement. The build checks that the statements are well-formed and rest on nothing extra. It
-does not check that they are true. A second, independent reader judged the first two rows true
-as written before they were fixed; the tests come from the reviewers of the definitions. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
+One group of targets is written down in exact form and **not proved**. Each is a definition of
+a statement. The build checks that the statements are well-formed and rest on nothing extra. It
+does not check that they are true. A second, independent reader judged them true as written
+before they were fixed. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
 and the goal `BirkhoffNoCoordinates`, were proved on 23 and 24 November 2026 by teams of
 workers: see the table above. Fixing the statements beforehand is what made it safe to hand
 the proofs to a team.)
@@ -105,9 +109,6 @@ the proofs to a team.)
 | Statement | In plain words | File, and the check that it is not about nothing |
 |---|---|---|
 | `BirkhoffAtEveryPoint`, `BirkhoffAtEveryPointOneMass` | Birkhoff's theorem at every point, the rim of a black hole included: around every point of a round, empty space-time there is a chart in which it is Kruskal's form of Schwarzschild's space-time for a positive mass, or Schwarzschild's own form for a mass that is zero or negative. And the mass is the same on a region in one piece. | [Goals/EveryPoint.lean](GravityInLean/Goals/EveryPoint.lean), with its own checks as statements: Kruskal's table is a space-time, empty and round; the rim is where the distance is not usable; Schwarzschild's is a piece of it; de Sitter's is not. |
-| `OneMassStatement` | One mass for a whole region: on a region in one piece, the charts of Birkhoff's theorem all have the same mass, also across a rim. | [Goals/OneMass.lean](GravityInLean/Goals/OneMass.lean) |
-| 25 tests | Cases where a definition should fail, and say which one: the rim fails only "usable distance"; zero fields are not "round"; two time directions are not one; a squashed sphere is not round; de Sitter's universe is Schwarzschild's in no chart; and more. Proposed by three independent reviewers. | [Goals/Tests.lean](GravityInLean/Goals/Tests.lean), [REVIEW.md](REVIEW.md) |
-| `ConnectionExistsStatement` | A length measure on a curved space has a connection. The standard library has this only when all lengths are positive. (That it has only one is proved: see the table above.) | [Goals/Connection.lean](GravityInLean/Goals/Connection.lean). Holds for every good table: `IsRegularTableOn.isConnectionOf`. |
 
 Two independent readers went through the definitions and these statements before anything was
 built on them. What they found, and what was changed, is in [PLAN.md](PLAN.md), "What the
@@ -190,7 +191,7 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and sixteen lines that end in
+You should see `Build completed successfully` and seventeen lines that end in
 `none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about two
 minutes.
 
@@ -210,7 +211,7 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 1,557 declarations in the project rests on (every definition and theorem, plus the helper
+of the 1,798 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
@@ -290,6 +291,9 @@ GravityInLean/Join/                 Birkhoff's theorem with no coordinates: from
                                     the theorem)
 GravityInLean/BothWays/             Birkhoff's theorem both ways, in coordinates and with none
                                     (14 files)
+GravityInLean/Checks/               tests that the definitions can fail (8 files)
+GravityInLean/OneMass/              one mass for a whole region (11 files)
+GravityInLean/Connection/           a length measure has a connection (10 files)
 scripts/queued-build.sh             one build at a time, for several workers on one machine
 scripts/setup-worktree.sh           gives a fresh copy of the repository the ready-built library
 fleet/                              a team of workers: the image, the brief, the scripts that

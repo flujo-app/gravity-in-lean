@@ -40,9 +40,12 @@ showed" below.
 **The theorem runs both ways** (24 November 2026, 01:19 UTC). A fourth team proved the "exactly
 when" form, in coordinates and with none, in 11 minutes. See "What the fourth team run showed".
 
-**Next:** what three independent reviewers of the definitions asked for (`REVIEW.md`): tests
-that the definitions can fail, one mass for a whole region, the rim included (issue 39), and
-"a length measure has a connection" proved from the textbook.
+**The reviewers' list is done** (24 November 2026, 02:02 UTC). A fifth team proved the 25 tests
+that the definitions can fail, one mass for a whole region, and "a length measure has a
+connection" from the textbook, in 14 minutes. See "What the fifth team run showed".
+
+**Next:** the rim (issue 39): Birkhoff's theorem at every point, with Kruskal's form as the
+target. Then the global theorem, on which a second chat is writing the statements.
 
 ## The short answer
 
@@ -412,6 +415,26 @@ the item was stopped and its files were left out of the repository. The statemen
 warnings (the brief now asks for that too). The fourth run was the shortest although it had
 six targets.
 
+## What the fifth team run showed
+
+The job: what three independent reviewers of the definitions asked for (`REVIEW.md`). Their 25
+tests were copied as fixed statements; the one-mass statement was written by one head; a second
+reader compared the copies with the reviewers' text and judged the one-mass statement true.
+
+| | | |
+|---|---|---|
+| Result | proved: all 27 targets, 29 files, about 3,800 lines, 134 theorems. No test turned out false. | Measured |
+| Time, from "all ten are ready" to "the whole project builds with the proofs in it" | 13 minutes 30 seconds (01:48:23 to 02:01:53 UTC) | Measured |
+| Lean runs | 80 until the goal, 10 failed and repaired; longest wait after the set-up 49 seconds | Measured |
+| Model use until the stop | 37.6 million tokens read (36.2 million from the cache), 411,000 written | Measured |
+| Weekly allowance | "all models" from 51% to 56%, "Fable" from 53% to 61%, between the end of the fourth run and the end of this one, with this chat, a second reader and two other chats busy. So: at most 5 and 8 points. | Measured |
+| Checked afterwards on this PC | only the three new folders and import lines changed; rebuilt from nothing, no warnings; all 1,798 declarations pass the audit; `Audit.lean` checks each of the 27 against its fixed statement | Measured |
+| The connection, proved without looking | the record of the run shows no reach to the network at all, and no mention of the other project | Measured |
+
+**What it settles.** Until now "empty" on a general curved space read "there is a connection of
+the length measure, and its curvature vanishes", with the connection assumed. It is now proved
+that there is one, and exactly one. And every notion in the goal now has a case where it fails.
+
 ## Next: Birkhoff's theorem with no coordinates at all
 
 Decided on 23 November 2026, before step 3: remove the last shortcut of step 2, with a small swarm
@@ -489,12 +512,11 @@ one head, read twice, and tested on known answers before any worker starts.
    the brief. Only the goal's statement was fixed beforehand.
 7. The "exactly when" form, in coordinates and with none. **Done** by the fourth team (see
    "What the fourth team run showed").
-8. **Next,** from the review of the definitions (`REVIEW.md`):
-   - tests that the definitions can fail (`Goals/Tests.lean`), and one mass for a whole region
-     (`Goals/OneMass.lean`);
-   - `ConnectionExistsStatement`, from the textbook, without reading another project's proof;
-   - the rim included (issue 39): around every point, a chart onto a piece of Kruskal's form.
-   - The checks of issue 34 before any public claim.
+8. From the review of the definitions (`REVIEW.md`): the tests, one mass, the connection from
+   the textbook. **Done** by the fifth team (see "What the fifth team run showed").
+9. **Next:** the rim included (issue 39): around every point, a chart onto a piece of Kruskal's
+   form (`Goals/EveryPoint.lean`, brief in `fleet/goal-every-point.md`). Then the global
+   theorem. The checks of issue 34 before any public claim.
 
 ## After Birkhoff: what could make a paper
 
