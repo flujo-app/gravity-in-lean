@@ -14,8 +14,9 @@ import Mathlib.Tactic
 /-!
 # The goal: Birkhoff's theorem with no coordinates at all
 
-This file states the theorem that the work on curved spaces is aiming at. **It is a statement,
-not a theorem: `BirkhoffNoCoordinates` is not proved anywhere in this project yet.**
+This file states the theorem that the work on curved spaces was aiming at. **This file holds the
+statement only.** It is proved in `Join/Goal.lean` (`birkhoffNoCoordinates`), and `Audit.lean`
+checks that what is proved there is the statement written here.
 
 In words: take a space-time with four dimensions that is empty and looks the same from every
 side. Then around every point where the size of the spheres can serve as a distance, there is a
@@ -137,7 +138,9 @@ theorem schwarzschild_usable (M : ℝ) {x : Coords 4} (hx : x ∈ outside M) :
     UsableDistanceAt (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) turns x :=
   round_usable _ _ hx.1.ne' (inv_ne_zero (schwA_pos_outside hx.1 hx.2.1).ne') hx.2.2
 
-/-- And inside the rim as well. Only on the rim itself it is not. -/
+/-- And inside the rim as well. (On the rim itself Schwarzschild's own table is no length measure
+at all. That the size of the spheres is not a usable distance there is said in coordinates that
+are good on the rim, as a test: `Tests.EfNotUsableOnRim` in `Goals/Tests.lean`.) -/
 theorem schwarzschild_usable_inside (M : ℝ) {x : Coords 4} (hx : x ∈ inside M) :
     UsableDistanceAt (flatMeasure (tableMeasure (roundG (schwA M) (schwB M)))) turns x :=
   round_usable _ _ hx.1.ne' (inv_ne_zero (schwA_neg_inside hx.1 hx.2.1).ne) hx.2.2
@@ -146,7 +149,8 @@ end Tests
 
 /-! ## The goal -/
 
-/-- **The goal: Birkhoff's theorem with no coordinates at all.** A statement, not yet a theorem.
+/-- **The goal: Birkhoff's theorem with no coordinates at all.** The statement; its proof is
+`birkhoffNoCoordinates` in `Join/Goal.lean`.
 
 Take a curved space `M` with four dimensions, a length measure `g` on it and three fields of
 arrows `ξ`, and an open region `s` on which
@@ -158,7 +162,8 @@ arrows `ξ`, and an open region `s` on which
 
 Then around every point `p` of the region where the size of the spheres is a usable distance,
 there are a mass `m` and a chart `φ` of the curved space in which `g` is Schwarzschild's length
-measure for the mass `m`: the length of any two steps at a point `q`, measured with `g`, is what
+measure for the mass `m`. The mass is any real number: zero gives flat space-time, and negative
+values are not ruled out. The length of any two steps at a point `q`, measured with `g`, is what
 Schwarzschild's table gives at the point `φ q` for the two steps as the chart sees them. The
 chart lands off the rim, off the centre and off the poles, where Schwarzschild's table is good.
 

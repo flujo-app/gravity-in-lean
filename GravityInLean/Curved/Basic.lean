@@ -241,8 +241,10 @@ connection of the textbooks). Three conditions:
 * it keeps lengths: the change of `g(Y, Z)` along a step is what the changes of `Y` and of `Z`
   along that step account for.
 
-The textbooks prove that a length measure has exactly one such connection. That is not shown
-here; it is part of the work that builds on these definitions. -/
+The textbooks prove that a length measure has exactly one such connection. That it has at most
+one is proved in `Unique.lean` (`IsConnectionOf.unique`). That it has one is proved for tables of
+functions on coordinate space (`Tables.lean`); for a general curved space it is a statement of
+its own (`Goals/Connection.lean`). -/
 structure IsConnectionOf (g : LengthMeasure I M) (cov : Transport I M) (s : Set M) : Prop where
   /-- The region is open: curvature at a point looks at the connection near the point. -/
   isOpen : IsOpen s
@@ -270,8 +272,9 @@ noncomputable def curvatureOfFields (cov : Transport I M) (X Y Z : Arrows I M) :
 extended to a field of arrows near `x`, in the standard library's way: with the same parts in the
 chart around `x`.
 
-The textbooks show that any other smooth extension gives the same answer. That is not shown here
-in general. It is shown for flat coordinate space in `Flat.lean`. -/
+The textbooks show that any other smooth extension gives the same answer. That is shown for flat
+coordinate space in `Flat.lean`, and for the connection of a length measure along any chart of a
+curved space in `Join/` (`curvatureOfFields_carry`, `curvatureAt_carry`). -/
 noncomputable def curvatureAt (cov : Transport I M) (x : M) (u v w : TangentSpace I x) :
     TangentSpace I x :=
   curvatureOfFields cov (extend E u) (extend E v) (extend E w) x
@@ -283,7 +286,7 @@ variable {ι V : Type*} [Fintype ι] [AddCommGroup V] [Module ℝ V]
 /-- The trace of a function from a space of steps to itself, read off in a basis: the function is
 applied to each basis step, and the part of the result along that same basis step is taken; these
 parts are added. For a linear function this is its trace, and does not depend on the basis
-(`traceIn_eq_trace` in `Flat.lean`). -/
+(`traceIn_eq_trace` in `Flat.lean`; a change of basis: `traceIn_conj` in `Join/`). -/
 noncomputable def traceIn (b : Module.Basis ι ℝ V) (F : V → V) : ℝ :=
   ∑ i, b.repr (F (b i)) i
 
@@ -292,9 +295,11 @@ end Trace
 variable [FiniteDimensional ℝ E]
 
 variable (I) in
-/-- A basis of the steps at `x`, chosen once and for all. Which basis it is does not matter: it
-is only used to take a trace, and the trace of a linear function does not depend on the basis
-(`traceIn_eq_trace` in `Flat.lean`). -/
+/-- A basis of the steps at `x`, chosen once and for all. Which basis it is does not matter as
+long as the function it is used on is linear: it is only used to take a trace, and the trace of
+a linear function does not depend on the basis (`traceIn_eq_trace` in `Flat.lean`). For the
+connection of a length measure on a curved space, the curvature is linear in each step and its
+trace carries over along a chart: `Join/` (`ricciAt_carry`). -/
 noncomputable def stepBasis (x : M) :
     Module.Basis (Fin (Module.finrank ℝ E)) ℝ (TangentSpace I x) :=
   (Module.finBasis ℝ E).map (tangentSpaceCastModel I x).symm.toLinearEquiv
@@ -328,8 +333,9 @@ of arrows `ξ 0`, `ξ 1`, `ξ 2` that
 
 * are smooth;
 * each leave the length measure unchanged;
-* combine the way the turns around three axes at right angles do: the bracket of two of them is
-  the third;
+* combine the way the turns around three axes at right angles do: the bracket of two of them,
+  taken in the order 0, 1, 2 round the circle, is the third (in the other order, minus the
+  third);
 * together sweep out surfaces, not whole regions: at each point they span two directions;
 * and on these surfaces all lengths are positive.
 
