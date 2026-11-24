@@ -298,6 +298,25 @@ example (m : ℝ) (hm : 0 < m) := GravityInLean.Curved.kruskal_meets_global
   GravityInLean.Curved.kruskalIsSpaceTime GravityInLean.Curved.kruskalIsEmpty
   GravityInLean.Curved.kruskalIsRound m hm
 
+-- Proved by the seventh team of workers: Birkhoff's theorem for a whole space-time, and its
+-- companions and checks (`Goals/Global.lean`). Each line checks that what was proved is the
+-- statement as it was fixed.
+example : GravityInLean.Curved.GlobalBirkhoff := GravityInLean.Curved.globalBirkhoff
+example : GravityInLean.Curved.GlobalBirkhoffUnique := GravityInLean.Curved.globalBirkhoffUnique
+example : GravityInLean.Curved.GlobalBirkhoffConverse :=
+  GravityInLean.Curved.globalBirkhoffConverse
+example : GravityInLean.Curved.GlobalMassUnique := GravityInLean.Curved.globalMassUnique
+example : GravityInLean.Curved.KruskalMapOfSchwarzschild :=
+  GravityInLean.Curved.kruskalMapOfSchwarzschild
+example : GravityInLean.Curved.GlobalDeSitterNoMap := GravityInLean.Curved.globalDeSitterNoMap
+example : GravityInLean.Curved.GlobalUniqueNeedsOnePiece :=
+  GravityInLean.Curved.globalUniqueNeedsOnePiece
+
+#audit GravityInLean.Curved.globalBirkhoff GravityInLean.Curved.globalBirkhoffUnique
+  GravityInLean.Curved.globalBirkhoffConverse GravityInLean.Curved.globalMassUnique
+  GravityInLean.Curved.kruskalMapOfSchwarzschild GravityInLean.Curved.globalDeSitterNoMap
+  GravityInLean.Curved.globalUniqueNeedsOnePiece
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean
