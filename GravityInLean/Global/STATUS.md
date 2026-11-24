@@ -5,11 +5,11 @@ from the queue's log and the branch commits. Lead: `m0-a0`, first step at about 
 set-up script ran until 03:14). Working branch: `global`; each item has a branch
 `global-<item>` (board claim `task:global-<item>`).
 
-## Result (04:04)
+## Result (04:03)
 
 **All seven targets are proved, and none was found false as written.** The whole project builds
 with them through the queue (`scripts/queued-build.sh`: `Build completed successfully
-(7821 jobs)`, first at 03:57:17, again after the last form fix at 04:03), `Audit.lean` included: "all 2605 declarations under GravityInLean
+(7821 jobs)`, first at 03:57:17, again after the last form fix at 04:02), `Audit.lean` included: "all 2605 declarations under GravityInLean
 checked: none rests on more than [propext, Classical.choice, Quot.sound]" (2004 before). That
 run printed no warning. All 40 new Lean files are imported by `GravityInLean.lean`. A scratch
 check `example : <statement> := <theorem>` passes for each of the seven targets, and
