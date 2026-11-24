@@ -105,7 +105,7 @@ theorem fderiv_sphericalToSpace_radial (y : Coords 4) :
     fderiv ℝ sphericalToSpace y (Pi.single 1 1)
       = ![0, sin (y 2) * cos (y 3), sin (y 2) * sin (y 3), cos (y 2)] := by
   rw [fderiv_sphericalToSpace]
-  simp [Pi.single_apply]
+  simp
 
 /-! ## The map of the angles, with time and distance left alone -/
 
@@ -165,14 +165,14 @@ theorem angleMap_pullback {f : Coords 4 → Coords 4} {x : Coords 4} (hf : Diffe
   obtain ⟨s20, s21, s30, s31⟩ := hsplit
   have k22 : jac f 2 2 x * jac f 2 2 x + sin (f x 2) ^ 2 * (jac f 3 2 x * jac f 3 2 x) = 1 := by
     have h := hkeep 2 2 (by decide) (by decide)
-    rwa [if_pos rfl, if_pos rfl] at h
+    rwa [ite_eq_left rfl, ite_eq_left rfl] at h
   have k33 : jac f 2 3 x * jac f 2 3 x + sin (f x 2) ^ 2 * (jac f 3 3 x * jac f 3 3 x)
       = sin (x 2) ^ 2 := by
     have h := hkeep 3 3 (by decide) (by decide)
-    rwa [if_pos rfl, if_neg (by decide)] at h
+    rwa [ite_eq_left rfl, ite_eq_right (by decide)] at h
   have k23 : jac f 2 2 x * jac f 2 3 x + sin (f x 2) ^ 2 * (jac f 3 2 x * jac f 3 3 x) = 0 := by
     have h := hkeep 2 3 (by decide) (by decide)
-    rwa [if_neg (by decide)] at h
+    rwa [ite_eq_right (by decide)] at h
   have e2 : ∀ u : Coords 4, fderiv ℝ f x u 2 = jac f 2 2 x * u 2 + jac f 2 3 x * u 3 := fun u ↦ by
     rw [fderiv_apply_eq_sum_jac hf, s20, s21]
     ring
@@ -292,7 +292,7 @@ theorem sphere_rigid_pos (hflat : FlatUnique) {f : Coords 4 → Coords 4} {W : S
     rw [fderiv_angleMap (hfd q hq), ← jac_eq_fderiv (hfd q hq) 2 1,
       ← jac_eq_fderiv (hfd q hq) 3 1, s21, s31]
     funext i
-    fin_cases i <;> simp [Pi.single_apply]
+    fin_cases i <;> simp
   -- so the point of the sphere with the new angles is `Λ` applied to the point with the old
   have hrot : ∀ q ∈ Metric.ball x₀ ε,
       (![0, sin (f q 2) * cos (f q 3), sin (f q 2) * sin (f q 3), cos (f q 2)] : Fin 4 → ℝ)
@@ -335,27 +335,27 @@ theorem sphere_rigid_pos (hflat : FlatUnique) {f : Coords 4 → Coords 4} {W : S
   -- so the space part of `Λ` is a turn or mirror
   have E11 : Λ 1 1 * Λ 1 1 + Λ 2 1 * Λ 2 1 + Λ 3 1 * Λ 3 1 = 1 := by
     have h := lightSign4_entry hΛ 1 1
-    rw [if_pos rfl, if_neg (by decide), r1] at h
+    rw [ite_eq_left rfl, ite_eq_right (by decide), r1] at h
     linarith
   have E22 : Λ 1 2 * Λ 1 2 + Λ 2 2 * Λ 2 2 + Λ 3 2 * Λ 3 2 = 1 := by
     have h := lightSign4_entry hΛ 2 2
-    rw [if_pos rfl, if_neg (by decide), r2] at h
+    rw [ite_eq_left rfl, ite_eq_right (by decide), r2] at h
     linarith
   have E33 : Λ 1 3 * Λ 1 3 + Λ 2 3 * Λ 2 3 + Λ 3 3 * Λ 3 3 = 1 := by
     have h := lightSign4_entry hΛ 3 3
-    rw [if_pos rfl, if_neg (by decide), r3] at h
+    rw [ite_eq_left rfl, ite_eq_right (by decide), r3] at h
     linarith
   have E12 : Λ 1 1 * Λ 1 2 + Λ 2 1 * Λ 2 2 + Λ 3 1 * Λ 3 2 = 0 := by
     have h := lightSign4_entry hΛ 1 2
-    rw [if_neg (by decide), r1] at h
+    rw [ite_eq_right (by decide), r1] at h
     linarith
   have E13 : Λ 1 1 * Λ 1 3 + Λ 2 1 * Λ 2 3 + Λ 3 1 * Λ 3 3 = 0 := by
     have h := lightSign4_entry hΛ 1 3
-    rw [if_neg (by decide), r1] at h
+    rw [ite_eq_right (by decide), r1] at h
     linarith
   have E23 : Λ 1 2 * Λ 1 3 + Λ 2 2 * Λ 2 3 + Λ 3 2 * Λ 3 3 = 0 := by
     have h := lightSign4_entry hΛ 2 3
-    rw [if_neg (by decide), r2] at h
+    rw [ite_eq_right (by decide), r2] at h
     linarith
   refine ⟨!![Λ 1 1, Λ 1 2, Λ 1 3; Λ 2 1, Λ 2 2, Λ 2 3; Λ 3 1, Λ 3 2, Λ 3 3], ?_, ?_⟩
   · ext i j
@@ -390,9 +390,9 @@ theorem sphere_rigid_of_flat (hflat : FlatUnique) {f : Coords 4 → Coords 4}
         = R.mulVec ![sin (x 2) * cos (x 3), sin (x 2) * sin (x 3), cos (x 2)] := by
   -- the shift: `x₀ 1 - 1` along the distance label
   obtain ⟨a, ha⟩ : ∃ a : Coords 4, a = Pi.single 1 (x₀ 1 - 1) := ⟨_, rfl⟩
-  have a1 : a 1 = x₀ 1 - 1 := by rw [ha]; simp [Pi.single_apply]
-  have a2 : a 2 = 0 := by rw [ha]; simp [Pi.single_apply]
-  have a3 : a 3 = 0 := by rw [ha]; simp [Pi.single_apply]
+  have a1 : a 1 = x₀ 1 - 1 := by rw [ha]; simp
+  have a2 : a 2 = 0 := by rw [ha]; simp
+  have a3 : a 3 = 0 := by rw [ha]; simp
   have p2 : ∀ x : Coords 4, (x + a) 2 = x 2 := fun x ↦ by rw [Pi.add_apply, a2, add_zero]
   have hW' : IsOpen ((fun x : Coords 4 ↦ x + a) ⁻¹' W) :=
     hW.preimage (continuous_id.add continuous_const)
