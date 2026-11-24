@@ -71,10 +71,19 @@ theorem KeepsSchwOn.keeps_sphere (hm : m < 0) (h : KeepsSchwOn m f W) (hx : x âˆ
           + sin (x 2) ^ 2 * ((Pi.single i 1 : Coords 4) 3 * (Pi.single j 1 : Coords 4) 3))
         + -schwA m (x 1) * ((Pi.single i 1 : Coords 4) 0 * (Pi.single j 1 : Coords 4) 0)
         + schwB m (x 1) * ((Pi.single i 1 : Coords 4) 1 * (Pi.single j 1 : Coords 4) 1) := by
-    have e := keep (Pi.single i 1) (Pi.single j 1)
-    rw [schw_apply, schw_apply] at e
-    simp only [hJ] at e
-    rw [hr] at e
+    have e0 := keep (Pi.single i 1) (Pi.single j 1)
+    rw [schw_apply, schw_apply, hr, hJ 0 i, hJ 0 j, hJ 1 i, hJ 1 j, hJ 2 i, hJ 2 j, hJ 3 i,
+      hJ 3 j] at e0
+    -- Schwarzschild's lengths of the two steps as the map carries them, and before
+    have e : -schwA m (x 1) * (jac f 0 i x * jac f 0 j x)
+          + schwB m (x 1) * (jac f 1 i x * jac f 1 j x)
+          + x 1 ^ 2 * (jac f 2 i x * jac f 2 j x)
+          + x 1 ^ 2 * sin (f x 2) ^ 2 * (jac f 3 i x * jac f 3 j x)
+        = -schwA m (x 1) * ((Pi.single i 1 : Coords 4) 0 * (Pi.single j 1 : Coords 4) 0)
+          + schwB m (x 1) * ((Pi.single i 1 : Coords 4) 1 * (Pi.single j 1 : Coords 4) 1)
+          + x 1 ^ 2 * ((Pi.single i 1 : Coords 4) 2 * (Pi.single j 1 : Coords 4) 2)
+          + x 1 ^ 2 * sin (x 2) ^ 2
+            * ((Pi.single i 1 : Coords 4) 3 * (Pi.single j 1 : Coords 4) 3) := e0
     linear_combination e + (schwA m (x 1) * jac f 0 j x) * s0 - (schwB m (x 1) * jac f 1 j x) * s1
   apply mul_left_cancelâ‚€ hx1
   rw [key]

@@ -178,16 +178,25 @@ theorem orthogonal_cofactors (hR : R.transpose * R = 1) :
       _ = R.det • R.transpose := by rw [Matrix.adjugate_mul, Matrix.smul_mul, one_mul]
   rw [Matrix.adjugate_fin_three] at hadj
   have e : ∀ i j, _ = _ := fun i j ↦ congrFun (congrFun hadj i) j
-  have e00 := e 0 0
-  have e01 := e 0 1
-  have e02 := e 0 2
-  have e10 := e 1 0
-  have e11 := e 1 1
-  have e12 := e 1 2
-  have e20 := e 2 0
-  have e21 := e 2 1
-  have e22 := e 2 2
-  simp [Matrix.transpose_apply] at e00 e01 e02 e10 e11 e12 e20 e21 e22
+  -- the nine entries of that equation, written out
+  have e00 : R 1 1 * R 2 2 - R 1 2 * R 2 1 = R.det * R 0 0 := by
+    simpa [Matrix.transpose_apply] using e 0 0
+  have e01 : -(R 0 1 * R 2 2) + R 0 2 * R 2 1 = R.det * R 1 0 := by
+    simpa [Matrix.transpose_apply] using e 0 1
+  have e02 : R 0 1 * R 1 2 - R 0 2 * R 1 1 = R.det * R 2 0 := by
+    simpa [Matrix.transpose_apply] using e 0 2
+  have e10 : -(R 1 0 * R 2 2) + R 1 2 * R 2 0 = R.det * R 0 1 := by
+    simpa [Matrix.transpose_apply] using e 1 0
+  have e11 : R 0 0 * R 2 2 - R 0 2 * R 2 0 = R.det * R 1 1 := by
+    simpa [Matrix.transpose_apply] using e 1 1
+  have e12 : -(R 0 0 * R 1 2) + R 0 2 * R 1 0 = R.det * R 2 1 := by
+    simpa [Matrix.transpose_apply] using e 1 2
+  have e20 : R 1 0 * R 2 1 - R 1 1 * R 2 0 = R.det * R 0 2 := by
+    simpa [Matrix.transpose_apply] using e 2 0
+  have e21 : -(R 0 0 * R 2 1) + R 0 1 * R 2 0 = R.det * R 1 2 := by
+    simpa [Matrix.transpose_apply] using e 2 1
+  have e22 : R 0 0 * R 1 1 - R 0 1 * R 1 0 = R.det * R 2 2 := by
+    simpa [Matrix.transpose_apply] using e 2 2
   exact ⟨hdd, ⟨by linarith, by linarith, by linarith⟩, ⟨by linarith, by linarith, by linarith⟩,
     ⟨by linarith, by linarith, by linarith⟩⟩
 
