@@ -565,7 +565,11 @@ one head, read twice, and tested on known answers before any worker starts.
    the textbook. **Done** by the fifth team (see "What the fifth team run showed").
 9. The rim included (issue 39, first step). **Done** by the sixth team (see "What the sixth
    team run showed").
-10. **Next: the theorem for a whole space-time** (issue 39, second step), in a chat of its own.
+10. **The theorem for a whole space-time** (issue 39, second step), in a chat of its own.
+    **Done** by the seventh team: all seven statements proved in about 46 minutes of team
+    time (40 files, 9,385 lines), rebuilt from nothing on this PC (2,605 declarations
+    audited). Weekly allowance 62% to 73% (all models) and 72% to 94% (Fable): by far the
+    costliest run (102 million tokens read, 1.23 million written).
     Statements fixed in `Goals/Global.lean`: a round, empty space-time on a simply connected
     region maps into Kruskal's whole space-time (or flat space-time, or Schwarzschild's of
     negative mass) by a length-keeping map, unique up to a symmetry; the mass is fixed; and the
