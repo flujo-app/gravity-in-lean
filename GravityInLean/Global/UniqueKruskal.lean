@@ -57,11 +57,6 @@ theorem orthogonal_mul {A B : Matrix (Fin 3) (Fin 3) ℝ} (hA : A.transpose * A 
   rw [Matrix.transpose_mul, Matrix.mul_assoc, ← Matrix.mul_assoc A.transpose, hA,
     Matrix.one_mul, hB]
 
-/-- The entry `k` of a table of three by three numbers applied to three numbers. -/
-theorem mulVec_three (R : Matrix (Fin 3) (Fin 3) ℝ) (v : Fin 3 → ℝ) (k : Fin 3) :
-    R.mulVec v k = R k 0 * v 0 + R k 1 * v 1 + R k 2 * v 2 := by
-  simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three]
-
 /-! ## A symmetry is fixed by what it does to a point of the sphere and the steps from it -/
 
 /-- A row of three numbers is fixed by what it gives on a point of the unit sphere off the poles
