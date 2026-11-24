@@ -34,9 +34,10 @@ before anyone tries to prove the statements built on them.
   here: time and distance bend each other through the connection).
 * `inRaySlow_not_isFreeFallPath`: the same ray run at a clock that is not the path's own (its
   parameter squared) is not: the equation fixes the clock along the path.
-* `inRayIn_isFreeFallPath`, `inRayIn_sizeSq`: a ray of light inside the rim is a path of free fall
-  that reaches the centre at a finite time, and the size of the spheres shrinks to zero along it:
-  the second case of the completeness condition really happens.
+* `inRayIn_isFreeFallPath`, `inRayIn_sizeSq`: a path of free fall in Schwarzschild's table inside
+  the rim (a ray of light) stops at a finite time with the spheres shrinking to zero, as the
+  second case of the completeness condition allows (that such a path cannot be continued in
+  Kruskal's whole space-time is part of `GlobalCompleteConverse`).
 * `line_isInextendible`, `line_short_not_isInextendible`: a straight line on all times cannot be
   continued; on the times between 0 and 1 it can.
 * `minkowski_path_eq_line`, `minkowski_freeFallComplete`: in flat space-time every path of free
@@ -739,8 +740,8 @@ theorem inRayIn_isFreeFallPath (hm : 0 < m) :
   fin_cases i
   exacts [c0, c1, c2, c3]
 
-/-- **Along that ray the spheres shrink to zero** as it reaches the centre at the parameter `0`:
-the second case of the completeness condition really happens. -/
+/-- **Along that ray the spheres shrink to zero** as it reaches the centre at the parameter `0`,
+as the second case of the completeness condition allows. -/
 theorem inRayIn_sizeSq :
     Tendsto (fun s ↦ sizeSq (schwMeasure m) turns (inRayIn m s)) (𝓝[<] 0) (𝓝 0) := by
   have e : ∀ s, sizeSq (schwMeasure m) turns (inRayIn m s) = s ^ 2 := fun s ↦ by

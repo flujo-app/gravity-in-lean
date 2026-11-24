@@ -14,7 +14,9 @@ import Mathlib.Tactic
 # Statements to prove: which whole space-times are round and empty (G2)
 
 **Nothing in this file is a proof of the statements it names**, except where a statement's own
-comment names its proof. The definitions are tested in `Global/FreeFallChecks.lean`.
+comment names its proof. The definitions are tested in `Global/FreeFallChecks.lean`,
+`Global/FoldChecks.lean` and `Global/FreeFallChart.lean` (`readsAs_chartTable`: the chart's
+table, read through any chart, gives back `g`).
 
 `GlobalBirkhoff` (`Goals/Global.lean`, proved) lays a round, empty space-time into Kruskal's (for
 a positive mass) by a length-keeping map, but only a region without holes, and the map need not
@@ -40,7 +42,7 @@ the standard library says "smooth" and "slope" through the chart at the point:
   `J` it obeys the equation in the chart that the curved space provides at `γ τ`.
 
 That the equation does not depend on the chart is the statement `FreeFallAnyChart` below, proved
-in `Global/FreeFallChart.lean` (`freeFallAnyChart`; in coordinates it is `isFreeFallAt_inNewCoords`
+in four dimensions in `Global/FreeFallChart.lean` (`freeFallAnyChart`; in coordinates it is `isFreeFallAt_inNewCoords`
 of `SamePath.lean`). Asking it in the provided chart is how the standard library itself defines
 slopes (`mfderiv` reads the map in the charts at the point).
 
@@ -99,7 +101,8 @@ exactly
   past (`kruskalFolds_table` checks the arithmetic behind the two columns).
 
   Each fold keeps lengths, sends Kruskal's whole space-time to itself, undoes itself, moves every
-  point, and commutes with the turns of the sphere (`Global/FreeFallChecks.lean`). So "a map onto
+  point, and commutes with the turns of the sphere (`Global/FreeFallChecks.lean`,
+`Global/FoldChecks.lean`). So "a map onto
   `M` whose fibres are the pairs `{p, fold p}`" says "`M` is Kruskal's divided by the fold": the
   map is a local diffeomorphism (it keeps lengths), so it is open, and an open, continuous map onto
   `M` makes `M` the quotient. A fold that differs from one of the four by a boost gives the same
@@ -121,7 +124,8 @@ exactly
   foldings exist as curved spaces of the standard library. With `GlobalCompleteConverse` they
   show that the assumptions of `GlobalComplete` can be met, and that every case of its conclusion
   occurs. `KruskalFoldsDistinct`: no space-time is two different foldings.
-* `FreeFallAnyChart`: the equation of free fall does not depend on the chart (proved).
+* `FreeFallAnyChart`: the equation of free fall does not depend on the chart (proved in four
+  dimensions).
 
 Steps of the route, as statements: `SizeSqIsRadius` (any three turning fields read off `r²`, so
 the choice of `ξ` does no harm), `FreeFallMaximal` (every path of free fall lies in one that
@@ -148,7 +152,8 @@ Failure tests, as statements:
   unwrapped so that it has no holes, is another example: the size of its spheres has no critical
   point, while Kruskal's and every folding have one, the sphere where the rims cross.)
 * `GlobalCompleteNeedsConnected`: without "in one piece" the statement is false (two copies of
-  Kruskal's side by side).
+  Kruskal's side by side; that the example meets the completeness condition is shown with the
+  same analysis of Kruskal's paths as `GlobalCompleteConverse`).
 
 ## Earlier work and route
 
@@ -456,8 +461,8 @@ def KruskalOntoSym : Prop :=
     IsKruskalOnto m g F → L.transpose * lightSign2 * L = lightSign2 → R.transpose * R = 1 →
     IsKruskalOnto m g (fun p ↦ F (kruskalSym L R p))
 
-/-- **Statement: every change of `(T, X)` of order two that keeps `-T² + X²` is one of the four,
-up to such a change.** -/
+/-- **Statement: every change of `(T, X)` that keeps `-T² + X²` and undoes itself is one of the
+four, up to such a change.** -/
 def FoldsUpToSymmetry : Prop :=
   ∀ L' : Matrix (Fin 2) (Fin 2) ℝ, L'.transpose * lightSign2 * L' = lightSign2 → L' * L' = 1 →
     ∃ B L : Matrix (Fin 2) (Fin 2) ℝ, B.transpose * lightSign2 * B = lightSign2 ∧
@@ -488,7 +493,9 @@ def KruskalFoldsDistinct : Prop :=
     L = L'
 
 /-- **Statement ("in one piece" is needed).** `GlobalComplete` with "in one piece" left out is
-false. Intended example: two copies of Kruskal's space-time side by side. -/
+false. Intended example: two copies of Kruskal's space-time side by side (that it meets the
+completeness condition is shown with the same analysis of Kruskal's paths as
+`GlobalCompleteConverse`). -/
 def GlobalCompleteNeedsConnected : Prop :=
   ¬ ∀ (M : Type) [TopologicalSpace M] [ChartedSpace (Coords 4) M]
     [IsManifold 𝓘(ℝ, Coords 4) ∞ M] [T2Space M]
