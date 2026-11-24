@@ -50,6 +50,9 @@ import GravityInLean.Global.Kretschmann
 import GravityInLean.Global.TableHess
 import GravityInLean.Global.Develop
 import GravityInLean.Global.KretschmannKept
+import GravityInLean.Global.HessKept
+import GravityInLean.Global.FlatRigid
+import GravityInLean.Global.UniqueFlat
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate
