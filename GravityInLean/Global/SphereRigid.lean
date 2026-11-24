@@ -6,6 +6,7 @@ Authors: flujo-app
 module
 
 public import GravityInLean.Global.Checks
+public import GravityInLean.Global.UniqueFlat
 public import GravityInLean.SlopeRules
 public import Mathlib.Analysis.Normed.Module.Convex
 public import Mathlib.Analysis.Convex.PathConnected
@@ -22,7 +23,8 @@ that keeps the length `dθ² + sin² θ dφ²` of the unit sphere is, near every
 or mirror of the sphere.
 
 No new analysis is done here. The statement is reduced to the uniqueness of length-keeping maps
-into flat space-time (`unique_flat`, here taken as the assumption `FlatUnique`):
+into flat space-time (`unique_flat` of `Global/UniqueFlat.lean`; the steps before the last take
+it as the assumption `FlatUnique`, so that they do not depend on how it is proved):
 
 * flat space-time in distance and angles is `-dt² + dr² + r² (dθ² + sin² θ dφ²)`
   (Schwarzschild's table of mass zero), and `sphericalToSpace` maps it to flat space-time in
@@ -86,7 +88,7 @@ theorem mulVecCLM_apply (Λ : Matrix (Fin 4) (Fin 4) ℝ) (u : Coords 4) :
 
 /-- What the slope of a map makes of a step, in one part: the sum over the four parts of the
 step of the rate of change along that part. -/
-theorem fderiv_apply_eq_sum_jac {f : Coords 4 → Coords 4} {x : Coords 4}
+theorem fderiv_apply_four {f : Coords 4 → Coords 4} {x : Coords 4}
     (hf : DifferentiableAt ℝ f x) (v : Coords 4) (α : Fin 4) :
     fderiv ℝ f x v α
       = jac f α 0 x * v 0 + jac f α 1 x * v 1 + jac f α 2 x * v 2 + jac f α 3 x * v 3 := by
@@ -174,10 +176,10 @@ theorem angleMap_pullback {f : Coords 4 → Coords 4} {x : Coords 4} (hf : Diffe
     have h := hkeep 2 3 (by decide) (by decide)
     rwa [ite_eq_right (by decide)] at h
   have e2 : ∀ u : Coords 4, fderiv ℝ f x u 2 = jac f 2 2 x * u 2 + jac f 2 3 x * u 3 := fun u ↦ by
-    rw [fderiv_apply_eq_sum_jac hf, s20, s21]
+    rw [fderiv_apply_four hf, s20, s21]
     ring
   have e3 : ∀ u : Coords 4, fderiv ℝ f x u 3 = jac f 3 2 x * u 2 + jac f 3 3 x * u 3 := fun u ↦ by
-    rw [fderiv_apply_eq_sum_jac hf, s30, s31]
+    rw [fderiv_apply_four hf, s30, s31]
     ring
   have hA : schwA 0 (x 1) = 1 := by simp [schwA]
   have hB : schwB 0 (x 1) = 1 := by simp [schwB]
@@ -453,7 +455,8 @@ theorem sphere_rigid {f : Coords 4 → Coords 4} {W : Set (Coords 4)} {x₀ : Co
         = if i = j then (if i = 2 then 1 else sin (x 2) ^ 2) else 0) :
     ∃ R : Matrix (Fin 3) (Fin 3) ℝ, R.transpose * R = 1 ∧ ∀ᶠ x in 𝓝 x₀,
       (![sin (f x 2) * cos (f x 3), sin (f x 2) * sin (f x 3), cos (f x 2)] : Fin 3 → ℝ)
-        = R.mulVec ![sin (x 2) * cos (x 3), sin (x 2) * sin (x 3), cos (x 2)] := by
-  sorry
+        = R.mulVec ![sin (x 2) * cos (x 3), sin (x 2) * sin (x 3), cos (x 2)] :=
+  sphere_rigid_of_flat (fun g s hs hg D D' hD hD' ↦ unique_flat g s hs hg D D' hD hD')
+    hW hx₀ hf hsin hsplit hkeep
 
 end GravityInLean.Curved
