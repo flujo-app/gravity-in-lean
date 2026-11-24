@@ -29,6 +29,7 @@ import GravityInLean.Curved.KnownAnswers
 import GravityInLean.Curved.Goal
 import GravityInLean.Goals.Turns
 import GravityInLean.Goals.Connection
+import GravityInLean.Goals.ExactlyWhen
 import GravityInLean.Flows.PathSpace
 import GravityInLean.Flows.Apply
 import GravityInLean.Flows.Integrate

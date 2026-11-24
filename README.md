@@ -90,15 +90,17 @@ no starting shape, and with no coordinates given. "Not found" is not "first". De
 
 ## Stated, not yet proved
 
-One target is still written down in exact form and **not proved**. It is a definition of a
-statement. The build checks that the statement is well-formed and rests on nothing extra. It
-does not check that it is true. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
+These targets are written down in exact form and **not proved**. Each is a definition of a
+statement. The build checks that the statements are well-formed and rest on nothing extra. It
+does not check that they are true. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
 and the goal `BirkhoffNoCoordinates`, were proved on 23 and 24 November 2026 by teams of
 workers: see the table above. Fixing the statements beforehand is what made it safe to hand
 the proofs to a team.)
 
 | Statement | In plain words | File, and the check that it is not about nothing |
 |---|---|---|
+| `SchwarzschildExactlyWhen`, `SchwarzschildIsEmptyStatement` | Birkhoff's theorem both ways, with no coordinates: around a point, a length measure is a round, empty space-time whose spheres give a usable distance exactly when it is Schwarzschild's in some chart. And on its own: Schwarzschild's in a chart is empty, outside the rim and inside it. | [Goals/ExactlyWhen.lean](GravityInLean/Goals/ExactlyWhen.lean). Both sides can be met: `schwarzschild_meets_goal`, `schwarzschild_meets_conclusion`. |
+| `BirkhoffExactlyWhenInCoordinates` | The same in coordinates: a round table whose spheres give a usable distance is empty exactly when it is Schwarzschild's after new labels for time and distance. | [Goals/ExactlyWhen.lean](GravityInLean/Goals/ExactlyWhen.lean). Its own checks are statements there too, not yet proved: the assumptions can be met outside and inside the rim, and "empty" can fail (de Sitter). |
 | `ConnectionExistsStatement` | A length measure on a curved space has a connection. The standard library has this only when all lengths are positive. (That it has only one is proved: see the table above.) | [Goals/Connection.lean](GravityInLean/Goals/Connection.lean). Holds for every good table: `IsRegularTableOn.isConnectionOf`. |
 
 Two independent readers went through the definitions and these statements before anything was
@@ -268,6 +270,7 @@ GravityInLean/Curved/KnownAnswers.lean  curved space: tests on flat space-time, 
 GravityInLean/Curved/Goal.lean      the goal, as a statement: Birkhoff with no coordinates
 GravityInLean/Goals/Turns.lean      statements to prove: coordinates that fit the turns
 GravityInLean/Goals/Connection.lean statements to prove: a length measure has one connection
+GravityInLean/Goals/ExactlyWhen.lean statements to prove: Birkhoff's theorem both ways
 GravityInLean/Flows/                paths along a field depend smoothly on where they start
                                     (eleven files; SmoothFlow.lean holds the theorem)
 GravityInLean/Turns/                coordinates that fit the turns exist
