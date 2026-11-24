@@ -151,8 +151,8 @@ wakes nobody. The lead gets a new turn every two minutes by itself.
   `checks-<item>` from the branch `checks`, proves it in that item's file, builds the file
   through the queue, commits, and reports to the lead.
 - **Git.** Commit often, at least after every step that builds: the run can be stopped at any
-  time, and only what is committed is collected. Before your first commit run
-  `git config user.name flujo-app` in your copy. No lines that credit an AI or a tool in commits.
+  time, and only what is committed is collected. `scripts/setup-worktree.sh` sets the name and the
+  address that your commits carry; do not change them. No lines that credit an AI or a tool in commits.
 - **The lead merges** finished branches into `checks` and keeps a short file
   `GravityInLean/Checks/STATUS.md` on that branch, updated at least every twenty minutes: for
   each of the twenty-seven targets whether it is proved, open, or reported false (with the

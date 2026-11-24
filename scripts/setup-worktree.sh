@@ -20,6 +20,12 @@ set -eu
 cd "$(dirname "$0")/.."
 mkdir -p .lake
 
+# The name and address that commits made in this copy will carry. The repository is public, so a
+# worker must never commit under whatever address its machine happens to have: on 24 November
+# 2026 a team's commits carried the address of the login used to start the container.
+git config user.name "${GRAVITY_GIT_NAME:-flujo-app}"
+git config user.email "${GRAVITY_GIT_EMAIL:-300233937+flujo-app@users.noreply.github.com}"
+
 PACKAGES="${GRAVITY_PACKAGES:-/opt/gravity/.lake/packages}"
 
 if [ -L .lake/packages ]; then

@@ -54,6 +54,16 @@ first on the search path, and `scripts/setup-worktree.sh` looks for the ready-bu
 the fixed place `/opt/gravity/.lake/packages`. The first small check found three faults of this
 kind before any real work was started; `image-check.sh` now tests for them without a model.
 
+## The name on the commits
+
+The repository is public. `scripts/setup-worktree.sh` sets, in every worker's copy, the one name
+and address that commits may carry (GitHub's no-reply address of the account). When a run ends,
+`trial.mjs` lists the addresses on the team's commits (`addresses.txt` in the run folder) and
+fails the run's check if any other address is among them. Then the work may only be brought
+over as one new commit, never with its history. On 24 November 2026 one run's history was
+merged as it was and made a private address public; this check is there so that it cannot
+happen unnoticed again.
+
 ## What comes back
 
 The team's branches arrive as a git bundle. Nothing is taken on the team's word: the supervisor
