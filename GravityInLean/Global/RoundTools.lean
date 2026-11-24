@@ -89,6 +89,7 @@ theorem LeavesUnchangedAt.const_smul {ξ : Arrows I M} {x : M} (hξ : LeavesUnch
     h1]
   ring
 
+omit [CompleteSpace E] in
 /-- **Only the field near the point matters.** A field that agrees near `x` with a field that
 leaves the length measure unchanged at `x` leaves it unchanged at `x`. -/
 theorem LeavesUnchangedAt.congr {ξ η : Arrows I M} {x : M} (h : LeavesUnchangedAt g ξ x)
@@ -106,9 +107,11 @@ theorem LeavesUnchangedAt.congr {ξ η : Arrows I M} {x : M} (h : LeavesUnchange
 
 /-- **Three fields mixed by a fixed table of numbers:** the field number `i` of the mix is
 `A i 0 • ξ 0 + A i 1 • ξ 1 + A i 2 • ξ 2`. -/
-def mixFields (A : Matrix (Fin 3) (Fin 3) ℝ) (ξ : Fin 3 → Arrows I M) (i : Fin 3) : Arrows I M :=
+noncomputable def mixFields (A : Matrix (Fin 3) (Fin 3) ℝ) (ξ : Fin 3 → Arrows I M) (i : Fin 3) :
+    Arrows I M :=
   A i 0 • ξ 0 + A i 1 • ξ 1 + A i 2 • ξ 2
 
+omit [CompleteSpace E] [IsManifold I ∞ M] in
 /-- The mix at a point, written out. -/
 theorem mixFields_apply (A : Matrix (Fin 3) (Fin 3) ℝ) (ξ : Fin 3 → Arrows I M) (i : Fin 3)
     (x : M) : mixFields A ξ i x = A i 0 • ξ 0 x + A i 1 • ξ 1 x + A i 2 • ξ 2 x := rfl
@@ -146,6 +149,7 @@ theorem mlieBracket_mix {ξ : Fin 3 → Arrows I M} {x : M} (hd : ∀ i, MDiffAt
   rw [left, right, right, right, z 0, z 1, z 2, h01, h12, h20, h10, h21, h02]
   module
 
+omit [CompleteSpace E] [IsManifold I ∞ M] in
 /-- The steps that three fields span at a point are the steps that a mix of them by a table
 `A` with `A * Aᵀ = 1` spans there. -/
 theorem span_mixFields {A : Matrix (Fin 3) (Fin 3) ℝ} (hA : A * A.transpose = 1)
@@ -175,7 +179,7 @@ theorem span_mixFields {A : Matrix (Fin 3) (Fin 3) ℝ} (hA : A * A.transpose = 
         rw [mixFields_apply, mixFields_apply, mixFields_apply]
         module
       rw [e1, hk j 0, hk j 1, hk j 2]
-      fin_cases j <;> simp
+      rcases (by fin_cases j <;> decide : j = 0 ∨ j = 1 ∨ j = 2) with rfl | rfl | rfl <;> simp
     change ξ j x ∈ Submodule.span ℝ (Set.range fun i ↦ mixFields A ξ i x)
     rw [e]
     exact add_mem (add_mem (Submodule.smul_mem _ _ (hmem' 0)) (Submodule.smul_mem _ _ (hmem' 1)))
@@ -225,6 +229,7 @@ theorem IsRoundOn.mix {ξ : Fin 3 → Arrows I M} (h : IsRoundOn g ξ s)
 
 /-! ## Only the fields on the region matter, and near each point -/
 
+omit [CompleteSpace E] in
 /-- **Only the values of the three fields on the region matter.** The region is open, so fields
 that agree on it agree near each of its points. -/
 theorem IsRoundOn.congr {ξ η : Fin 3 → Arrows I M} (h : IsRoundOn g ξ s)
@@ -250,6 +255,7 @@ theorem IsRoundOn.congr {ξ η : Fin 3 → Arrows I M} (h : IsRoundOn g ξ s)
     rw [e]
     exact h.positive x hx
 
+omit [CompleteSpace E] in
 /-- **It is enough to look near every point.** If every point of an open region has a
 neighbourhood inside the region on which `g` looks the same from every side by the three fields
 `ξ`, then it does so on the whole region. -/
