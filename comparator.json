@@ -1,0 +1,23 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Audit",
+  "theorem_names": [
+    "GravityInLean.birkhoffNoCoordinates",
+    "GravityInLean.Curved.birkhoffAtEveryPoint",
+    "GravityInLean.Curved.birkhoffAtEveryPointOneMass",
+    "GravityInLean.Curved.globalBirkhoff",
+    "GravityInLean.Curved.globalBirkhoffUnique",
+    "GravityInLean.Curved.globalBirkhoffConverse",
+    "GravityInLean.Curved.globalMassUnique",
+    "GravityInLean.Curved.kruskalMapOfSchwarzschild",
+    "GravityInLean.Curved.globalUniqueNeedsOnePiece",
+    "GravityInLean.Curved.globalDeSitterNoMap",
+    "GravityInLean.connectionExists",
+    "GravityInLean.oneMass",
+    "GravityInLean.schwarzschildExactlyWhen",
+    "GravityInLean.birkhoffExactlyWhenInCoordinates",
+    "GravityInLean.smoothFlow",
+    "GravityInLean.turnsCoordinates"
+  ],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
