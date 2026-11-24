@@ -13,6 +13,9 @@ export const REPOSITORY = 'flujo-app/gravity-in-lean';
 export const REVISION = required('GRAVITY_REVISION');
 export const IMAGE = 'gravity-worker:lean-4.36.0-r2';
 export const MODEL = 'claude-fable-5-2';
+// The one address that commits of a team may carry (GitHub's no-reply address of the account).
+// scripts/setup-worktree.sh sets it in every worker's copy; trial.mjs checks it on collection.
+export const COMMIT_ADDRESS = process.env.GRAVITY_GIT_EMAIL ?? '300233937+flujo-app@users.noreply.github.com';
 
 function required(name) {
   const value = process.env[name];

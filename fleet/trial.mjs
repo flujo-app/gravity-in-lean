@@ -8,7 +8,7 @@ import { execFile } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
-import { ROOT, REPOSITORY, REVISION, IMAGE, MODEL, githubToken, makeFleet, sleep, stamp, traces, enrolled } from './common.mjs';
+import { ROOT, REPOSITORY, REVISION, IMAGE, MODEL, COMMIT_ADDRESS, githubToken, makeFleet, sleep, stamp, traces, enrolled } from './common.mjs';
 
 const minutes = Number(process.argv[2]);
 if (!Number.isFinite(minutes) || minutes < 1 || minutes > 240) throw new Error('Give the length of the trial in minutes (1 to 240).');
@@ -80,9 +80,16 @@ try {
   try { const observation = await fleet.observe({ maxPages: 25 }); writeFileSync(join(directory, 'status.json'), JSON.stringify(summary(observation), null, 1)); } catch { /* keep the last status */ }
   // Copy out the branches, the queue's log and the size of every work folder, while the container still runs.
   try {
-    await docker(['exec', container, '/bin/sh', '-c', 'cd /data/repository 2>/dev/null || cd "$(git -C /data/worktrees/m0-a0 rev-parse --git-common-dir)/.." && git bundle create /data/flows.bundle --all 2>&1 | tail -2; (cat /data/gravity-build.log 2>/dev/null || cat /tmp/gravity-in-lean-build.log 2>/dev/null) > /data/queue.log; git branch --all --format="%(refname:short) %(objectname:short) %(committerdate:iso8601) %(subject)" > /data/branches.txt']);
-    for (const name of ['flows.bundle', 'queue.log', 'branches.txt']) await docker(['cp', `${container}:/data/${name}`, join(directory, name)]);
-    say('copied out: flows.bundle, queue.log, branches.txt');
+    await docker(['exec', container, '/bin/sh', '-c', 'cd /data/repository 2>/dev/null || cd "$(git -C /data/worktrees/m0-a0 rev-parse --git-common-dir)/.." && git bundle create /data/flows.bundle --all 2>&1 | tail -2; (cat /data/gravity-build.log 2>/dev/null || cat /tmp/gravity-in-lean-build.log 2>/dev/null) > /data/queue.log; git branch --all --format="%(refname:short) %(objectname:short) %(committerdate:iso8601) %(subject)" > /data/branches.txt; git log --all --not ' + REVISION + ' --format="%ae%n%ce" | sort -u > /data/addresses.txt']);
+    for (const name of ['flows.bundle', 'queue.log', 'branches.txt', 'addresses.txt']) await docker(['cp', `${container}:/data/${name}`, join(directory, name)]);
+    say('copied out: flows.bundle, queue.log, branches.txt, addresses.txt');
+    // The repository is public: commits must carry the one agreed address and no other.
+    const foreign = readFileSync(join(directory, 'addresses.txt'), 'utf8').split('\n').map(line => line.trim()).filter(line => line && line !== COMMIT_ADDRESS);
+    if (foreign.length) {
+      writeFileSync(join(directory, 'DO-NOT-MERGE-WITH-HISTORY.txt'), `Commits of this run carry ${foreign.length} address(es) other than the agreed one.\nBring the work over as one new commit (squash), never with its history.\n`);
+      say(`IDENTITY CHECK FAILED: ${foreign.length} other address(es) on the team's commits; see DO-NOT-MERGE-WITH-HISTORY.txt (the addresses are in addresses.txt, not printed here)`);
+      process.exitCode = 1;
+    } else say('identity check passed: every commit of the run carries the agreed address');
   } catch (error) { say(`copying out failed: ${error.message}`); process.exitCode = 1; }
   try { await fleet.stop(); say('container stopped (not removed)'); } catch (error) { say(`stop failed: ${error.message}`); process.exitCode = 1; }
 } catch (error) {

@@ -156,8 +156,8 @@ wakes nobody. The lead gets a new turn every two minutes by itself.
   `join-<item>` from the branch `join`, proves the lemma in that item's file, builds the file
   through the queue, commits, and reports to the lead.
 - **Git.** Commit often, at least after every step that builds: the run can be stopped at any
-  time, and only what is committed is collected. Before your first commit run
-  `git config user.name flujo-app` in your copy. No lines that credit an AI or a tool in commits.
+  time, and only what is committed is collected. `scripts/setup-worktree.sh` sets the name and the
+  address that your commits carry; do not change them. No lines that credit an AI or a tool in commits.
 - **The lead merges** finished branches into `join` and keeps a short file
   `GravityInLean/Join/STATUS.md` on that branch, updated at least every twenty minutes: the
   route chosen and why, the list of lemmas, and for each one who has it, when it was given out,
