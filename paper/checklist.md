@@ -71,12 +71,28 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
 
 ## The author
 
-- [ ] **The author reads the whole paper** and can defend each sentence listed in
-      [plain-summary.md](plain-summary.md).
-- [ ] **The author writes his part of Section 10** in his own words: what he chose, decided,
-      read and checked.
-- [ ] Author name, affiliation and contact are filled in by the author at submission. They are
-      not in this repository.
+- [x] **The author has read the whole paper** (24 November 2026). Section 10 says plainly that
+      the author is not a specialist and has not checked the mathematics, so the sentences in
+      [plain-summary.md](plain-summary.md) are not yet defended by a human. A reading by a
+      human expert (Sections 6 and 8) is what would close that.
+- [x] **Section 10 has the author's part**: what the author chose, decided and read, and that
+      the author did not check the mathematics. Taken from the author's own words and put into
+      formal wording on 24 November 2026. For a venue that wants human-written text, the author
+      rewrites it.
+- [x] Author names are on the paper: Mario Andreschak, Claude Fable 5.2 and Claude Opus 5.5
+      (24 November 2026). Affiliation and contact are added at submission and are not kept in
+      this repository.
+- [ ] **AI systems as authors.** arXiv, Springer Nature and the Annals of Formalized Mathematics
+      do not accept an AI system as an author (read 24 November 2026); the reason they give is
+      that an author must be able to take responsibility for the paper. Before submitting, move
+      Claude Fable 5.2 and Claude Opus 5.5 from the author line to Section 10 or the
+      acknowledgements, unless the chosen venue's rules, read on the day, say otherwise.
+- [ ] **Responsibility for the content.** Venues expect the human author to answer for the whole
+      paper, and arXiv was reported in 2026 to ban authors for a year over unverified AI
+      content (read its moderation page on the day). Section 10 says honestly that the author
+      has not checked the mathematics. Before submitting anywhere, either have a human expert
+      read the paper, or confirm that the venue accepts a paper whose human author relies on
+      the machine checks.
 
 ## The venue
 

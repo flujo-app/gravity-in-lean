@@ -1,6 +1,9 @@
 # Birkhoff's theorem without coordinates, machine-checked in Lean 4, and how teams of AI workers built it
 
-**[author]**
+**Mario Andreschak, Claude Fable 5.2 and Claude Opus 5.5**
+
+*Claude Fable 5.2 and Claude Opus 5.5 are AI systems made by Anthropic. Section 10 sets out
+what each author did.*
 
 *Draft of 24 November 2026. Not submitted. Every number below is a measurement recorded in
 `PLAN.md` or in the run logs of the repository; nothing is estimated unless it says so.*
@@ -490,11 +493,20 @@ that is part of every build; the whole development compiles from scratch on a cl
 All Lean code, all proofs, the definitions, the statements, the second readings, the reviews
 and the first draft of this text were written by AI systems: Claude Fable 5.2 (supervisor and
 workers) and Claude Opus 5.5 (second readers, the review in `REVIEW.md`, and the literature
-research), through Claude Code and the FACTORY framework.
-The human author chose the goal and its order of priority, decided the working rules (one build
-at a time; no porting of another project's recent proof; when to make the repository public),
-[the author describes here what he read, checked and decided, and confirms that he stands
-behind the claims]. No Lean proof in the repository was written or edited by hand.
+research), through Claude Code and the FACTORY framework. No Lean proof in the repository was
+written or edited by hand.
+
+The human author, Mario Andreschak, chose the goal and its order of priority and decided the
+working rules (one build at a time; no porting of another project's recent proof; when to make
+the repository public). The human author has read the manuscript in full but is not a
+specialist in general relativity, differential geometry or interactive theorem proving, and
+has not independently verified the mathematical arguments or the formal proofs; no claim of
+personal verification is made. The human author's approval of the manuscript rests on the
+machine verification described in Section 9 and on the AI reviews described in Section 6, not
+on a personal assessment of its mathematical content. Readers should weigh the results
+accordingly: the correctness of the proofs rests on Lean's kernel and the independent checkers,
+whereas the agreement between the formal statements and their description in this text has so
+far been checked only by AI reviewers (Section 8).
 
 ## References
 
