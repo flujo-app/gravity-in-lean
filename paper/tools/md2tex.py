@@ -54,7 +54,7 @@ PREAMBLE = r"""% Generated from paper.md by tools/md2tex.py. Do not edit by hand
 \usepackage{xcolor}
 \usepackage{fvextra}
 \fvset{fontsize=\footnotesize, breaklines=true, breakautoindent=true, frame=lines,
-  framesep=2mm, rulecolor=\color{black!40}}
+  framesep=2mm, rulecolor=\color{black!40}, samepage=true}
 \usepackage[hidelinks, bookmarksnumbered]{hyperref}
 \tracinglostchars=2
 \emergencystretch=3em

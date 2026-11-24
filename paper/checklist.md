@@ -4,6 +4,11 @@ What is still needed before [paper.md](paper.md) goes anywhere. This is the only
 points here and keeps no boxes of its own. Tick a box only when the thing is done and written
 down where others can see it.
 
+[paper.tex](paper.tex) and [paper.pdf](paper.pdf) are made from paper.md by
+[tools/md2tex.py](tools/md2tex.py) and the workflow "Build the paper". Edit only paper.md, run
+`python paper/tools/md2tex.py`, and take the new PDF from that workflow's run (artifact
+`paper-pdf`).
+
 ## The claim
 
 - [ ] **Search again on the day of submission** for machine-checked Birkhoff theorems, in Lean,
