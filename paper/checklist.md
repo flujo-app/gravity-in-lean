@@ -26,6 +26,19 @@ down where others can see it.
 - [ ] In reader-facing text say "horizon" and "inside the horizon", not "rim": an outside reader
       took "including the region inside the rim" to mean the horizon itself.
 
+## The text
+
+- [x] **Outside review 1** (24 November 2026, `review/paper-outside-review-1.md`): fifteen
+      findings, all on the text, none on the theorems or definitions. Worked in; what was done
+      with each is at the end of that file.
+- [ ] **Before each new version, read the whole paper against the repository.** Every paragraph
+      that goes run by run covers all seven runs; every number is taken again from `PLAN.md`,
+      the `STATUS.md` files or the audit; Section 8 agrees with Section 9; the abstract claims
+      nothing the statements do not say. The outside review found that late additions (run 7,
+      the sandbox checks) had left older paragraphs behind.
+- [ ] **One more outside review** of the whole draft after the next large change, by a model
+      that did not write it.
+
 ## The four questions for AI-written formal proofs
 
 From the Xena blog, 12 November 2026; the answers are in Section 9.
@@ -56,6 +69,12 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
       scope (464,847 declarations, mathlib and Lean's own library included) five checkers
       accept; `nanoda` crashed with a stack overflow. `nanoda` accepts the project's own 2,605
       declarations with everything they depend on, also inside the sandbox. Section 9, item 4.
+- [ ] **`lake comparator` for all 54 fixed statements, in public CI.** The question covers the
+      sixteen headline statements; the other 38 (failure tests, Kruskal's known answers, the
+      "exactly when" checks, `SchwarzschildIsEmptyStatement`) are checked only by the audit.
+      Widen `comparator/Challenge.lean` to all of them and run `lake comparator --paranoid` in a
+      GitHub workflow, so that a reader can see the log without re-running it (outside review
+      1, finding F9).
 - [ ] **`nanoda` on the whole export.** Tell nanoda's authors about the stack overflow (it
       needs only the public repository and `scripts/sandbox-check/run.sh` to repeat), and run it
       again with a version that gets through.
@@ -72,8 +91,11 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
       with two-dimensional spacelike orbits; the statements assume three Killing fields
       (`IsRoundOn`). Either prove in Lean that such an action gives `IsRoundOn`, or keep calling
       the result a variant, as Sections 3 and 8 now do. This is the question a referee will ask.
-- [ ] **A person who works in gravity reads** `Curved/Basic.lean`, `Curved/Goal.lean` and
-      `Goals/EveryPoint.lean`. Welcome, not strictly required; say in the paper which it was.
+- [ ] **A person who works in gravity reads** `Curved/Basic.lean`, `Curved/Goal.lean`,
+      `Goals/ExactlyWhen.lean`, `Goals/EveryPoint.lean` and `Goals/Global.lean`. Welcome, not
+      strictly required; say in the paper which it was. The outside review of 24 November
+      (`review/paper-outside-review-1.md`, F5 and F9) ranks this first among the gaps in the
+      trust story and calls it a blocker for a mathematics venue.
 
 ## The method
 
