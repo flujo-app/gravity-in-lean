@@ -514,10 +514,10 @@ that is part of every build; the whole development compiles from scratch on a cl
 - A classification of all maximal or inextendible spherically symmetric vacuum space-times.
   The global theorem proved here maps every simply connected one into a model space-time; the
   classification is stated but not proved (Section 4).
-- What Section 9 leaves open: `lake comparator` covers 16 of the 54 fixed statements (the other
-  38 are checked only by the audit inside the build); the sandboxed checks ran on the author's
-  PC, in a Linux container, not on a second machine or in public CI; and `nanoda` has not
-  checked the whole export.
+- What Section 9 leaves open: `lake check --paranoid` over the whole project ran on the author's
+  PC, in a Linux container, not on a second machine or in public CI (`lake comparator` now runs
+  in public CI); `nanoda` has not checked the whole export; and `connectionUnique`, one of the
+  fixed statements, cannot be put to `lake comparator` (item 3 of Section 9).
 
 ## 9. Reproducibility
 
@@ -544,25 +544,35 @@ that is part of every build; the whole development compiles from scratch on a cl
      `GravityInLean/Goals/` and `Curved/Goal.lean`), and `Audit.lean` holds
      `example : Statement := theorem` for each, checked by every build together with the axioms
      of all 2,605 declarations. Lean's own tool for this question, `lake comparator`, gives the
-     same answer from outside the build. Its question, `comparator/Challenge.lean`, states the
-     sixteen headline results under their full names with a hole (`sorry`) in place of each
-     proof, and imports only the statement files; `comparator.json` names the sixteen, the three
-     permitted axioms, and `Audit` as the answer. The question sits in a library of its own, so
-     `lake build` and the audit never see its holes. `lake comparator --paranoid` built question
-     and answer inside Lake's sandbox on Linux (the setting is described in item 4) and accepted
-     ("Your solution is okay!", in 9 minutes, at most 10 GB of memory): each of the sixteen has
+     same answer from outside the build. Its question, `comparator/Challenge.lean`, states each
+     result under its full name with a hole (`sorry`) in place of the proof, and imports only
+     the statement files; `comparator.json` names the results, the three permitted axioms, and
+     `Audit` as the answer. The question sits in a library of its own, so `lake build` and the
+     audit never see its holes. `lake comparator --paranoid` builds question and answer inside
+     Lake's sandbox on Linux (described in item 4) and accepts only if each named result has
      exactly the question's statement, every definition those statements use is the same on
      both sides, no axiom beyond the three is used, and all six checkers of item 4 accept the
-     answer's export (the sixteen and everything they depend on, 546 MB, as in item 4 (a)). It
-     ran at commit `73816cc`, which is `3b816ea` plus the question; no Lean file of the proofs,
-     the audit, the toolchain or the list of dependencies differs. The sixteen are 16 of the 54
-     fixed statements; the other 38 (the 25 failure tests, the nine known answers for
-     Kruskal's table, three checks that the assumptions of the "exactly when" statement can be
-     met inside and outside the horizon and that "vacuum" can fail, and
-     `SchwarzschildIsEmptyStatement`) are checked only by the audit
-     inside the build. To see that the tool is not a
-     rubber stamp, the question was changed once by hand to give `oneMass` the statement of
-     `connectionExists`: the comparator rejected it ("statement do not match").
+     answer's export. It ran twice.
+     - *Sixteen headline results, on the PC described,* at commit `73816cc` (`3b816ea` plus the
+       question): accepted ("Your solution is okay!", in 9 minutes; export 546 MB, as in item 4
+       (a)).
+     - *Every statement the audit checks, on GitHub's machine.* The question is now written from
+       the audit's `example : Statement := theorem` lines by `scripts/comparator/make_challenge.py`,
+       which also fails the workflow when the question is out of date. It holds 57 statements:
+       the 54 of this paper and three proved since. One more fixed statement cannot be asked:
+       that of `connectionUnique`, whose own type is its statement. The statement files already
+       import its proof, so the question cannot declare its name; the build checks its type and
+       the audit its axioms. The workflow "Compare statements" ran `lake comparator --paranoid` at
+       commit `e30d888` on a standard Linux machine of GitHub (bubblewrap installed, Ubuntu's
+       limit on unprivileged namespaces lifted): accepted, in 12.5 minutes; all six checkers
+       accepted the export, about 56,000 declarations. The log is public (workflow run
+       45483949294). Between `3b816ea` and `e30d888` no Lean file of this paper's proofs
+       changed; files were only added, and lines added to the audit.
+
+     To see that the tool is not a rubber stamp, the question was changed by hand twice. Once
+     `oneMass` was given the statement of `connectionExists`, and once the failure test
+     `cylNotEmpty` was given the statement of `cylNotUsable`: each time the comparator rejected
+     it ("statement do not match").
   4. *Lean's kernel.* Three re-checks outside the build:
      - `leanchecker` (Lean's built-in successor of `lean4checker`) re-checked the project's
        200 modules (`Audit` included) one by one against their imports, in 101 minutes: 199
@@ -613,7 +623,8 @@ that is part of every build; the whole development compiles from scratch on a cl
        the sandbox needs, so the container ran with `--security-opt seccomp=unconfined`. That
        was the only flag: no added capabilities, not privileged, not run as root. It weakens
        the wall between the container and the PC, not the sandbox inside the container. The
-       container ran on the PC described, not on a second machine. mathlib's prebuilt files
+       container ran on the PC described, not on a second machine (only the comparator of item 3
+       has also run on another machine, GitHub's, with no container). mathlib's prebuilt files
        were fetched outside the sandbox, but each of their declarations in the export was
        checked again by the checkers. And `nanoda` has not checked the whole export.
 
