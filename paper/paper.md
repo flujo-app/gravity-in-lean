@@ -91,6 +91,27 @@ documented with dates in `SURVEY.md` and `TARGETS.md`.
   and its files were discarded, so the proof in the repository comes from a later, fresh team.
 - Schwarzschild's solution itself had been verified in Lean at least twice before.
 
+**Side by side.** The two earlier Birkhoff statements, read in their source files on 24 November
+2026 (ProjectAinos: `theorem birkhoff` in `ProjectAinos/GeneralRelativity/Birkhoff.lean`;
+grlab: `theorem exists_mass_of_areal_vacuum` in `GRLab/Birkhoff.lean`), against the two main
+statements here:
+
+| | ProjectAinos, `birkhoff` | grlab, `exists_mass_of_areal_vacuum` | here, `birkhoffNoCoordinates` | here, `birkhoffAtEveryPoint` |
+|---|---|---|---|---|
+| Space | an open box of (t, r, θ, φ) in ℝ⁴ | an open interval of r in ℝ | any smooth 4-manifold | any smooth 4-manifold |
+| Metric | −A(t,r)dt² + B(t,r)dr² + r²dΩ², smooth, A, B > 0 | one function f(r); the metric −f dt² + f⁻¹dr² + r²dΩ² appears only in comments | any smooth Lorentzian metric | the same |
+| Symmetry | built into the formula | built into the formula, and static | three Killing fields with so(3) brackets and two-dimensional spacelike orbits | the same |
+| Vacuum | every Ricci component of the coordinate table vanishes | the single equation 1 − f − r f′ = 0 | the Ricci tensor of the Levi-Civita connection vanishes; the connection is proved to exist | the same |
+| Coordinates in the hypotheses | yes | yes | none | none |
+| Conclusion | B = r/(r−2M) and A = f(t)(r−2M)/r, with r > 2M | f = 1 − 2M/r | a chart around p in which the metric is Schwarzschild's, r > 2m or 0 < r < 2m | a chart around p onto Kruskal's form (m > 0) or Schwarzschild's (m ≤ 0) |
+| Where | outside the horizon | an interval avoiding r = 0 | every point where the gradient of the area radius is not null; includes the inside of the horizon | every point |
+
+The row that matters is the fifth. In both earlier theorems the coordinates, and the symmetry
+with them, are part of the hypothesis; here they are part of the conclusion. ProjectAinos's
+theorem is comparable to the coordinate version in this repository, which is four days younger
+and is not claimed as new. grlab's file says of itself that it is the calculus core of the
+static case and not the full theorem.
+
 **To our knowledge**, no machine-checked Birkhoff theorem in any proof assistant starts from
 symmetry assumptions without coordinates, or covers the horizon. This is a statement about what
 we found, on the dates given, and must be re-checked on the day of submission.
@@ -280,6 +301,15 @@ supervisor diffs the bundle against the starting commit, adds
 `example : Statement := theorem` to the audit file, rebuilds the whole project from scratch and
 checks that every declaration rests only on `propext`, `Classical.choice` and `Quot.sound`.
 
+**What the workers could see and reach.** Each worker had the repository at the starting
+commit (all earlier proofs, the definitions and the fixed statements), the brief (the
+statement, the rules and the route on paper) and the source of mathlib in the image. The
+container was not cut off from the internet, because the agents reach the model through it.
+The briefs limited its use: in runs 1 to 3 to reading documentation; in run 5 no web search and
+no other project's proof; the briefs of runs 4 and 6 had no rule about it. Only run 5's record
+was checked for use of the network, and none was found. For the other runs the records do not
+show that the network went unused.
+
 **Measurements.** Times run from "all ten agents ready" to "whole project builds with the
 proof".
 
@@ -297,13 +327,21 @@ measured as the change of the subscription's weekly usage meter over each run; t
 bounds, because other sessions ran at the same time: between 2 and 11 percentage points per
 run (details in `PLAN.md`).
 
+**What these numbers show, and what they do not.** All 47 statements fixed before the runs
+were proved without a change to any of them, and no person wrote or repaired a proof. Of 349
+Lean runs, 60 failed and were repaired by the teams. There is no comparison point: the same job
+was not run by one agent instead of ten, nor without the route in the brief, nor by a person.
+Lines and theorems depend on style and are given for scale only.
+
 **Where the time went.** Not into proving. The definitions and the first goal took one
 supervising agent 57 minutes to a first green build and 80 minutes including the second
 reading; each later set of statements took about 20 minutes to write and 12 to 13 minutes to
 read. Setting up the worker fleet and finding its faults took about an hour. A rebuild from
 scratch to check a result took 2 to 6 minutes. The estimate made beforehand for the coordinate-free theorem was
 one to three weeks; it took about four hours from the start of that work. Every estimate in
-the project was too high by a factor of ten or more.
+the project was too high by a factor of ten or more. These estimates were made beforehand by
+the supervising agent; they show that its estimates were poor, not that the method is fast
+compared with anything measured.
 
 **What went wrong.**
 - A small test run before the first real run found three set-up faults that would have cost
@@ -317,6 +355,12 @@ the project was too high by a factor of ten or more.
   was merged, and run 5 proved the result from the textbook.
 - Twice a lead gave the same lemma to two workers.
 - No statement fixed in advance had to be changed, and no team reported a statement false.
+
+**What was changed after a run, and by whom.** No person edited a Lean file. The supervising
+agent made small changes before merging after two runs: after run 1 it trimmed three files to
+load only the parts of mathlib they used and tidied the eleven files; after run 3 it rewrote
+three loosely written steps in one file that gave style warnings. After run 4 nothing was
+changed; for runs 2, 5 and 6 the record lists no change.
 
 ## 8. What is and is not established
 
@@ -334,6 +378,10 @@ that is part of every build; the whole development compiles from scratch on a cl
   not as a group action; manifolds live in universe 0; the theorems are local (a chart around
   each point), and the charts' images avoid the poles of the angular coordinates, although no
   point of the manifold is excluded.
+- That the textbook's assumption gives ours. Hawking and Ellis, Wald and O'Neill assume an
+  isometric action of SO(3) with two-dimensional spacelike orbits. Such an action yields three
+  fields as in `IsRoundOn`, so the theorem here is at least as strong; but that step is an
+  argument on paper and is not proved in Lean.
 - A global statement. [If the global theorem of issue 39, second step, is proved before
   submission, it becomes a section here; otherwise it is future work.]
 - The independent checks 3 and 4 of Section 9.
@@ -341,7 +389,8 @@ that is part of every build; the whole development compiles from scratch on a cl
 ## 9. Reproducibility
 
 - Repository: `github.com/flujo-app/gravity-in-lean`, public since 24 November 2026. The
-  numbers in this draft refer to commit `3f4e818` (pull request 49).
+  numbers in this draft refer to commit `3f4e818` (pull request 49). [Before submission: a
+  tagged commit replaces it, and every number is taken again from that commit.]
 - Lean 4.36.0, mathlib v4.36.0 (pinned). To check: `lake exe cache get`, then `lake build`.
   A full rebuild of the project (not of mathlib) takes 2 to 6 minutes on the PC described.
 - The build ends with lines of the form "all 2004 declarations under GravityInLean checked:
