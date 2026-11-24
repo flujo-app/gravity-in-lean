@@ -460,9 +460,22 @@ that is part of every build; the whole development compiles from scratch on a cl
   3. *It proves the theorem as stated.* Each final statement is a definition (in
      `GravityInLean/Goals/` and `Curved/Goal.lean`), and `Audit.lean` holds
      `example : Statement := theorem` for each, checked by every build together with the axioms
-     of all 2,605 declarations. Lean's own tool for this question, `lake comparator`, has not
-     been run.
-  4. *Lean's kernel.* Two re-checks outside the build:
+     of all 2,605 declarations. Lean's own tool for this question, `lake comparator`, gives the
+     same answer from outside the build. Its question, `comparator/Challenge.lean`, states the
+     sixteen headline results under their full names with a hole (`sorry`) in place of each
+     proof, and imports only the statement files; `comparator.json` names the sixteen, the three
+     permitted axioms, and `Audit` as the answer. The question sits in a library of its own, so
+     `lake build` and the audit never see its holes. `lake comparator --paranoid` built question
+     and answer inside Lake's sandbox on Linux (the setting is described in item 4) and accepted
+     ("Your solution is okay!", in 9 minutes, at most 10 GB of memory): each of the sixteen has
+     exactly the question's statement, every definition those statements use is the same on
+     both sides, no axiom beyond the three is used, and all six checkers of item 4 accept the
+     answer's export (the sixteen and everything they depend on, 546 MB, as in item 4 (a)). It
+     ran at commit `73816cc`, which is `3b816ea` plus the question; no Lean file of the proofs,
+     the audit, the toolchain or the list of dependencies differs. To see that the tool is not a
+     rubber stamp, the question was changed once by hand to give `oneMass` the statement of
+     `connectionExists`: the comparator rejected it ("statement do not match").
+  4. *Lean's kernel.* Three re-checks outside the build:
      - `leanchecker` (Lean's built-in successor of `lean4checker`) re-checked the project's
        200 modules (`Audit` included) one by one against their imports, in 101 minutes: 199
        passed. On one, `GravityInLean.OneMass` (145 lines from the first step: Schwarzschild's
@@ -478,12 +491,43 @@ that is part of every build; the whole development compiles from scratch on a cl
        in about eight minutes and one minute, and both rest only on `propext`,
        `Classical.choice` and `Quot.sound`. `nanoda` 0.4.17 was also run on its own over both
        exports, with any other axiom counted as an error: no errors.
-     - *Not shown.* Lake's sandbox (`bwrap`) runs only on Linux; this PC runs Windows. So the
-       exports were made, and the checkers run, outside a sandbox, with
-       `--inadvisably-no-sandbox`, a run Lake itself labels "not trustworthy": code that
-       misbehaved while being built or exported could in principle have changed what was
-       checked. A run inside the sandbox on Linux, over the whole project rather than the
-       headline theorems, is still to do.
+     - *Inside Lake's sandbox, over the whole project.* Lake's sandbox (`bwrap`) runs only on
+       Linux, and this PC runs Windows, so the two exports above were made, and checked,
+       outside it, with `--inadvisably-no-sandbox`, a run Lake itself labels "not
+       trustworthy": code that misbehaved while being built or exported could in principle
+       have changed what was checked. We repeated the check inside the sandbox, in a Linux
+       container (Debian 12, bubblewrap 0.8.0, Lean 4.36.0 from elan, run as an ordinary
+       user) under Docker on the same PC; the recipe is `scripts/sandbox-check/`. Inside the
+       sandbox the code has no network, can write nothing but the build folder `.lake`, and
+       cannot see the home folders. From a fresh copy of tag `paper-1-numbers`, after
+       mathlib's prebuilt files were fetched (`lake exe cache get`, the one step outside the
+       sandbox; the project itself was not built outside it), `lake check --paranoid` built
+       the project inside the sandbox (the audit line above came out again), exported every
+       declaration in scope, Lean's own library and the parts of mathlib the project imports
+       included (3.1 GB, 464,847 declarations), and gave the export to all six checkers.
+       Five accepted all of it: `leanchecker-paranoid` (16 minutes), `lean4lean` (18),
+       `con-leche` (6), `con-ron` (12) and Lean's own kernel (12). `nanoda` 0.4.17 gave no
+       verdict: after 43 minutes, using all 24 GB of memory the container had plus about
+       30 GB of swap, one of its worker threads overflowed its stack and the program aborted.
+       Lake counts any non-zero exit as a rejection, so the run ended with "error: nanoda
+       exited with 134" after 2 hours 21 minutes (27 of them spent writing `nanoda`'s crash
+       dump). The stack size is fixed inside `nanoda`; we found no way to raise it from
+       outside. Because Lake stops at that error before it lists the axioms, we ran
+       `lake check --from-export` (Lean's own kernel only) on the same export, made inside
+       the sandbox: the kernel accepted it again, and Lake reported "Uses axioms: propext,
+       Quot.sound, Classical.choice". Finally `nanoda`, under the same sandbox settings that
+       Lake uses for its checkers, was given an export of the project's own 2,605
+       declarations with everything they depend on (576 MB): "Checked 58865 declarations with
+       no typechecker errors", in 24 seconds. So `nanoda` accepts all that the project uses;
+       where in the rest of the environment it stumbled was not found. Without `nanoda`, the
+       peak memory of the run was 19 GB.
+     - *What weakens these runs.* Docker's own filter on system calls forbids the namespaces
+       the sandbox needs, so the container ran with `--security-opt seccomp=unconfined`. That
+       was the only flag: no added capabilities, not privileged, not run as root. It weakens
+       the wall between the container and the PC, not the sandbox inside the container. The
+       container ran on the PC described, not on a second machine. mathlib's prebuilt files
+       were fetched outside the sandbox, but each of their declarations in the export was
+       checked again by the checkers. And `nanoda` has not checked the whole export.
 
 ## 10. Use of AI
 
