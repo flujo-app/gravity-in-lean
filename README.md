@@ -77,9 +77,10 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **The definitions can fail where they should** | Twenty-five tests asked for by three independent reviewers of the definitions. On the rim of a black hole, in coordinates that are good there, every assumption of Birkhoff's theorem holds except "usable distance". Spheres of one fixed size are round but give no distance and are not empty. Three zero fields are not "round". Schwarzschild's with all signs turned round is empty but no space-time in the sense used here. Two time directions are not one. A squashed sphere is not round. De Sitter's universe meets every assumption except "empty", and is Schwarzschild's in no chart at all. Flat space-time with the turns written in ordinary `x`, `y`, `z` is round, poles included. No test turned out false. | [Checks/](GravityInLean/Checks/); the statements are in [Goals/Tests.lean](GravityInLean/Goals/Tests.lean), the reviewers' reasons in [REVIEW.md](REVIEW.md) |
 | **One mass for a whole region** | On a region in one piece, the charts of Birkhoff's theorem all have the same mass, also on the two sides of a rim. The mass is said without coordinates. | [OneMass/Goal.lean](GravityInLean/OneMass/Goal.lean), `oneMass`; [OneMass/Mass.lean](GravityInLean/OneMass/Mass.lean), `MassAt` |
 | **A length measure has a connection** | On any curved space, a length measure (of any signature) has a connection that belongs to it. With "at most one" from before: exactly one. So "empty" no longer rests on an assumed connection. Proved from the textbook (Koszul's formula). Another project, TauCeti, had proved the same earlier and independently; its proof was not read for this one. | [Connection/Exists.lean](GravityInLean/Connection/Exists.lean), `connectionExists` |
+| **Birkhoff's theorem at every point, the rim included** | Around **every** point of a round, empty space-time, with nothing asked of the size of the spheres there, there is a chart in which it is Kruskal's form of Schwarzschild's space-time for a positive mass, or Schwarzschild's own form for a mass that is zero or negative. On a region in one piece the mass is the same everywhere. This covers the rim of a black hole and the place where the two rims cross, which Schwarzschild's own coordinates cannot reach. Known answers for Kruskal's table come with it: its radius is well defined and smooth; it is a space-time, empty and round, rim included; on the rim the size of the spheres is no usable distance; Schwarzschild's outside and inside are pieces of it; de Sitter's universe is not. Proved by a sixth team in 29 minutes, from a route worked out on paper that the team changed in one place. For the crossing point we did not find a complete written proof in the literature ([review/global-birkhoff.md](review/global-birkhoff.md)); "not found" is not "new". | [Rim/Goal.lean](GravityInLean/Rim/Goal.lean), `birkhoffAtEveryPoint`, `birkhoffAtEveryPointOneMass`; the statements are in [Goals/EveryPoint.lean](GravityInLean/Goals/EveryPoint.lean), the team's record in [Rim/STATUS.md](GravityInLean/Rim/STATUS.md) |
 | **Probes** | Two tests of the definitions on curvatures that are known and not zero. A sphere: its curvature comes out equal to its own length measure. De Sitter's space-time, an empty universe with a cosmological constant: its curvature comes out as `3/L²` times its own length measure, with the textbooks' sign, in the time direction too. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere`; [Probe/DeSitter.lean](GravityInLean/Probe/DeSitter.lean), `ricci_deSitter` |
 
-In numbers: 996 theorems in about 24,600 lines.
+In numbers: 1,151 theorems in about 29,300 lines.
 
 **What others did, and did first.** None of the physics here is new: it is textbook material
 from 1916 to 1923. In Lean, Schwarzschild's solution had been checked before this repository,
@@ -98,30 +99,10 @@ read the definitions and the goal against the textbooks: [REVIEW.md](REVIEW.md).
 
 ## Stated, not yet proved
 
-One group of targets is written down in exact form and **not proved**. Each is a definition of
-a statement. The build checks that the statements are well-formed and rest on nothing extra. It
-does not check that they are true. A second, independent reader judged them true as written
-before they were fixed. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
-and the goal `BirkhoffNoCoordinates`, were proved on 23 and 24 November 2026 by teams of
-workers: see the table above. Fixing the statements beforehand is what made it safe to hand
-the proofs to a team.)
-
-| Statement | In plain words | File, and the check that it is not about nothing |
-|---|---|---|
-| `BirkhoffAtEveryPoint`, `BirkhoffAtEveryPointOneMass` | Birkhoff's theorem at every point, the rim of a black hole included: around every point of a round, empty space-time there is a chart in which it is Kruskal's form of Schwarzschild's space-time for a positive mass, or Schwarzschild's own form for a mass that is zero or negative. And the mass is the same on a region in one piece. | [Goals/EveryPoint.lean](GravityInLean/Goals/EveryPoint.lean), with its own checks as statements: Kruskal's table is a space-time, empty and round; the rim is where the distance is not usable; Schwarzschild's is a piece of it; de Sitter's is not. |
-
-Two independent readers went through the definitions and these statements before anything was
-built on them. What they found, and what was changed, is in [PLAN.md](PLAN.md), "What the
-definitions showed".
-
-Every statement with assumptions also has a check that the assumptions can be met. For step 2:
-Schwarzschild's own space-time meets them (`schwarzschild_isEmptyOn`), and so does one whose clock
-labels really do change in time (`relabelled_isEmptyOn`). The second shows the time factor cannot
-be left out of the statement. For the theorems without a starting shape: every empty space-time
-of the general round shape meets them (`roundEmpty_genG`), and Eddington's and Finkelstein's is
-one written out (`eddington_roundEmpty`). For the theorems about other coordinates: every change
-of coordinates that loses no direction meets them (`inverse_inNewCoords`), and the change from
-Eddington's time label to Schwarzschild's is one written out, for all three.
+Nothing in the files of fixed statements (`GravityInLean/Goals/`) from this line of work is
+open at the moment: every statement there has a proof, and `Audit.lean` checks each proof
+against its statement. Statements for the theorem about a whole space-time at once are being
+written in `GravityInLean/Goals/Global*.lean`; until they are proved, they are statements.
 
 ## What is still taken on trust
 
@@ -165,15 +146,18 @@ of Piece C. Both are now proved. What is left:
    differentiable for curvature, twice for free fall and symmetry). The theorem with no
    coordinates is a statement around a point: it gives a chart near every point where the size
    of the spheres is a usable distance, says nothing at the rim itself, and nothing about the
-   whole space-time at once. Nothing says yet that two points of one space-time get the same
-   mass, and nothing is said at the rim: both are stated next.
+   whole space-time at once. Since then the rim is covered (`birkhoffAtEveryPoint`, with
+   Kruskal's form) and the mass is one for a region in one piece (`oneMass`). What is still
+   missing is a statement about the whole space-time at once; that is the next piece of work.
 4. **Meaning.** Lean checks that a proof proves its statement. It cannot check that the statement
    says what we mean. That is why the statements are short and each has a plain-language comment:
    they are meant to be read. For the theorem with no coordinates this now rests on one file,
    [Curved/Basic.lean](GravityInLean/Curved/Basic.lean), and on the goal in
    [Curved/Goal.lean](GravityInLean/Curved/Goal.lean): they were read by two independent
-   readers and tested on known answers, but not yet by someone who works in gravity. The lemmas
-   the teams wrote in between (about 250) were read by nobody but their authors; that is safe for
+   readers, then by three reviewers against the textbooks ([REVIEW.md](REVIEW.md)), and tested
+   on known answers and on cases where they must fail, but not yet by someone who works in
+   gravity. The lemmas
+   the teams wrote in between (about 630) were read by nobody but their authors; that is safe for
    the final theorems, whose statements were fixed beforehand, and it means the lemmas should
    not be quoted on their comments alone.
 
@@ -191,7 +175,7 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and seventeen lines that end in
+You should see `Build completed successfully` and eighteen lines that end in
 `none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about two
 minutes.
 
@@ -211,7 +195,7 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 1,798 declarations in the project rests on (every definition and theorem, plus the helper
+of the 2,004 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
@@ -294,6 +278,8 @@ GravityInLean/BothWays/             Birkhoff's theorem both ways, in coordinates
 GravityInLean/Checks/               tests that the definitions can fail (8 files)
 GravityInLean/OneMass/              one mass for a whole region (11 files)
 GravityInLean/Connection/           a length measure has a connection (10 files)
+GravityInLean/Rim/                  Birkhoff's theorem at every point, the rim included, and
+                                    Kruskal's table (24 files; Goal.lean holds the theorem)
 scripts/queued-build.sh             one build at a time, for several workers on one machine
 scripts/setup-worktree.sh           gives a fresh copy of the repository the ready-built library
 fleet/                              a team of workers: the image, the brief, the scripts that

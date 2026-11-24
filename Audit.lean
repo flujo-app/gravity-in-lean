@@ -255,6 +255,27 @@ example : GravityInLean.Curved.ConnectionExistsStatement := GravityInLean.connec
   GravityInLean.Curved.Tests.deSitterNotSchwarzschild GravityInLean.Curved.Tests.minkowskiIsRoundOn
   GravityInLean.Curved.Tests.isEmptyOnNegIff
 
+-- Proved by the sixth team of workers: Birkhoff's theorem at every point, the rim included, and
+-- the known answers for Kruskal's table (`Goals/EveryPoint.lean`). Each line checks that what
+-- was proved is the statement as it was fixed.
+example : GravityInLean.Curved.KruskalRadiusSpec := GravityInLean.Curved.kruskalRadiusSpec
+example : GravityInLean.Curved.KruskalRadiusSmooth := GravityInLean.Curved.kruskalRadiusSmooth
+example : GravityInLean.Curved.KruskalIsSpaceTime := GravityInLean.Curved.kruskalIsSpaceTime
+example : GravityInLean.Curved.KruskalIsEmpty := GravityInLean.Curved.kruskalIsEmpty
+example : GravityInLean.Curved.KruskalIsRound := GravityInLean.Curved.kruskalIsRound
+example : GravityInLean.Curved.KruskalNotUsableOnRim := GravityInLean.Curved.kruskalNotUsableOnRim
+example : GravityInLean.Curved.KruskalMeetsConclusion := GravityInLean.Curved.kruskalMeetsConclusion
+example : GravityInLean.Curved.DeSitterNotKruskal := GravityInLean.Curved.deSitterNotKruskal
+example : GravityInLean.Curved.KruskalHoldsSchwarzschild :=
+  GravityInLean.Curved.kruskalHoldsSchwarzschild
+example : GravityInLean.Curved.BirkhoffAtEveryPoint := GravityInLean.Curved.birkhoffAtEveryPoint
+example : GravityInLean.Curved.BirkhoffAtEveryPointOneMass :=
+  GravityInLean.Curved.birkhoffAtEveryPointOneMass
+
+#audit GravityInLean.Curved.birkhoffAtEveryPoint GravityInLean.Curved.birkhoffAtEveryPointOneMass
+  GravityInLean.Curved.kruskalIsEmpty GravityInLean.Curved.kruskalNotUsableOnRim
+  GravityInLean.Curved.kruskalHoldsSchwarzschild GravityInLean.Curved.kruskalRadiusSmooth
+
 /-! ## Everything else, without exception -/
 
 #audit_namespace GravityInLean

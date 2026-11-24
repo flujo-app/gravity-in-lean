@@ -241,10 +241,10 @@ connection of the textbooks). Three conditions:
 * it keeps lengths: the change of `g(Y, Z)` along a step is what the changes of `Y` and of `Z`
   along that step account for.
 
-The textbooks prove that a length measure has exactly one such connection. That it has at most
-one is proved in `Unique.lean` (`IsConnectionOf.unique`). That it has one is proved for tables of
-functions on coordinate space (`Tables.lean`); for a general curved space it is a statement of
-its own (`Goals/Connection.lean`). -/
+The textbooks prove that a length measure has exactly one such connection. Both halves are
+proved in this project: at most one in `Unique.lean` (`IsConnectionOf.unique`), and one, on any
+curved space, in `Connection/Exists.lean` (`connectionExists`; the statement is in
+`Goals/Connection.lean`). -/
 structure IsConnectionOf (g : LengthMeasure I M) (cov : Transport I M) (s : Set M) : Prop where
   /-- The region is open: curvature at a point looks at the connection near the point. -/
   isOpen : IsOpen s
