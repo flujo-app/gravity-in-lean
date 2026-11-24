@@ -5,13 +5,15 @@
 #                                sandbox, exports every declaration in scope (mathlib and Lean's
 #                                own library included: about 3.1 GB) and runs the export through
 #                                Lean's kernel and the five other checkers that ship with Lean.
-#   lake comparator --paranoid   builds comparator/Challenge.lean (the sixteen headline
-#                                statements, with a hole for each proof) and Audit.lean inside the
+#   lake comparator --paranoid   builds comparator/Challenge.lean (every statement that Audit.lean
+#                                checks, with a hole for each proof) and Audit.lean inside the
 #                                sandbox, and accepts only if each named result has exactly the
 #                                challenge's statement, uses no axiom beyond the three standard
 #                                ones, and passes the same six checkers.
 #
-# Usage: scripts/sandbox-check/run.sh [git ref]      (default: main)
+# Usage: scripts/sandbox-check/run.sh [git ref] [comparator]   (default ref: main)
+#        With "comparator", only the second check runs. The workflow "Compare statements" runs
+#        the same on GitHub's machines.
 #
 # Needs Docker and a network. On the PC of the paper (8 cores) the first check took 2 h 21 min
 # and the second 9 minutes. On the whole export, nanoda 0.4.17 used all 24 GB of memory plus
@@ -21,6 +23,7 @@
 set -uo pipefail
 
 REF="${1:-main}"
+ONLY="${2:-}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 IMAGE=gravity-sandbox-check:lean-4.36.0
 NAME=gravity-sandbox-check
@@ -41,7 +44,9 @@ docker exec "$NAME" bash -uc "
   # build results, whose declarations the checkers below check again one by one.
   lake exe cache get || exit 1
   # No lake build here: the project's own code is built only inside the sandbox.
-  /usr/bin/time -v lake check --paranoid; echo \"lake check: exit \$?\"
+  if [ '$ONLY' != comparator ]; then
+    /usr/bin/time -v lake check --paranoid; echo \"lake check: exit \$?\"
+  fi
   if [ -f comparator.json ]; then
     /usr/bin/time -v lake comparator --paranoid; echo \"lake comparator: exit \$?\"
   fi

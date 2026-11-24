@@ -69,12 +69,12 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
       scope (464,847 declarations, mathlib and Lean's own library included) five checkers
       accept; `nanoda` crashed with a stack overflow. `nanoda` accepts the project's own 2,605
       declarations with everything they depend on, also inside the sandbox. Section 9, item 4.
-- [ ] **`lake comparator` for all 54 fixed statements, in public CI.** The question covers the
-      sixteen headline statements; the other 38 (failure tests, Kruskal's known answers, the
-      "exactly when" checks, `SchwarzschildIsEmptyStatement`) are checked only by the audit.
-      Widen `comparator/Challenge.lean` to all of them and run `lake comparator --paranoid` in a
-      GitHub workflow, so that a reader can see the log without re-running it (outside review
-      1, finding F9).
+- [x] **`lake comparator` for all fixed statements, in public CI** (outside review 1, finding
+      F9). The question is written from `Audit.lean` by `scripts/comparator/make_challenge.py`
+      (57 statements: the paper's 54 and three proved since); the workflow "Compare statements"
+      runs `lake comparator --paranoid` on GitHub's Linux machine and fails when the question is
+      out of date. First run accepted, 12.5 minutes. `connectionUnique` cannot be asked: the
+      statement files import its proof. Section 9, item 3.
 - [ ] **`nanoda` on the whole export.** Tell nanoda's authors about the stack overflow (it
       needs only the public repository and `scripts/sandbox-check/run.sh` to repeat), and run it
       again with a version that gets through.
