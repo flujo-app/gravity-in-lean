@@ -135,9 +135,9 @@ the whole region into Kruskal's whole space-time.** -/
 theorem exists_kruskalMap_of_simplyConnected (hm : 0 < m) (hs : IsOpen s)
     (hsc : IsSimplyConnected s) (hg : IsSpaceTimeOn g s) (hloc : ∀ p ∈ s, IsKruskalNear m g p) :
     ∃ D : M → Coords 5, IsKruskalMapOn m g D s := by
-  haveI : SimplyConnectedSpace s := hsc
-  haveI : LocallyPathConnectedSpace M := ChartedSpace.locallyPathConnectedSpace (Coords 4) M
-  haveI : LocallyPathConnectedSpace s := hs.locallyPathConnectedSpace
+  have : SimplyConnectedSpace s := hsc
+  have : LocallyPathConnectedSpace M := ChartedSpace.locallyPathConnectedSpace (Coords 4) M
+  have : LocallyPathConnectedSpace s := hs.locallyPathConnectedSpace
   refine exists_global_map_on hs (0 : Coords 5) (fun D U ↦ IsKruskalMapOn m g D U) kruskalSyms
     (fun D U h ↦ h.1) (fun D U V h hV hVU ↦ h.mono hV hVU) (fun D D' U h heq ↦ h.congr heq)
     (fun D 𝒰 h ↦ IsKruskalMapOn.sUnion h) (fun q hq ↦ (hloc q hq).exists_map) ?_ ?_ ?_
@@ -200,9 +200,9 @@ theorem exists_schwMap_of_simplyConnected_neg (hm : m < 0) (hs : IsOpen s)
     (hsc : IsSimplyConnected s) (hg : IsSpaceTimeOn g s)
     (hloc : ∀ p ∈ s, IsSchwarzschildWith m g p) :
     ∃ D : M → Coords 4, IsSchwarzschildMapOn m g D s := by
-  haveI : SimplyConnectedSpace s := hsc
-  haveI : LocallyPathConnectedSpace M := ChartedSpace.locallyPathConnectedSpace (Coords 4) M
-  haveI : LocallyPathConnectedSpace s := hs.locallyPathConnectedSpace
+  have : SimplyConnectedSpace s := hsc
+  have : LocallyPathConnectedSpace M := ChartedSpace.locallyPathConnectedSpace (Coords 4) M
+  have : LocallyPathConnectedSpace s := hs.locallyPathConnectedSpace
   refine exists_global_map_on hs (0 : Coords 4) (fun D U ↦ IsSchwarzschildMapOn m g D U) schwSyms
     (fun D U h ↦ h.1) (fun D U V h hV hVU ↦ h.mono hV hVU) (fun D D' U h heq ↦ h.congr heq)
     (fun D 𝒰 h ↦ IsSchwarzschildMapOn.sUnion h)
