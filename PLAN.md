@@ -480,8 +480,8 @@ at the same time, and from the fourth run on they were busy most of the time.
 
 **What is not checked, said plainly.** The same list as after the third run, shorter by what
 the fifth run added: the definitions have now been read by three reviewers against the
-textbooks and have failure tests, but still not by someone who works in gravity; the roughly
-650 lemmas in between were read by nobody but their authors; the symmetry is assumed in its
+textbooks and have failure tests, but still not by someone who works in gravity; the about
+630 lemmas in between were read by nobody but their authors; the symmetry is assumed in its
 small-steps form; and nothing is said about a whole space-time at once.
 
 ## Next: Birkhoff's theorem with no coordinates at all

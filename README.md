@@ -154,8 +154,10 @@ of Piece C. Both are now proved. What is left:
    they are meant to be read. For the theorem with no coordinates this now rests on one file,
    [Curved/Basic.lean](GravityInLean/Curved/Basic.lean), and on the goal in
    [Curved/Goal.lean](GravityInLean/Curved/Goal.lean): they were read by two independent
-   readers and tested on known answers, but not yet by someone who works in gravity. The lemmas
-   the teams wrote in between (about 250) were read by nobody but their authors; that is safe for
+   readers, then by three reviewers against the textbooks ([REVIEW.md](REVIEW.md)), and tested
+   on known answers and on cases where they must fail, but not yet by someone who works in
+   gravity. The lemmas
+   the teams wrote in between (about 630) were read by nobody but their authors; that is safe for
    the final theorems, whose statements were fixed beforehand, and it means the lemmas should
    not be quoted on their comments alone.
 
