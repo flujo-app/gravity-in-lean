@@ -28,8 +28,9 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
    is proved to exist and to be the only one.
 6. **The definitions can fail.** For each notion there is a checked example where it does not
    hold. A definition that can never fail says nothing.
-7. **How it was made.** Teams of ten AI workers wrote the proofs, in six runs of 11 to 29
-   minutes. The statements were fixed before each run in a file the workers could not change.
+7. **How it was made.** Teams of ten AI workers wrote most of the proofs, in six runs of 11
+   to 29 minutes. The groundwork in coordinates, the definitions and the statements were written
+   by single AI chats. The statements were fixed before each run in a file the workers could not change.
    Afterwards everything was rebuilt from nothing and audited.
 
 ## What the paper does not claim
