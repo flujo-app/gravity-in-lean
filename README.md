@@ -72,23 +72,33 @@ which opens in a browser by itself, and one picture. Start with *Slow Clocks, Be
 | **Curved space: only one connection** | A length measure has at most one connection: two of them agree on every field of arrows that can be differentiated. So curvature belongs to the length measure, and "empty" cannot be reached by picking a convenient connection. For tables of functions, empty in the new sense and empty in coordinates are the same thing, in both directions. | [Curved/Unique.lean](GravityInLean/Curved/Unique.lean), `IsConnectionOf.unique`, `connectionUnique`, `ricciAt_eq_of_isConnectionOf`, `IsRegularTableOn.isEmptyOn_iff` |
 | **Paths along a field depend smoothly on where they start** | Follow a smooth field of arrows for a time `t` from a point `x`: where you end up is a smooth function of `t` and `x` together. Lean's standard library has the paths, and that they depend continuously on the start, but not this. Proved by a team of ten workers in the first fleet trial, in 14 minutes; the statement was fixed beforehand and the result was rebuilt and checked on this PC afterwards. The route: the paths are the solutions of one smooth equation on the space of all paths, and the library's theorem on solving smooth equations does the rest. | [Flows/SmoothFlow.lean](GravityInLean/Flows/SmoothFlow.lean), `smoothFlow`; the pieces are in [Flows/](GravityInLean/Flows/), the team's own record in [Flows/STATUS.md](GravityInLean/Flows/STATUS.md) |
 | **Coordinates that fit the turns exist** | Start from any coordinates, and three fields of arrows that combine the way turns do and span two directions at every point. Then around every point there are new coordinates in which the three fields, after one fixed rotation among themselves, are exactly the three standard turns of a globe. This is the step the textbooks take for granted. Proved by a second team of ten workers in 17 minutes, from a route worked out on paper beforehand, which the team improved in one step; rebuilt and checked on this PC afterwards. It turned out to need less than was assumed: neither "the fields leave lengths unchanged" nor "lengths are positive" is used. | [Turns/TurnsCoordinates.lean](GravityInLean/Turns/TurnsCoordinates.lean), `turnsCoordinates`; the pieces are in [Turns/](GravityInLean/Turns/), the team's own record in [Turns/STATUS.md](GravityInLean/Turns/STATUS.md) |
+| **Birkhoff's theorem, with no coordinates given** | Take a curved space of four dimensions with a length measure that has one time direction, is empty, and looks the same from every side. Then around every point where the size of the spheres can serve as a distance, there are a mass and a chart in which the length measure is Schwarzschild's, outside the rim or inside it. Nothing is said in coordinates at the start: no time label, no distance label, no angles. This was the goal fixed before any team started. A third team of ten workers proved it in 21 minutes from the pieces above and a route worked out on paper; it was rebuilt and checked on this PC afterwards. | [Join/Goal.lean](GravityInLean/Join/Goal.lean), `birkhoffNoCoordinates`; the statement is in [Curved/Goal.lean](GravityInLean/Curved/Goal.lean); the pieces are in [Join/](GravityInLean/Join/), the team's own record in [Join/STATUS.md](GravityInLean/Join/STATUS.md) |
 | **Probes** | Two tests of the definitions on curvatures that are known and not zero. A sphere: its curvature comes out equal to its own length measure. De Sitter's space-time, an empty universe with a cosmological constant: its curvature comes out as `3/L²` times its own length measure, with the textbooks' sign, in the time direction too. | [Probe/Sphere.lean](GravityInLean/Probe/Sphere.lean), `ricci_sphere`; [Probe/DeSitter.lean](GravityInLean/Probe/DeSitter.lean), `ricci_deSitter` |
 
-In numbers: 609 theorems in about 13,400 lines.
+In numbers: 777 theorems in about 18,000 lines.
+
+**What others did, and did first.** None of the physics here is new: it is textbook material
+from 1916 to 1923. In Lean, Schwarzschild's solution had been checked before this repository,
+at least twice. Birkhoff's theorem in coordinates, starting from a fixed diagonal shape, was
+proved by `x-oai/ProjectAinos` on 19 November 2026, four days before the version here, and
+`BrandonMYates/grlab` has the static last step (August 2026). `LightLikeProject/lightlike`
+builds charts from the fields of a symmetry for the case of cosmology, and
+`TauCetiProject/TauCeti` proves that a length measure of any signature has a connection. What we
+have not found elsewhere, as far as we looked: Birkhoff's theorem from the symmetry alone, with
+no starting shape, and with no coordinates given. "Not found" is not "first". Details and dates:
+[SURVEY.md](SURVEY.md), [TARGETS.md](TARGETS.md).
 
 ## Stated, not yet proved
 
-The next piece of work is Birkhoff's theorem with no coordinates at all
-([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all"). Its targets are
-written down in exact form, so that nobody proving them can quietly change them. **Neither of
-these two is proved.** (Two more, `SmoothFlowStatement` and `TurnsCoordinatesStatement`, were
-proved on 23 November 2026 by teams of workers: see the table above.) Each is a definition of a
-statement. The build checks that the statements are
-well-formed and rest on nothing extra. It does not check that they are true.
+One target is still written down in exact form and **not proved**. It is a definition of a
+statement. The build checks that the statement is well-formed and rests on nothing extra. It
+does not check that it is true. (Three more, `SmoothFlowStatement`, `TurnsCoordinatesStatement`
+and the goal `BirkhoffNoCoordinates`, were proved on 23 and 24 November 2026 by teams of
+workers: see the table above. Fixing the statements beforehand is what made it safe to hand
+the proofs to a team.)
 
 | Statement | In plain words | File, and the check that it is not about nothing |
 |---|---|---|
-| `BirkhoffNoCoordinates` | A space-time with four dimensions that is empty and looks the same from every side is, around every point where the size of the spheres is a usable distance, Schwarzschild's in a suitable chart. | [Curved/Goal.lean](GravityInLean/Curved/Goal.lean). Schwarzschild's space-time meets every assumption, and the conclusion holds for it: `schwarzschild_meets_goal`, `schwarzschild_meets_conclusion`. |
 | `ConnectionExistsStatement` | A length measure on a curved space has a connection. The standard library has this only when all lengths are positive. (That it has only one is proved: see the table above.) | [Goals/Connection.lean](GravityInLean/Goals/Connection.lean). Holds for every good table: `IsRegularTableOn.isConnectionOf`. |
 
 Two independent readers went through the definitions and these statements before anything was
@@ -116,8 +126,10 @@ of Piece C. Both are now proved. What is left:
    begun: the same notions are now defined on a curved space
    ([Curved/Basic.lean](GravityInLean/Curved/Basic.lean)), and on coordinate space they are proved
    to be exactly the coordinate formulas ([Curved/Tables.lean](GravityInLean/Curved/Tables.lean)).
-   Still missing is the same agreement in every chart of an arbitrary curved space; that is part
-   of the next piece of work. Proved in the meantime: none of the three formulas depends on the
+   That agreement along any chart of any curved space is now proved, as far as the goal needs
+   it: "empty", the fields and their brackets, and the usable distance all carry over
+   ([Join/](GravityInLean/Join/), `isRicciFlatAt_of_isEmptyOn`, `ricciAt_carry`). So the
+   coordinate formulas are tied to the definitions on a curved space. Also proved: none of the three formulas depends on the
    coordinates (`ricci_inNewCoords`, `isFreeFallAt_inNewCoords`,
    `leavesUnchangedAt_inNewCoords`). That is the property the abstract definitions exist to
    guarantee.
@@ -125,29 +137,35 @@ of Piece C. Both are now proved. What is left:
    fields of arrows are shown to be the three turns of ordinary space (`rotX_turns`, `rotY_turns`,
    `rotZ_turns`). What stays on trust is that these are the formulas the textbooks mean. That can
    be read, not proved.
-2. **Coordinates that fit the symmetry.** The starting shape is no longer assumed. It is derived
-   from "looks the same from every side" (`shape_of_round`), and the cross term and the choice of
-   distance label are dealt with by new labels inside the proof (`birkhoff_of_round`). What is
-   still assumed lies one step earlier: that there are coordinates in which turning space moves
-   only the two angles, in the usual way. **The main step of this is now proved**
-   (`turnsCoordinates`): such coordinates exist around every point. It is not yet joined to
-   `shape_of_round`: that theorem asks for its assumptions at all angles, and the new
-   coordinates cover a small patch. Two lemmas are still missing for the join (the shape of a
-   round table on a small patch, and its continuation to all angles). Until they are proved,
-   this item stands ([PLAN.md](PLAN.md), "Next: Birkhoff's theorem with no coordinates at all").
+2. **Coordinates that fit the symmetry: closed.** `birkhoffNoCoordinates` starts from a curved
+   space with no coordinates at all; the coordinates that fit the turns are built inside the
+   proof (`turnsCoordinates`). What it does assume about the symmetry, said plainly: three
+   fields of arrows that leave the length measure unchanged, combine the way turns do, span two
+   directions at every point, and have positive lengths there
+   ([Curved/Basic.lean](GravityInLean/Curved/Basic.lean), `IsRoundOn`). That is "looks the same
+   from every side" in its small-steps form. A group of turns acting on the whole space is not
+   used and not assumed.
 3. **The blind spots.** The two poles and the centre are left out of every statement. The rim of
    the black hole is left out of the statements about new labels, because there the size of the
    spheres cannot serve as a distance; the statements "the mass is the same everywhere" and
    "Eddington's form is empty" do hold across it. The new labels are shown to be coordinates near
    every point, not to be one-to-one over a whole region. The theorems about other coordinates
    are statements at a point, for changes of coordinates that are smooth near it (three times
-   differentiable for curvature, twice for free fall and symmetry). And the two directions of
-   Birkhoff's theorem are proved separately, not as one "exactly when": the new time label it
-   builds is shown to be differentiable once, while "Schwarzschild's in other coordinates is
-   empty" asks for three times.
+   differentiable for curvature, twice for free fall and symmetry). The theorem with no
+   coordinates is a statement around a point: it gives a chart near every point where the size
+   of the spheres is a usable distance, says nothing at the rim itself, and nothing about the
+   whole space-time at once. And the two directions of Birkhoff's theorem are still two
+   theorems, not one "exactly when". What stood in the way is gone (the new time label is now
+   shown smooth of every order, `birkhoff_general_smooth`); joining them is the next job.
 4. **Meaning.** Lean checks that a proof proves its statement. It cannot check that the statement
    says what we mean. That is why the statements are short and each has a plain-language comment:
-   they are meant to be read.
+   they are meant to be read. For the theorem with no coordinates this now rests on one file,
+   [Curved/Basic.lean](GravityInLean/Curved/Basic.lean), and on the goal in
+   [Curved/Goal.lean](GravityInLean/Curved/Goal.lean): they were read by two independent
+   readers and tested on known answers, but not yet by someone who works in gravity. The lemmas
+   the teams wrote in between (about 250) were read by nobody but their authors; that is safe for
+   the final theorems, whose statements were fixed beforehand, and it means the lemmas should
+   not be quoted on their comments alone.
 
 ## Check it yourself
 
@@ -163,7 +181,7 @@ Then, in this folder:
 lake build
 ```
 
-You should see `Build completed successfully` and fourteen lines that end in
+You should see `Build completed successfully` and fifteen lines that end in
 `none rests on more than [propext, Classical.choice, Quot.sound]`. A full rebuild takes about two
 minutes.
 
@@ -183,7 +201,7 @@ Lean accepts a proof with a hole in it and only warns. It also lets anyone add a
 and then "prove" anything from it. So "it builds" is not enough.
 
 [Audit.lean](Audit.lean) closes both doors, and it is part of `lake build`. It asks Lean what each
-of the 1,243 declarations in the project rests on (every definition and theorem, plus the helper
+of the 1,436 declarations in the project rests on (every definition and theorem, plus the helper
 pieces Lean generates for them), and fails the build unless the answer is: nothing but Lean's own
 three standard assumptions, the same three that almost all of the standard library uses.
 
@@ -254,6 +272,9 @@ GravityInLean/Flows/                paths along a field depend smoothly on where
                                     (eleven files; SmoothFlow.lean holds the theorem)
 GravityInLean/Turns/                coordinates that fit the turns exist
                                     (twenty files; TurnsCoordinates.lean holds the theorem)
+GravityInLean/Join/                 Birkhoff's theorem with no coordinates: from a curved space
+                                    to a table in a chart, and back (24 files; Goal.lean holds
+                                    the theorem)
 scripts/queued-build.sh             one build at a time, for several workers on one machine
 scripts/setup-worktree.sh           gives a fresh copy of the repository the ready-built library
 fleet/                              a team of workers: the image, the brief, the scripts that

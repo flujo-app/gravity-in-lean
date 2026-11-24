@@ -120,3 +120,23 @@ The goal is reached; nothing of it is open. Still unproved in the project and no
 `ConnectionExistsStatement` (`Goals/Connection.lean`). `Join/CarryConnection.lean` and
 `Join/FlatToTable.lean` give a connection in every chart of a space modelled on a vector space;
 gluing these over a space with a general model (corners) is the missing part.
+
+## Added by the supervisor, after the run
+
+The text above is the team's own record, left as the lead wrote it. Checked afterwards on the
+supervisor's PC:
+
+- The clock of the run started at 00:08:49 UTC, when all ten agents were ready. The whole
+  project built with the proof at 00:30:08 (the queue's log): 21 minutes 19 seconds.
+- The queue's log has 79 runs until the goal, 10 of them the set-up, 17 failed.
+- Only `GravityInLean/Join/` and 24 import lines in `GravityInLean.lean` differ from the commit
+  the team started from. `GravityInLean/Goals/`, `GravityInLean/Curved/` and `Audit.lean` were
+  not touched.
+- Rebuilt from nothing through the queue: all 1,436 declarations pass the audit.
+- Changed afterwards: the three loosely written steps in `Signature.lean` that the lead names
+  above as "not clean" now state exactly what they produce. No warnings are left.
+- `Audit.lean` now holds `example : Curved.BirkhoffNoCoordinates := birkhoffNoCoordinates`, so
+  the build fails if the theorem ever stops proving the goal as it was fixed.
+- Not checked by anyone but its author: whether each lemma's comment says what its Lean
+  statement says.
+
