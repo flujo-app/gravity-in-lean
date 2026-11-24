@@ -29,11 +29,13 @@ theorem Curved.globalBirkhoffUnique : Curved.GlobalBirkhoffUnique
 theorem Curved.globalBirkhoff : Curved.GlobalBirkhoff
 ```
 
-`GlobalBirkhoff` needs the theorem at every point, `Curved.birkhoffAtEveryPointOneMass`
-(`Goals/EveryPoint.lean`). If it is in the repository when you start, use it. If it is not,
-prove `Curved.BirkhoffAtEveryPointOneMass → Curved.GlobalBirkhoff` under the name
-`Curved.globalBirkhoff_of_everyPoint`, and say so on the board; that is a full result for this
-run.
+`GlobalBirkhoff` is the main target. Its local input is proved: the theorem at every point,
+`Curved.birkhoffAtEveryPointOneMass` (`Rim/Goal.lean`), with the known answers for Kruskal's
+table (`kruskalRadiusSpec`, `kruskalRadiusSmooth`, `kruskalIsSpaceTime`, `kruskalIsEmpty`,
+`kruskalIsRound`, `kruskalMeetsConclusion`, `kruskalHoldsSchwarzschild`, `deSitterNotKruskal`).
+The pieces the sixth team built on the way are in `GravityInLean/Rim/` (its `STATUS.md` explains
+the chain); `OneMass/` has the mass without coordinates (`MassAt`), `Connection/` the connection
+of a length measure, `Checks/` de Sitter's and flat space-time's facts.
 
 ## A route, as a suggestion
 
@@ -72,7 +74,9 @@ start at once and do not depend on each other; part 4 needs part 3, part 5 needs
    assumption.
 5. *`GlobalDeSitterNoMap`.* The first three parts: `isSimplyConnected_shellBox`,
    `deSitter_isSpaceTimeOn`, `round_isRoundOn` (`Checks/DeSitter.lean`). The last two: a map
-   would make de Sitter's table empty (step 4), and it is not (`deSitter_not_isEmptyOn_near`).
+   gives a chart into Kruskal's (step 3), and `deSitterNotKruskal` says there is none; for a
+   map into Schwarzschild's, the same with `Tests.deSitterNotSchwarzschild` (or: a map makes
+   de Sitter's table empty, step 4, and it is not, `deSitter_not_isEmptyOn_near`).
 6. *`GlobalUniqueNeedsOnePiece`.* Two disjoint boxes; `D = kruskalWrap` on both; `D'` the same
    on the first and `kruskalSym 1 R ∘ kruskalWrap` on the second, `R` a turn about the axis by a
    quarter. A single symmetry would have to fix an open piece of the sphere point by point on
@@ -109,7 +113,7 @@ rest.
 
 **Part 5. The theorem (one statement): `GlobalBirkhoff`.**
 
-12. *Maps near every point.* From `birkhoffAtEveryPointOneMass`: around every point of `s`, a
+12. *Maps near every point.* From `birkhoffAtEveryPointOneMass` (proved): around every point of `s`, a
     chart in which `g` is Kruskal's table (or Schwarzschild's, mass zero or negative), the same
     mass everywhere. Compose with `kruskalWrap` (or `sphericalToSpace`): a length-keeping map
     on the chart's domain (chain rule, `kruskalWrap_pullback`, `sphericalToSpace_pullback`).
@@ -130,20 +134,88 @@ file, is the result the next team builds on.
 ## Rules that are not negotiable
 
 1. **Do not change the statements.** `GravityInLean/Goals/`, `GravityInLean/Curved/` and
-   `GravityInLean/Global/Checks.lean` are not to be edited, by anyone. If you come to think
-   that a statement is false or cannot be proved as written, say so on the board with your
-   argument, and stop work on that statement. Do not prove a weaker statement instead. A report
-   "this is false, here is why" is a good result.
+   `GravityInLean/Global/Checks.lean` are not to be edited, by anyone. If you come to think that
+   a statement is false or cannot be proved as written, say so on the board with your argument,
+   and stop work on that statement. Do not prove a weaker statement instead. A report "this is
+   false, here is why" is a good result.
 2. **Do not change existing files** outside your own new ones. New files go in
    `GravityInLean/Global/`. Only the lead adds them to `GravityInLean.lean`, and only when they
    are finished.
-3. **The build is the judge.** A file is finished when it builds without a hole (`sorry`), with
-   no new assumption (`axiom`), and with no warnings. Build only through
-   `scripts/queued-build.sh` (one Lean build at a time on this machine).
-4. **Files in the project's form:** `module`, then `public import` of only what is needed (never
-   `import Mathlib`), `@[expose] public section`, a short comment in plain words at the top.
-5. **Hand out work early.** The lead wakes every two minutes, a worker only when a message
-   arrives: the lead gives every worker a piece in the first minutes, and gives the next piece
-   as soon as one is finished.
-6. **Write down what you learned** in `GravityInLean/Global/STATUS.md`: what is proved, what is
-   not, what failed and why.
+3. **The build is the judge.** A file is finished when it builds without a hole (`sorry`),
+   without a new assumption (`axiom`) and without warnings. The goal is reached when the whole
+   project builds with all of it: `scripts/queued-build.sh` ends with `Build completed
+   successfully`. That build includes `Audit.lean`, which fails on any hole and on any new
+   assumption. Do not weaken `Audit.lean`.
+4. **One Lean run at a time, for the whole team.** Never call `lake` or `lean` directly. Always
+   go through the queue, which waits for the others' runs to finish:
+   - one file: `scripts/queued-build.sh lake build GravityInLean.Global.YourFile`
+   - a quick try of a scratch file: `scripts/queued-build.sh lake env lean path/to/Scratch.lean`
+   - the whole project: `scripts/queued-build.sh`
+   Think before you run, and try several ideas in one scratch file rather than one idea per
+   run. Never build the standard library from source: if a run starts compiling files under
+   `Mathlib/`, stop it and report.
+5. **Set up your copy once,** before anything else: `scripts/setup-worktree.sh`. It links the
+   ready-built standard library into your copy and gives it the project's build, so that only
+   your new files have to be built. It can take four minutes the first time.
+6. **One file, one worker.** Two of you never edit the same file.
+7. **The form of a file.** As in `GravityInLean/Global/Checks.lean`: the copyright lines, then
+   `module`, then `public import` lines naming only the parts of the library that the file needs
+   (never all of `Mathlib`), then `import Mathlib.Tactic`, a comment that says in plain words
+   what the file is for, then `@[expose] public section`. Every theorem gets a short comment in
+   plain language that says what it means. No `simp at h` followed by a step that depends on the
+   exact result: say what the step produces.
+8. **Nothing leaves the container:** do not push to GitHub, do not open pull requests or
+   issues. Reading the standard library's files in your copy is the way to look things up.
+9. **The repository is public.** Write nothing into files or commit messages that names a
+   person, a machine or a folder outside the repository.
+
+## How turns work here
+
+A worker gets a new turn only when a message arrives in its inbox. Writing on the board alone
+wakes nobody. The lead gets a new turn every two minutes by itself.
+
+- **Workers, on your first turn:** run `scripts/setup-worktree.sh`, check your inbox, and if the
+  lead has sent you nothing yet, end your turn. Do not start reading or proving on your own.
+- **Lead:** nine workers waiting is the costliest thing here. In your first minutes give every
+  worker a piece: parts 1, 2 and 3 are ready to hand out as they stand. Give out every job by a
+  message to one named worker. The message says which board item it is, which file, and the
+  exact statement or the names of the statements. Keep the pieces small: what one worker can
+  prove in ten to twenty minutes. A worker who finishes gets the next piece at once.
+- **Workers, at the end of a job:** send the lead a message (what is done, the branch, what is
+  left), and end your turn. If you are stuck for more than about fifteen minutes on one step,
+  say so to the lead with the exact goal Lean shows, and end your turn: a smaller lemma, or a
+  second pair of eyes, is cheaper than an hour alone.
+
+## How to work as a team
+
+- **The lead** splits the parts into lemmas and writes each lemma's exact statement into its own
+  file, with the proof left open (`sorry`), commits these files on the branch `global` and makes
+  one board item per piece, claimed as `task:global-<item>`. Before giving a statement out, the
+  lead checks that it compiles with the proof left open, and, as soon as possible, that the
+  lemmas together give the goal. Statements that later lemmas depend on are fixed by the lead and
+  not changed by workers. If a worker finds a lemma's statement wrong or too hard, the worker
+  says so to the lead, and the lead decides.
+- **A worker** claims the item it was given (`task:global-<item>`), starts a branch
+  `global-<item>` from the branch `global`, proves it in that item's file, builds the file
+  through the queue, commits, and reports to the lead.
+- **Git.** Commit often, at least after every step that builds: the run can be stopped at any
+  time, and only what is committed is collected. Before your first commit run
+  `git config user.name flujo-app` in your copy. No lines that credit an AI or a tool in commits.
+- **The lead merges** finished branches into `global` and keeps a short file
+  `GravityInLean/Global/STATUS.md` on that branch, updated at least every twenty minutes: for
+  each of the seven targets whether it is proved, open, or reported false (with the reason); the
+  route chosen; and for each piece who has it, when it was given out, when it built, or why it
+  is stuck. If the run is stopped before the goals are reached, this file is what the next team
+  starts from.
+- **When all is done that can be done,** the lead makes sure that the branch `global` builds as
+  a whole through the queue, with every proved theorem imported by `GravityInLean.lean`, says so
+  on the board with the claim `task:global-goal-reached` (naming what is proved, what is open and
+  what is reported false), and then stops: no further turns are needed.
+
+## What the supervisor measures
+
+This run is measured: how much such a team gets done per hour, and at what cost. It will be
+stopped after a set time, possibly before the goals are reached. Honest numbers matter more than
+good ones: a step of the route that turned out false is a result, and so is an item that was too
+hard. If the run ends before `GlobalBirkhoff` is proved, what counts is how far the chain of
+parts 3 and 5 is proved and checked, link by link.
