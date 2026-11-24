@@ -124,9 +124,9 @@ theorem wrapTwoWays_isKruskalMapOn (m : ℝ) :
     (((kruskalWrap_boxFar m).sym (L := 1) (R := quarterTurn) (by simp)
       quarterTurn_orthogonal).congr fun q hq ↦ ?_)
   · have h3 : q 3 < 1 := hq.2
-    exact if_pos (by linarith)
+    exact ite_eq_left (by linarith)
   · have h3 : 3 < q 3 := hq.2
-    exact if_neg (by linarith)
+    exact ite_eq_right (by linarith)
 
 /-- The point with the angle `0` around the axis, where the two rims cross, is in the first
 box. -/
@@ -153,7 +153,7 @@ theorem wrapTwoWays_near : wrapTwoWays ![0, 0, π / 2, 0] 2 = 1 := by
   have h : (![0, 0, π / 2, 0] : Coords 4) 3 < 2 := by
     simp only [Matrix.cons_val]
     norm_num
-  rw [wrapTwoWays, if_pos h]
+  rw [wrapTwoWays, ite_eq_left h]
   simp [kruskalWrap]
 
 /-- At the point of the second box, the second map gives a point of the sphere whose first
@@ -162,7 +162,7 @@ theorem wrapTwoWays_far : wrapTwoWays ![0, 0, π / 2, 2 * π] 2 = 0 := by
   have h : ¬ (![0, 0, π / 2, 2 * π] : Coords 4) 3 < 2 := by
     simp only [Matrix.cons_val]
     exact not_lt.mpr (by linarith [two_le_pi])
-  rw [wrapTwoWays, if_neg h]
+  rw [wrapTwoWays, ite_eq_right h]
   simp [kruskalSym, kruskalWrap, quarterTurn]
 
 /-- **The region must be in one piece: uniqueness fails on a region in two pieces.** For every
