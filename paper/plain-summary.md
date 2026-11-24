@@ -69,12 +69,13 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
    it was thrown away unmerged.
 6. "The cost figures are upper bounds." *Why:* other work used the same allowance at the same
    time.
-7. "I did not write the proofs." The paper says so in its section on the use of AI. What you
-   did do (chose the goal, set the rules, read and stand behind the claims) is for you to
-   write there in your own words.
+7. "I did not write the proofs." The paper says so in its section on the use of AI, together
+   with what you did do (chose the goal, set the rules, read the paper) and that you did not
+   check the mathematics yourself.
 
 ## Read first
 
 1. Section 8 of the draft, "What is and is not established". It is the honest core.
-2. Section 10, "Use of AI". It has a gap that only you can fill.
+2. Section 10, "Use of AI". Your part is filled in from your own words; change anything that
+   is not how you would put it.
 3. The abstract, last. If you can defend every sentence of it after the first two, it is yours.
