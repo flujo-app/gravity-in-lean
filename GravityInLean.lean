@@ -34,7 +34,11 @@ import GravityInLean.Goals.Tests
 import GravityInLean.Goals.OneMass
 import GravityInLean.Goals.EveryPoint
 import GravityInLean.Goals.Global
+import GravityInLean.Goals.GlobalComplete
 import GravityInLean.Global.Checks
+import GravityInLean.Global.FreeFallChecks
+import GravityInLean.Global.FreeFallChart
+import GravityInLean.Global.FoldChecks
 import GravityInLean.Global.KSOutside
 import GravityInLean.Global.KSInside
 import GravityInLean.Global.TwoPieces

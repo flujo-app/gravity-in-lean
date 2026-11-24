@@ -577,9 +577,22 @@ one head, read twice, and tested on known answers before any worker starts.
     reader judged every statement true as written; its findings were worked in before the
     statements were fixed. Checks proved in `Global/Checks.lean`. Brief in
     `fleet/goal-global.md`; item 9 is its local input. The classification (Kruskal's or one of
-    its four quotients by a reflection, under a completeness condition) is **not stated**: it
-    needs paths of free fall on a curved space, which neither this project nor the standard
-    library has yet. The checks of issue 34 before any public claim.
+    its four quotients by a reflection, under a completeness condition) was not stated then: it
+    needed paths of free fall on a curved space. The checks of issue 34 before any public claim.
+11. **Which whole space-times are round and empty (G2)**, in a chat of its own. **Stated, not
+    proved** (24 November 2026): `Goals/GlobalComplete.lean`, with paths of free fall on a
+    curved space (said through charts with the coordinate equation of `Curvature.lean`),
+    "cannot be continued", the completeness condition (the spheres shrink to nothing at every
+    end where a path stops), orientation, and Kruskal's whole space-time with its four foldings
+    said as a map onto the space whose points meet in pairs. Checks proved in
+    `Global/FreeFallChecks.lean`. Read by a second reader before being fixed. No team run: the
+    weekly Fable allowance stood at 94%. Open for a later run, hardest first:
+    `GlobalCompleteConverse` (the paths of free fall of Kruskal's space-time),
+    `KruskalWholeExists` and `KruskalFoldsExist` (Kruskal's whole space-time as a curved space),
+    the steps of the route (`SizeSqIsRadius`, `FreeFallMaximal`, `FreeFallUnique`,
+    `KruskalOntoSym`, `FoldsUpToSymmetry`), then `GlobalComplete` itself and its corollary, and
+    the failure tests. Proved in the same chat, with no team: `FreeFallAnyChart` (free fall does
+    not depend on the chart), `TurnFixesPoint` and `SphereFreeInvolution`.
 
 ## After Birkhoff: what could make a paper
 
