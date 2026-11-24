@@ -26,10 +26,13 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
    and empty.
 5. **No hidden assumption in "empty".** The tool that measures curvature (the connection)
    is proved to exist and to be the only one.
-6. **The definitions can fail.** For each notion there is a checked example where it does not
+6. **The whole space-time.** On a region with no holes a loop could wind round, the pieces fit
+   together into one map onto Kruskal's black hole (or flat space-time, or negative-mass
+   Schwarzschild), unique up to a symmetry. A full list of all possible shapes is not claimed.
+7. **The definitions can fail.** For each notion there is a checked example where it does not
    hold. A definition that can never fail says nothing.
-7. **How it was made.** Teams of ten AI workers wrote most of the proofs, in six runs of 11
-   to 29 minutes. The groundwork in coordinates, the definitions and the statements were written
+8. **How it was made.** Teams of ten AI workers wrote most of the proofs, in seven runs of 11
+   to 46 minutes. The groundwork in coordinates, the definitions and the statements were written
    by single AI chats. The statements were fixed before each run in a file the workers could not change.
    Afterwards everything was rebuilt from nothing and audited.
 
@@ -42,8 +45,8 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
 - **Not that the definitions are right beyond doubt.** A proof checker checks the proof, not
   whether the statement says what we mean. AI reviewers compared the definitions with the
   textbooks and found none wrong. No person who works in gravity has read them yet.
-- **Nothing about the whole space-time at once** (unless the global theorem is finished before
-  submission).
+- **Not a full list of every possible shape.** The whole-space-time theorem maps every space-time
+  without loop-holes into a model; which folded or extended versions occur is not claimed.
 - **Not the most general case.** No electric charge, no cosmological constant, and the
   space-time is assumed perfectly smooth.
 
@@ -52,7 +55,9 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
 1. "Every final theorem has exactly the statement that was fixed before it was proved." *Why it
    holds:* each build checks this (`Audit.lean`), and the public build on GitHub shows it.
 2. "The proofs rest on nothing but Lean's three standard assumptions." *Why:* the same audit,
-   for all 2,004 declarations.
+   for all 2,605 declarations. *And:* six separate checking programs that ship with Lean
+   accept the main theorems (Section 9). *Weak point:* that run was not inside Lake's
+   protective sandbox, which needs Linux; this PC runs Windows.
 3. "To our knowledge no earlier machine-checked Birkhoff theorem starts without coordinates or
    covers the rim." *Why:* searches on the dates given in `SURVEY.md`. *Weak point:* this field
    moves by the day. Search again on the day of submission.

@@ -12,18 +12,22 @@ start from coordinates: a smooth Lorentzian metric on a 4-manifold that is Ricci
 carries three Killing fields with the brackets of so(3), two-dimensional spacelike orbits, is
 locally Schwarzschild. The formal statement holds at every point of the region, including the
 horizon and the bifurcation sphere, where the target is the Kruskal–Szekeres form; it gives one
-mass on each connected region; and it comes with its converse, as one "if and only if". The
+mass on each connected region; and it comes with its converse, as one "if and only if". For a simply connected region the
+local charts are glued into one length-keeping map into the Kruskal–Szekeres space-time (or
+into Minkowski or negative-mass Schwarzschild space-time), unique up to a symmetry. The
 Levi-Civita connection of a metric of arbitrary signature is shown to exist and to be unique,
 so "Ricci-flat" carries no hidden assumption. The definitions were reviewed against the
 textbooks and are pinned by 25 tests in which a definition must fail. The development has
-1,151 theorems and was produced in about 26 hours from the repository's first commit (23
-November 2026, 01:08 UTC, to 24 November, 03:03 UTC). Most of the proofs were written by teams of
-ten AI workers in six runs of 11 to 29 minutes each; the groundwork in coordinates, the
+about 1,550 theorems (2,605 declarations in the axiom audit, about 39,400 lines of Lean) and
+was produced in about 27 hours from the repository's first commit (23 November 2026, 01:08 UTC,
+to 24 November, 04:13 UTC). Most of the proofs were written by teams of ten AI workers in seven
+runs of 11 to 46 minutes each; the groundwork in coordinates, the
 definitions and the statements were written by single AI sessions. The statements were fixed in advance, read by an
 independent second reader, and checked afterwards by a rebuild from scratch and an audit of
 axioms. We report what this cost, where the time went, and what is not checked. To our
 knowledge no earlier machine-checked Birkhoff theorem starts from symmetry assumptions without
-coordinates; the mathematics itself is classical.
+coordinates; the mathematics itself is classical, except that we found no complete written
+proof for the bifurcation sphere or for the global statement.
 
 ## 1. Introduction
 
@@ -51,7 +55,12 @@ fields. What is machine-checked:
    `birkhoffExactlyWhenInCoordinates`).
 5. **Existence and uniqueness of the Levi-Civita connection** for a non-degenerate metric of any
    signature on a manifold (`connectionExists`, `connectionUnique`).
-6. **Two results the above needed that mathlib v4.36.0 does not have:** smooth dependence of a
+6. **The whole space-time** (`globalBirkhoff`, `globalBirkhoffUnique`,
+   `globalBirkhoffConverse`, `globalMassUnique`): on a simply connected open region, one
+   length-keeping map into Kruskal–Szekeres space-time for a positive mass, or into
+   Schwarzschild space-time (Minkowski for mass zero) for a mass that is zero or negative;
+   unique up to a symmetry of the model when the region is in one piece; and the converse.
+7. **Two results the above needed that mathlib v4.36.0 does not have:** smooth dependence of a
    flow on time and initial point jointly (`smoothFlow`), and adapted coordinates for three
    vector fields with so(3) brackets and two-dimensional orbits (`turnsCoordinates`).
 
@@ -197,6 +206,35 @@ which g is (32m³/r)e^{−r/2m}(−dT² + dX²) + r²dΩ², with r defined by
 (r/2m − 1)e^{r/2m} = X² − T². The radius is defined in Lean as an infimum and proved to be the
 unique positive root and smooth (`kruskalRadiusSpec`, `kruskalRadiusSmooth`).
 
+The global statement glues the local charts on a simply connected region:
+
+```lean
+def GlobalBirkhoff : Prop :=
+  ∀ (M : Type) [TopologicalSpace M] [ChartedSpace (Coords 4) M]
+    [IsManifold 𝓘(ℝ, Coords 4) ∞ M]
+    (g : LengthMeasure 𝓘(ℝ, Coords 4) M) (ξ : Fin 3 → Arrows 𝓘(ℝ, Coords 4) M) (s : Set M),
+    IsOpen s → IsSimplyConnected s → IsSpaceTimeOn g s → IsEmptyOn g s → IsRoundOn g ξ s →
+    (∃ m : ℝ, 0 < m ∧ ∃ D : M → Coords 5, IsKruskalMapOn m g D s) ∨
+      (∃ m : ℝ, m ≤ 0 ∧ ∃ D : M → Coords 4, IsSchwarzschildMapOn m g D s)
+```
+
+Here Kruskal–Szekeres space-time is written with the sphere as the unit sphere in ℝ³, so that
+no pole is left out: points (T, X, y) with X² − T² > −1 and |y| = 1, and the metric
+A(r)(−dT² + dX²) + r²(dy₁² + dy₂² + dy₃²). The map D is not required to be one-to-one: it keeps
+lengths, and that is all. Companion statements say that D is unique up to a symmetry of the
+model on a region in one piece (`GlobalBirkhoffUnique`), that the converse holds
+(`GlobalBirkhoffConverse`), and that the mass is fixed by the space-time (`GlobalMassUnique`).
+Three checks show the statements are not empty or too easy: Schwarzschild's exterior and
+interior map into Kruskal's by the textbook formulas (`KruskalMapOfSchwarzschild`), de Sitter
+space has no such map (`GlobalDeSitterNoMap`), and uniqueness fails on a region in two pieces
+(`GlobalUniqueNeedsOnePiece`).
+
+What we did not state: a classification of all maximal or inextendible such space-times. The
+second target of that kind (Kruskal–Szekeres or one of its four Z₂ quotients, under a
+completeness condition) needs geodesics on a manifold, which neither the project nor mathlib
+has; and its first form is false as written: two copies of Kruskal–Szekeres glued along one
+exterior region meet the conditions but are on neither list.
+
 The other statements, with their proofs' names:
 
 | Statement | Content | Proof |
@@ -260,6 +298,16 @@ Kruskal null coordinates. The same argument covers points off the horizon, so fo
 no case distinction on the gradient is needed. For m ≤ 0 the gradient is never null and the
 first theorem applies (24 files, about 4,700 lines).
 
+**The whole space-time.** The local theorem at every point gives charts into the model. Two
+such charts differ, on their overlap, by a map of coordinate space that carries the model's
+table to itself. The team did not use the ordinary differential equation of the route on paper.
+Instead such a map keeps the curvature scalar (−48m²/r⁶ in the project's signs), hence the
+radius; it keeps the second derivative of the radius, hence the split into the (T, X) plane and
+the sphere; on the plane it keeps a constant quadratic form, hence it is affine; on the sphere
+it is a rotation or a reflection. So two charts differ by a symmetry of the model, a region in
+one piece has one symmetry, and on a simply connected region the local maps are glued by
+continuation (40 files, about 9,400 lines).
+
 ## 6. How the definitions were checked
 
 Lean checks that a proof proves its statement, not that the statement means what is intended.
@@ -321,15 +369,17 @@ proof".
 | 4 | both directions (6 statements) | 14 | 2,000 | 83 | 11 | 46 (10) |
 | 5 | 25 failure tests, one mass, the connection | 29 | 3,800 | 134 | 14 | 80 (10) |
 | 6 | every point, horizon included (11 statements) | 24 | 4,700 | 155 | 29 | 72 (13) |
+| 7 | the whole space-time (7 statements) | 40 | 9,400 | 350 | 46 | 132 (19) |
 
-Together: about 18,000 lines of checked proof in 106 minutes of team time. The cost was
+Together: about 27,400 lines of checked proof in 152 minutes of team time. The cost was
 measured as the change of the subscription's weekly usage meter over each run; these are upper
 bounds, because other sessions ran at the same time: between 2 and 11 percentage points per
-run (details in `PLAN.md`).
+run for runs 1 to 6 (details in `PLAN.md`), and 22 points of the weekly Fable meter for run 7
+(72% to 94%, with three sessions active).
 
-**What these numbers show, and what they do not.** All 47 statements fixed before the runs
-were proved without a change to any of them, and no person wrote or repaired a proof. Of 349
-Lean runs, 60 failed and were repaired by the teams. There is no comparison point: the same job
+**What these numbers show, and what they do not.** All 54 statements fixed before the runs
+were proved without a change to any of them, and no person wrote or repaired a proof. Of 481
+Lean runs, 79 failed and were repaired by the teams. There is no comparison point: the same job
 was not run by one agent instead of ten, nor without the route in the brief, nor by a person.
 Lines and theorems depend on style and are given for scale only.
 
@@ -382,26 +432,58 @@ that is part of every build; the whole development compiles from scratch on a cl
   isometric action of SO(3) with two-dimensional spacelike orbits. Such an action yields three
   fields as in `IsRoundOn`, so the theorem here is at least as strong; but that step is an
   argument on paper and is not proved in Lean.
-- A global statement. [If the global theorem of issue 39, second step, is proved before
-  submission, it becomes a section here; otherwise it is future work.]
+- A classification of all maximal or inextendible spherically symmetric vacuum space-times.
+  The global theorem proved here maps every simply connected one into a model space-time; which
+  quotients and extensions occur is not stated (Section 4).
 - The independent checks 3 and 4 of Section 9.
 
 ## 9. Reproducibility
 
 - Repository: `github.com/flujo-app/gravity-in-lean`, public since 24 November 2026. The
-  numbers in this draft refer to commit `3f4e818` (pull request 49). [Before submission: a
-  tagged commit replaces it, and every number is taken again from that commit.]
+  numbers in this draft refer to commit `3b816ea` (pull request 55), tagged `paper-1-numbers`.
 - Lean 4.36.0, mathlib v4.36.0 (pinned). To check: `lake exe cache get`, then `lake build`.
   A full rebuild of the project (not of mathlib) takes 2 to 6 minutes on the PC described.
-- The build ends with lines of the form "all 2004 declarations under GravityInLean checked:
+- The build ends with lines of the form "all 2605 declarations under GravityInLean checked:
   none rests on more than [propext, Classical.choice, Quot.sound]" (`Audit.lean`).
 - CI: the workflow "Check the proofs" runs the same build on a clean machine on every push.
 - The briefs given to the teams, the scripts that ran them, and each team's own record
   (`STATUS.md` in `Flows/`, `Turns/`, `Join/`, `BothWays/`, `Checks/`, `Rim/`) are in the
   repository.
-- Of the four checks proposed for AI-written formal proofs (the statement matches the paper;
-  it builds; an external kernel re-check such as `lean4checker`; an independent checker), the
-  first two are done. **The last two are open.**
+- The Xena blog (12 November 2026) asks four questions of a Lean proof written by AI: does the
+  Lean statement match the informal statement; does the code compile; does it prove the theorem
+  as stated; does it exploit a bug in Lean's kernel. What was done for each, at commit `3b816ea`
+  with the tools that ship with Lean 4.36.0:
+  1. *The statement.* Each Lean excerpt in this paper was compared with the source by a script.
+     Whether the definitions say what the textbooks mean was checked by three AI reviewers
+     (Section 6), not yet by a person who works in gravity.
+  2. *It compiles*, on a clean machine (CI) and from scratch on the PC described.
+  3. *It proves the theorem as stated.* Each final statement is a definition (in
+     `GravityInLean/Goals/` and `Curved/Goal.lean`), and `Audit.lean` holds
+     `example : Statement := theorem` for each, checked by every build together with the axioms
+     of all 2,605 declarations. Lean's own tool for this question, `lake comparator`, has not
+     been run.
+  4. *Lean's kernel.* Two re-checks outside the build:
+     - `leanchecker` (Lean's built-in successor of `lean4checker`) re-checked the project's
+       200 modules (`Audit` included) one by one against their imports, in 101 minutes: 199
+       passed. On one, `GravityInLean.OneMass` (145 lines from the first step: Schwarzschild's
+       functions make the three curvature formulas vanish), the checker crashed twice, after
+       about three minutes and 15 GB of memory, without giving a verdict. The declarations of
+       that file passed every checker below, Lean's own kernel included.
+     - `lake check --paranoid` runs an export through Lean's kernel and the five other
+       checkers bundled with the toolchain: `leanchecker-paranoid`, `lean4lean`, `nanoda`,
+       `con-leche` and `con-ron`. We exported with `leanexport` (lean4export 3.1.0) (a) the
+       sixteen headline theorems and everything they depend on, mathlib included (546 MB,
+       58,081 declarations), and (b) the twelve declarations of `GravityInLean.OneMass` with
+       everything they depend on (81 MB, 18,166 declarations). All six accepted both exports,
+       in about eight minutes and one minute, and both rest only on `propext`,
+       `Classical.choice` and `Quot.sound`. `nanoda` 0.4.17 was also run on its own over both
+       exports, with any other axiom counted as an error: no errors.
+     - *Not shown.* Lake's sandbox (`bwrap`) runs only on Linux; this PC runs Windows. So the
+       exports were made, and the checkers run, outside a sandbox, with
+       `--inadvisably-no-sandbox`, a run Lake itself labels "not trustworthy": code that
+       misbehaved while being built or exported could in principle have changed what was
+       checked. A run inside the sandbox on Linux, over the whole project rather than the
+       headline theorems, is still to do.
 
 ## 10. Use of AI
 
@@ -433,4 +515,6 @@ behind the claims]. No Lean proof in the repository was written or edited by han
 - K. Schleich and D. M. Witt, "What does Birkhoff's theorem really tell us?", arXiv:0910.5194.
 - The mathlib Community, "The Lean mathematical library", CPP 2020.
 - L. de Moura and S. Ullrich, "The Lean 4 theorem prover and programming language", CADE 2021.
+- Xena Project blog, "…and the proof is checked in Lean", 12 November 2026,
+  xenaproject.wordpress.com.
 - Repositories named in Section 2, with the dates on which they were read: see `SURVEY.md`.

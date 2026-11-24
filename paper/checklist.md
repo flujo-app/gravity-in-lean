@@ -21,16 +21,28 @@ down where others can see it.
 - [ ] In reader-facing text say "horizon" and "inside the horizon", not "rim": an outside reader
       took "including the region inside the rim" to mean the horizon itself.
 
-## The four checks for AI-written formal proofs
+## The four questions for AI-written formal proofs
 
-- [x] **The statement matches the paper.** `Audit.lean` holds `example : Statement := theorem`
-      for every statement quoted; the Lean excerpts in the draft are copied from the files.
-      Re-check the excerpts against the commit named in Section 9 before submitting.
-- [x] **It builds** from scratch, on this PC and on GitHub's clean machine (workflow "Check the
-      proofs").
-- [ ] **An external re-check of the compiled proofs** with a kernel re-checker such as
-      `lean4checker`. Not done. Needs a build slot; report the result in Section 9.
-- [ ] **An independent checker** (a second implementation of Lean's kernel). Not done.
+From the Xena blog, 12 November 2026; the answers are in Section 9.
+
+- [x] **The statement matches the paper.** The Lean excerpts in the draft are copied from the
+      files. Re-check the excerpts against the commit named in Section 9 before submitting.
+- [x] **It compiles** from scratch, on this PC and on GitHub's clean machine (workflow "Check
+      the proofs").
+- [x] **It proves the theorem as stated:** `Audit.lean` holds `example : Statement := theorem`
+      for every final statement, checked by every build.
+- [ ] **Lean's own `lake comparator`** on the same question, with the statements (in `Goals/`
+      and `Curved/Goal.lean`) as the challenge. Not run.
+- [x] **A kernel re-check outside the build:** `leanchecker` over all 200 modules at tag
+      `paper-1-numbers`: 199 passed; the checker itself crashed twice on
+      `GravityInLean.OneMass`, whose declarations then passed the six checkers below.
+- [x] **Independent checkers:** `lake check --from-export --paranoid` (Lean's kernel,
+      `leanchecker-paranoid`, `lean4lean`, `nanoda`, `con-leche`, `con-ron`) on an export of
+      the sixteen headline theorems and one of `GravityInLean.OneMass`: all six accept both,
+      with only the three standard axioms.
+- [ ] **The same inside Lake's sandbox, on Linux,** over the whole project: `lake check
+      --paranoid` without `--inadvisably-no-sandbox`. This PC runs Windows, where the sandbox
+      (`bwrap`) does not exist, so the run above is one Lake labels "not trustworthy".
 - [ ] **Axioms printout** for the main theorems in the paper's appendix or repository
       (`#print axioms`). The audit already checks this for every declaration; a printed list for
       the named theorems is still to be added.
@@ -89,10 +101,11 @@ Rules read at the source on 24 November 2026:
 
 ## The content
 
-- [ ] Decide whether the global theorem (issue 39, second step) is in the paper. If it is
-      proved in time, it becomes a section; if not, it stays as future work in Section 8.
-- [ ] Freeze a commit and tag it, after the team run on the global theorem has ended and been
-      checked; use that commit in Section 9 and re-take every number from it (theorems,
-      declarations, lines).
+- [x] The global theorem (issue 39, second step) is in the paper: proved and merged (PR #55);
+      Sections 1, 4, 5, 7 and 8 describe it.
+- [x] Freeze a commit and tag it: tag `paper-1-numbers` on commit `3b816ea` (PR #55). Section 9
+      and the numbers in the abstract and Section 7 are taken from it (theorems counted as
+      lines that start a theorem or lemma: about 1,550; 2,605 declarations audited; about 39,400
+      lines of Lean in `GravityInLean/`).
 - [ ] Have someone who did not write the draft read it for sentences that claim more than the
       measurements show.
