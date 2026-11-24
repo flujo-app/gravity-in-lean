@@ -5,7 +5,7 @@ Authors: flujo-app
 -/
 module
 
-public import GravityInLean.Global.SchwKept
+public import GravityInLean.Global.SchwLocal
 public import GravityInLean.Global.SchwChart
 public import GravityInLean.Global.ChartChange
 public import GravityInLean.Global.UniqueKruskal
@@ -19,10 +19,9 @@ import Mathlib.Tactic
 The second part of `GlobalBirkhoffUnique` (`Goals/Global.lean`): `unique_schw`. The twin of
 `Global/UniqueKruskal.lean`.
 
-The local input is the statement that a map of coordinate space that keeps Schwarzschild's table
-of negative mass is, in ordinary space labels, a symmetry `schwSym ε c R` near every point
-(`KeepsSchwOn.local_stmt` here; it is proved in its own file, and this copy of the statement
-is to be replaced by that theorem).
+The local input is `KeepsSchwOn.local` (`Global/SchwLocal.lean`): a map of coordinate space that
+keeps Schwarzschild's table of negative mass is, in ordinary space labels, a symmetry
+`schwSym ε c R` near every point.
 
 * `schwSym_comp`, `schwSym_one`: the symmetries one after another.
 * `schwSym_eq_of_eventuallyEq`: two symmetries that agree on an open set of ordinary space and
@@ -87,17 +86,6 @@ theorem schwSym_eq_of_eventuallyEq {ε c ε' c' : ℝ} {R R' : Matrix (Fin 3) (F
   rw [hε] at h0
   exact ⟨hε, add_left_cancel h0, hR⟩
 
-/-! ## The local statement -/
-
-/-- **A map of coordinate space that keeps Schwarzschild's table of negative mass is a symmetry
-of Schwarzschild's whole space-time, near every point:** in ordinary space labels it is
-`schwSym ε c R`. (The statement only; its proof is in its own file.) -/
-theorem KeepsSchwOn.local_stmt {m : ℝ} {f : Coords 4 → Coords 4} {W : Set (Coords 4)}
-    {x₀ : Coords 4} (hm : m < 0) (h : KeepsSchwOn m f W) (hx₀ : x₀ ∈ W) :
-    ∃ (ε c : ℝ) (R : Matrix (Fin 3) (Fin 3) ℝ), (ε = 1 ∨ ε = -1) ∧ R.transpose * R = 1 ∧
-      ∀ᶠ x in 𝓝 x₀, sphericalToSpace (f x) = schwSym ε c R (sphericalToSpace x) := by
-  sorry
-
 /-! ## Two length-keeping maps -/
 
 variable {M : Type} [TopologicalSpace M] [ChartedSpace (Coords 4) M]
@@ -127,7 +115,7 @@ theorem IsSchwarzschildMapOn.local_unique {D D' : M → Coords 4} (hm : m < 0)
     refine ⟨φ.map_source hqφ, ?_⟩
     rw [mem_preimage, φ.left_inv hqφ]
     exact hqφ'
-  obtain ⟨ε, c, R₀, hε, hR₀, hloc⟩ := hK.local_stmt hm hqW
+  obtain ⟨ε, c, R₀, hε, hR₀, hloc⟩ := hK.local hm hqW
   have hpull : ∀ᶠ q' in 𝓝 q, sphericalToSpace (φ' (φ.symm (φ q')))
       = schwSym ε c R₀ (sphericalToSpace (φ q')) := (φ.continuousAt hqφ).eventually hloc
   have hR₁' : R₁.transpose.transpose * R₁.transpose = 1 := by
