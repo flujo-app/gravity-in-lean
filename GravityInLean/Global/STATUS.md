@@ -4,20 +4,21 @@ Goals: the seven statements of `Goals/Global.lean`. Times are UTC on 24 November
 `m0-a0`, started at about 03:05. Working branch: `global`; each item has a branch
 `global-<item>` (board claim `task:global-<item>`).
 
-## The seven targets (03:33)
+## The seven targets (03:42)
 
 | target | state | file |
 |---|---|---|
-| `kruskalMapOfSchwarzschild` | proved, merged | `Global/DeSitterNoMap.lean` (halves: `KSOutside.lean`, `KSInside.lean`) |
-| `globalDeSitterNoMap` | proved, merged | `Global/DeSitterNoMap.lean` |
-| `globalUniqueNeedsOnePiece` | proved, merged | `Global/TwoPieces.lean` |
-| `globalBirkhoffConverse` | open: "empty" half proved (`ConverseEmpty.lean`); "round" half given out | `ConverseRoundKruskal.lean`, `ConverseRoundSchw.lean` |
-| `globalBirkhoffUnique` | open: chain stated, links given out (see below) | `UniqueFlat.lean`, `UniqueKruskal.lean`, ... |
-| `globalMassUnique` | open: needs the curvature scalar links of the chain below | not started |
-| `globalBirkhoff` | open: abstract gluing theorem given out (`Develop.lean`) | not started |
+| `kruskalMapOfSchwarzschild` | proved; in the whole-project build (03:36) | `Global/DeSitterNoMap.lean` (halves: `KSOutside.lean`, `KSInside.lean`) |
+| `globalDeSitterNoMap` | proved; in the whole-project build (03:36) | `Global/DeSitterNoMap.lean` |
+| `globalUniqueNeedsOnePiece` | proved; in the whole-project build (03:36) | `Global/TwoPieces.lean` |
+| `globalBirkhoffConverse` | open: "empty" half proved (`ConverseEmpty.lean`); "round" half proved for Schwarzschild's (`ConverseRoundSchw.lean`), given out for Kruskal's | `ConverseRoundKruskal.lean` |
+| `globalBirkhoffUnique` | open: flat case proved (`UniqueFlat.lean`); Kruskal's case: chain stated, all links given out; negative mass: chain stated, first link given out. `Unique.lean` puts the three cases together and compiles against the open statements. | `Unique.lean` |
+| `globalMassUnique` | open: given out | `MassUnique.lean` |
+| `globalBirkhoff` | open: abstract gluing theorem proved (`Develop.lean`); its use given out; rests on `globalBirkhoffUnique` | `Glue.lean` |
 
-None of the three proved targets has been checked in a whole-project build yet; none is in
-`GravityInLean.lean` yet. No statement has been reported false.
+Whole project through the queue at 03:36: `Build completed successfully (7771 jobs)`, the audit
+included (2255 declarations, none rests on more than the three standard assumptions), with the
+first 15 finished files in `GravityInLean.lean`. No statement has been reported false.
 
 ## The route chosen
 
@@ -72,14 +73,18 @@ connected space (covering space of germs; the library's lifting theorem).
 | `desitter` | `DeSitterNoMap.lean` | m0-a1 | 03:24 | 03:27 | merged; two targets proved |
 | `converse-empty` | `ConverseEmpty.lean` | m0-a2 | 03:24 | 03:28 | merged |
 | `converse-round-kruskal` | `ConverseRoundKruskal.lean` | m0-a4 | 03:24 | | |
-| `converse-round-schw` | `ConverseRoundSchw.lean` | m0-a5 | 03:24 | | |
-| `unique-flat` | `UniqueFlat.lean` | m0-a3 | 03:24 | | |
-| `develop` | `Develop.lean` | m0-a6 | 03:24 | | |
-| `kretschmann-kept` | `KretschmannKept.lean` | m0-a7 | 03:27 | | |
-| `kretschmann-kruskal` | `KretschmannKruskal.lean` | m0-a8 | 03:27 | | |
-| `hess-kept` | `HessKept.lean` | m0-a9 | 03:30 | | |
+| `converse-round-schw` | `ConverseRoundSchw.lean` | m0-a5 | 03:24 | 03:39 | merged |
+| `unique-flat` | `UniqueFlat.lean`, `FlatRigid.lean` | m0-a3 | 03:24 | 03:36 | merged; third part of `GlobalBirkhoffUnique` |
+| `develop` | `Develop.lean` | m0-a6 | 03:24 | 03:32 | merged; glued space of pairs (point, symmetry), the library's fibre bundle core and lifting theorem |
+| `kretschmann-kept` | `KretschmannKept.lean` | m0-a7 | 03:27 | 03:32 | merged |
+| `kretschmann-kruskal` | `RiemannGen.lean`, `KretschmannGen.lean`, `KretschmannKruskal.lean` | m0-a8 | 03:27 | 03:39 | merged; the scalar is `-48 m² / r⁶` in this project's signs |
+| `hess-kept` | `HessKept.lean` | m0-a9 | 03:30 | 03:33 | merged |
 | `hess-kruskal` | `HessKruskal.lean` | m0-a1 | 03:30 | | |
-| `sphere-rigid` | `SphereRigid.lean` | m0-a2 | 03:33 | | needs `unique_flat` |
-| `kruskal-kept` | `KruskalKept.lean` | | | | stated; needs the four curvature links |
-| `kruskal-plane` | `KruskalPlane.lean` | | | | stated |
-| `unique-kruskal` | `UniqueKruskal.lean` | | | | stated |
+| `sphere-rigid` | `SphereRigid.lean` | m0-a2 | 03:33 | | |
+| `glue` | `LocalMaps.lean`, `Glue.lean` | m0-a6 | 03:34 | | Part 5 |
+| `kruskal-kept` | `KruskalKept.lean` | m0-a7 | 03:34 | | |
+| `unique-kruskal` | `UniqueKruskal.lean` | m0-a9 | 03:37 | | |
+| `kruskal-plane` | `KruskalPlane.lean` | m0-a3 | 03:38 | | |
+| `schw-kept` | `SchwScalars.lean`, `SchwKept.lean` | m0-a8 | 03:41 | | |
+| `mass-unique` | `MassUnique.lean` | m0-a5 | 03:41 | | Part 4 |
+| `unique-schw` | `UniqueSchw.lean` | | | | stated, not given out yet |
