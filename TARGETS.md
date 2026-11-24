@@ -10,7 +10,7 @@ The one result gravity-in-lean can publish soon with an honest claim to be first
 
 Before claiming any "first", four things are needed:
 
-- The repository must be public and dated. Today it is private, so no priority is established.
+- The repository must be public and dated. **Done:** it has been public since 24 November 2026, 00:26 UTC (it was private when this research was written).
 - The statement must be compared line by line with ProjectAinos.
 - The community's four standard checks must pass (listed in the last section).
 - A human must write the manuscript, because every venue requires one.
@@ -31,7 +31,7 @@ Birkhoff's theorem has now been machine-checked three ways, all in Lean, all in 
 
 Searches of Isabelle, Coq/Rocq, the HOL family, Mizar and Metamath found no Birkhoff theorem at all **[Notes: summary]**.
 
-So the **coordinate version is not a first**. The project's coordinate Birkhoff merged on 23 November 2026. Its "from symmetry, no starting template" version merged the same day. That second version is probably **more general than ProjectAinos's** **[Checked: file header only]**. It allows a mixed time–distance term and a free sphere size. It holds "wherever the size of the spheres is a usable distance", which takes in the inside of the horizon. Only the horizon itself (the "rim") and the poles are left out. It still assumes that coordinates exist in which rotations move only the two angles. But that version sits in a **private repository**, so it has no public date. A competing claim made tomorrow would be on record first.
+So the **coordinate version is not a first**. The project's coordinate Birkhoff merged on 23 November 2026. Its "from symmetry, no starting template" version merged the same day. That second version is probably **more general than ProjectAinos's** **[Checked: file header only]**. It allows a mixed time–distance term and a free sphere size. It holds "wherever the size of the spheres is a usable distance", which takes in the inside of the horizon. Only the horizon itself (the "rim") and the poles are left out. It still assumes that coordinates exist in which rotations move only the two angles. It sat in a private repository when this research was written; the repository has been public since 24 November 2026, 00:26 UTC, which dates it from then.
 
 The fully coordinate-free goal is `BirkhoffNoCoordinates`, already fixed in `Curved/Goal.lean`. It reads: a four-dimensional spacetime that is empty, with three symmetry fields that combine like rotations and sweep out spheres, has around each point where the sphere size is a usable distance a chart in which the metric is exactly Schwarzschild's. **That statement has not been found machine-checked anywhere.** It would also cover the black-hole interior and charts that are not diagonal, which ProjectAinos's template excludes. One of its two main building blocks is done. That is `turnsCoordinates`: coordinates adapted to three symmetry fields, about 2,070 lines, merged **[Checked]**.
 
@@ -233,7 +233,7 @@ No CICM 2027 call was found. Every publisher checked agrees that AI cannot be an
 
 The checks before any "first" claim are concrete. All are **[Judgement]**, drawn from the researchers' notes and the RH precedent.
 
-1. **Make it public and dated.** The repository is private today, so no priority exists. ProjectAinos's date is public.
+1. **Make it public and dated.** Done on 24 November 2026, 00:26 UTC. ProjectAinos's date is public too. A permanent archive copy (for example Software Heritage or Zenodo) would make the date harder to dispute.
 2. **Compare statements word for word** with ProjectAinos's `birkhoff` and grlab's `Birkhoff.lean`. Phrase the claim narrowly, for example: "to our knowledge, the first machine-checked Birkhoff theorem from coordinate-free symmetry hypotheses, in any proof assistant, including the region inside the horizon". Credit ProjectAinos (19 Nov 2026) and grlab (Aug 2026) as earlier coordinate versions.
 3. **Re-search on the day of submission.** Cover Lightlike, ProjectAinos, TauCeti, physlib pull requests #968 and #2132, mathlib #36036, a GitHub code search, the Isabelle Archive of Formal Proofs, Rocq, HOL and Mizar, and the Lean "1000+ theorems" list. Ask on the Lean Zulip and on the Lightlike and ProjectAinos issue trackers. All three AI libraries changed within the last week.
 4. **Pass Buzzard's four checks.** The Lean statement must match the paper. It must compile. A comparator tool must confirm the proved theorem is the fixed statement. And a "paranoid" multi-kernel check must rule out tricks with Lean itself. Add an axioms printout and a reproducible build ([Xena blog](https://xenaproject.wordpress.com/2026/11/12/and-the-proof-is-checked-in-lean/)).
