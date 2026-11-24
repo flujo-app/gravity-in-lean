@@ -565,8 +565,17 @@ one head, read twice, and tested on known answers before any worker starts.
    the textbook. **Done** by the fifth team (see "What the fifth team run showed").
 9. The rim included (issue 39, first step). **Done** by the sixth team (see "What the sixth
    team run showed").
-10. **Next:** the theorem about a whole space-time at once (issue 39, second step), in a second
-    chat. The checks of issue 34 before any public claim.
+10. **Next: the theorem for a whole space-time** (issue 39, second step), in a chat of its own.
+    Statements fixed in `Goals/Global.lean`: a round, empty space-time on a simply connected
+    region maps into Kruskal's whole space-time (or flat space-time, or Schwarzschild's of
+    negative mass) by a length-keeping map, unique up to a symmetry; the mass is fixed; and the
+    other way round. Kruskal's is written with the unit sphere, so no pole is left out. A second
+    reader judged every statement true as written; its findings were worked in before the
+    statements were fixed. Checks proved in `Global/Checks.lean`. Brief in
+    `fleet/goal-global.md`; item 9 is its local input. The classification (Kruskal's or one of
+    its four quotients by a reflection, under a completeness condition) is **not stated**: it
+    needs paths of free fall on a curved space, which neither this project nor the standard
+    library has yet. The checks of issue 34 before any public claim.
 
 ## After Birkhoff: what could make a paper
 

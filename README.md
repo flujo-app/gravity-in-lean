@@ -99,10 +99,16 @@ read the definitions and the goal against the textbooks: [REVIEW.md](REVIEW.md).
 
 ## Stated, not yet proved
 
-Nothing in the files of fixed statements (`GravityInLean/Goals/`) from this line of work is
-open at the moment: every statement there has a proof, and `Audit.lean` checks each proof
-against its statement. Statements for the theorem about a whole space-time at once are being
-written in `GravityInLean/Goals/Global*.lean`; until they are proved, they are statements.
+One group of targets is written down in exact form and **not proved**: the theorem about a
+whole space-time at once. Each is a definition of a statement. The build checks that the
+statements are well-formed and rest on nothing extra. It does not check that they are true. A
+second, independent reader judged them true as written before they were fixed. Every earlier
+statement in `GravityInLean/Goals/` has a proof, and `Audit.lean` checks each proof against its
+statement.
+
+| Statement | In plain words | File, and the check that it is not about nothing |
+|---|---|---|
+| `GlobalBirkhoff`, `GlobalBirkhoffUnique`, `GlobalBirkhoffConverse`, `GlobalMassUnique` | Birkhoff's theorem for a whole space-time. A round, empty space-time on a region in one piece with no holes (simply connected) can be laid onto Kruskal's whole space-time (positive mass), flat space-time (mass zero) or Schwarzschild's of negative mass, by a map that keeps every length; the map need not be one-to-one. It is unique up to a symmetry of that model; the mass is fixed by the space-time; and the other way round, a space-time with such a map is round and empty. Kruskal's is written here with the sphere as the unit sphere of ordinary space, so no pole is left out. In the research notes this was not found written down as a theorem. | [Goals/Global.lean](GravityInLean/Goals/Global.lean), with checks as statements (Schwarzschild's maps into Kruskal's by the textbook formulas; de Sitter's has no such map; uniqueness needs a region in one piece) and checks already proved in [Global/Checks.lean](GravityInLean/Global/Checks.lean): the assumptions can be met, for every mass and across the rim, and the conclusion then holds; the pole-free Kruskal's is the project's Kruskal's; the symmetries keep lengths; a map that does not move is never length-keeping. |
 
 ## What is still taken on trust
 
@@ -266,6 +272,8 @@ GravityInLean/Goals/ExactlyWhen.lean statements to prove: Birkhoff's theorem bot
 GravityInLean/Goals/Tests.lean      statements to prove: tests that the definitions can fail
 GravityInLean/Goals/OneMass.lean    statement to prove: one mass for a whole region
 GravityInLean/Goals/EveryPoint.lean statements to prove: the theorem at every point, rim included
+GravityInLean/Goals/Global.lean     statements to prove: the theorem for a whole space-time
+GravityInLean/Global/Checks.lean    checks of those statements: assumptions met, known answers
 GravityInLean/Flows/                paths along a field depend smoothly on where they start
                                     (eleven files; SmoothFlow.lean holds the theorem)
 GravityInLean/Turns/                coordinates that fit the turns exist
