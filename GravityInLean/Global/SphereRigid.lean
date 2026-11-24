@@ -81,6 +81,7 @@ theorem lightSign4_entry {Λ : Matrix (Fin 4) (Fin 4) ℝ}
 noncomputable def mulVecCLM (Λ : Matrix (Fin 4) (Fin 4) ℝ) : Coords 4 →L[ℝ] Coords 4 :=
   LinearMap.toContinuousLinearMap (Matrix.mulVecLin Λ)
 
+/-- That linear map, applied to a list of four numbers, is the table applied to the list. -/
 theorem mulVecCLM_apply (Λ : Matrix (Fin 4) (Fin 4) ℝ) (u : Coords 4) :
     mulVecCLM Λ u = Λ.mulVec u := rfl
 
