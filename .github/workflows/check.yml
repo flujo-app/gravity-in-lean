@@ -2,6 +2,8 @@ name: Check the proofs
 
 # Runs the same check as `lake build` on a clean machine:
 # every proof, plus the audit that fails on any hole or extra assumption.
+# The project is built from source every time: only mathlib's prebuilt files are fetched.
+# GitHub's cache of earlier builds is not used, so that a green run means a build from scratch.
 on:
   push:
   pull_request:
@@ -16,3 +18,5 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: leanprover/lean-action@v1
+        with:
+          use-github-cache: false

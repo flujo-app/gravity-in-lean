@@ -19,8 +19,10 @@ down where others can see it.
       `Birkhoff.lean`: the table "Side by side" in Section 2, from the source files read on
       24 November 2026. Read them again on the day of submission; both projects change often.
 - [ ] **Verify every reference** against the source: authors, title, year, volume, pages. The
-      draft marks the list as unverified. Do not describe Schmidt's method beyond "avoids
-      introducing coordinates".
+      draft marks the list as unverified. Section 2 describes H.-J. Schmidt's method (no
+      coordinates on the orbit space, starting from the warped-product form) and the gap in
+      Schleich and Witt from `review/global-birkhoff.md` §1.5 and §1.6: check both against the
+      papers themselves.
 - [ ] Keep every priority claim as "to our knowledge" or "not found written down". No "first",
       no "new".
 - [ ] In reader-facing text say "horizon" and "inside the horizon", not "rim": an outside reader
@@ -36,25 +38,36 @@ down where others can see it.
       the `STATUS.md` files or the audit; Section 8 agrees with Section 9; the abstract claims
       nothing the statements do not say. The outside review found that late additions (run 7,
       the sandbox checks) had left older paragraphs behind.
+- [x] **Review 2** (25 November 2026, `review/paper-review-2.md`): a hostile round by Claude
+      Opus 5.5 with two fresh instances of the same model, one for the mathematics against the
+      Lean files and one for every number and record. About forty findings, all on the text and
+      the record, none on the theorems; worked in. It found that the CI build reused a saved
+      build, so "Check the proofs" now builds from source.
 - [ ] **One more outside review** of the whole draft after the next large change, by a model
-      that did not write it.
+      that did not write it. Review 2 does not count: the same model wrote much of the text.
+- [ ] **Name the AI system that wrote outside review 1** in Section 10; the repository does not
+      record it.
 
 ## The four questions for AI-written formal proofs
 
 From the Xena blog, 12 November 2026; the answers are in Section 9.
 
-- [x] **The statement matches the paper.** The Lean excerpts in the draft are copied from the
-      files. Re-check the excerpts against the commit named in Section 9 before submitting.
-- [x] **It compiles** from scratch, on this PC and on GitHub's clean machine (workflow "Check
-      the proofs").
+- [x] **The statement matches the paper.** The Lean excerpts in the draft agree with the files
+      up to line breaks, and the field comments of `IsRoundOn` are left out. Re-check the
+      excerpts against the commit named in Section 9 before submitting.
+- [x] **It compiles** from scratch, on this PC and on GitHub's clean machine: the workflow
+      "Compare statements" builds the project from source, and since 25 November so does "Check
+      the proofs" (before that it restored a saved build of an earlier commit, which review 2
+      found).
 - [x] **It proves the theorem as stated:** `Audit.lean` holds `example : Statement := theorem`
-      for every final statement, checked by every build.
-- [x] **Lean's own `lake comparator`** on the same question, with the statements (in `Goals/`
-      and `Curved/Goal.lean`) as the challenge: `comparator/Challenge.lean` (the sixteen
-      headline statements, each with a hole for its proof) and `comparator.json`.
-      `lake comparator --paranoid`, inside Lake's sandbox on Linux (the setting below), accepted
-      all sixteen against `Audit`: same statements, only the three standard axioms, all six
-      checkers. A question changed by hand was rejected. Section 9, item 3.
+      for every final statement (for `ConnectionUniqueStatement` under a second name, since
+      24 November), checked by every build.
+- [x] **Lean's own `lake comparator`**, first on a question of the sixteen headline statements
+      (`comparator/Challenge.lean` at commit `73816cc`, each statement with a hole for its
+      proof, and `comparator.json`): `lake comparator --paranoid`, inside Lake's sandbox on
+      Linux (the setting below), accepted all sixteen against `Audit`: same statements, only
+      the three standard axioms, all six checkers. A question changed by hand was rejected. The
+      question now holds all 58 proved statements (the box below). Section 9, item 3.
 - [x] **A kernel re-check outside the build:** `leanchecker` over all 200 modules at tag
       `paper-1-numbers`: 199 passed; the checker itself crashed twice on
       `GravityInLean.OneMass`, whose declarations then passed the six checkers below.
@@ -81,12 +94,19 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
 - [ ] **Axioms printout** for the main theorems in the paper's appendix or repository
       (`#print axioms`). The audit already checks this for every declaration; a printed list for
       the named theorems is still to be added.
+- [ ] **Keep the logs of local checker runs in the repository.** The logs of the `leanchecker`,
+      `lake check` and `nanoda` runs and of the local comparator runs of 24 November were not
+      kept; most of Section 9's figures for them are recorded only in the paper (review 2). Next
+      time commit the logs, for example under `scripts/sandbox-check/logs/`.
 
 ## The definitions
 
-- [x] Reviewed against the textbooks by three AI reviewers (`REVIEW.md`). Its to-do list is
-      done: the connection exists, one mass per connected region, the 25 tests, the comments.
-- [x] 25 failure tests proved.
+- [x] The core definitions (commit `600b6a2`: `Curved/Basic.lean`, `Curved/Goal.lean`,
+      `BirkhoffNoCoordinates`) reviewed by three AI reviewers (`REVIEW.md`), one of them against
+      the textbooks. Its to-do list is done: the connection exists, one mass per connected
+      region, the 25 tests, the comments. The definitions added later (Kruskal–Szekeres, the
+      global models and maps) had one AI second reader each, not this review.
+- [x] 25 tests proved, 13 of them cases where a definition must fail.
 - [ ] **The textbook's symmetry gives ours.** The textbooks assume an isometric action of SO(3)
       with two-dimensional spacelike orbits; the statements assume three Killing fields
       (`IsRoundOn`). Either prove in Lean that such an action gives `IsRoundOn`, or keep calling
@@ -100,7 +120,11 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
 ## The method
 
 - [x] **What the workers could see and reach**, and **what was changed after each run and by
-      whom**: written in Section 7.
+      whom**: written in Section 7 (completed in review 2: the leads' edits in runs 3, 5 and 6,
+      and the unused assumption removed after run 1, had been left out).
+- [ ] For later runs: make the statement files read-only for the team (for example a read-only
+      mount), so that "the team could not change them" is true by construction and not only a
+      rule checked afterwards.
 - [ ] **A comparison point** for the method paper: the same job (for example run 2 or run 4)
       run by one agent instead of ten, or without the route in the brief. Without one, Section 7
       reports measurements, not a comparison.
@@ -109,6 +133,9 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
 
 ## The author
 
+- [ ] **The author reads the current version.** The reading below was of the version of
+      24 November (commit `a26e6f7`), before both AI reviews of the text and before the
+      sandbox and comparator sections; Section 10 now says so. Re-read, then change Section 10.
 - [x] **The author has read the whole paper** (24 November 2026). Section 10 says plainly that
       the author is not a specialist and has not checked the mathematics, so the sentences in
       [plain-summary.md](plain-summary.md) are not yet defended by a human. A reading by a
