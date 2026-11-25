@@ -516,8 +516,7 @@ that is part of every build; the whole development compiles from scratch on a cl
   classification is stated but not proved (Section 4).
 - What Section 9 leaves open: `lake check --paranoid` over the whole project ran on the author's
   PC, in a Linux container, not on a second machine or in public CI (`lake comparator` now runs
-  in public CI); `nanoda` has not checked the whole export; and `connectionUnique`, one of the
-  fixed statements, cannot be put to `lake comparator` (item 3 of Section 9).
+  in public CI); and `nanoda` has not checked the whole export.
 
 ## 9. Reproducibility
 
@@ -556,18 +555,20 @@ that is part of every build; the whole development compiles from scratch on a cl
      - *Sixteen headline results, on the PC described,* at commit `73816cc` (`3b816ea` plus the
        question): accepted ("Your solution is okay!", in 9 minutes; export 546 MB, as in item 4
        (a)).
-     - *Every statement the audit checks, on GitHub's machine.* The question is now written from
-       the audit's `example : Statement := theorem` lines by `scripts/comparator/make_challenge.py`,
-       which also fails the workflow when the question is out of date. It holds 57 statements:
-       the 54 of this paper and three proved since. One more fixed statement cannot be asked:
-       that of `connectionUnique`, whose own type is its statement. The statement files already
-       import its proof, so the question cannot declare its name; the build checks its type and
-       the audit its axioms. The workflow "Compare statements" ran `lake comparator --paranoid` at
-       commit `e30d888` on a standard Linux machine of GitHub (bubblewrap installed, Ubuntu's
-       limit on unprivileged namespaces lifted): accepted, in 12.5 minutes; all six checkers
-       accepted the export, about 56,000 declarations. The log is public (workflow run
-       45483949294). Between `3b816ea` and `e30d888` no Lean file of this paper's proofs
-       changed; files were only added, and lines added to the audit.
+     - *Every proved fixed statement, on GitHub's machine.* The question is now written from
+       `Audit.lean` by `scripts/comparator/make_challenge.py`, which also fails the workflow when
+       the question is out of date. It holds 58 statements: the 54 of this paper,
+       `connectionUnique`, and three proved since. `connectionUnique` is asked under a second
+       name, `connectionUniqueForComparator := connectionUnique`, which only `Audit.lean`
+       declares: its own name is taken in the question, because every statement file loads its
+       proof (`Curved/Goal.lean` imports `Curved/KnownAnswers.lean`, which leads to it). The
+       workflow "Compare statements" runs `lake comparator --paranoid` on a standard Linux
+       machine of GitHub (bubblewrap installed, Ubuntu's limit on unprivileged namespaces
+       lifted). At commit `e30d888`, with 57 statements, it accepted in 12.5 minutes, all six
+       checkers over about 56,000 declarations (workflow run 45483949294). At commit `582cfe9`,
+       with all 58, it accepted in 15.5 minutes, all six checkers (workflow run 45515418074), and so did the local Linux container of item 4, in
+       12 minutes. The logs on GitHub are public. Between `3b816ea` and these commits no Lean
+       file of this paper's proofs changed; files were only added, and lines added to the audit.
 
      To see that the tool is not a rubber stamp, the question was changed by hand twice. Once
      `oneMass` was given the statement of `connectionExists`, and once the failure test

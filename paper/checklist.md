@@ -71,10 +71,10 @@ From the Xena blog, 12 November 2026; the answers are in Section 9.
       declarations with everything they depend on, also inside the sandbox. Section 9, item 4.
 - [x] **`lake comparator` for all fixed statements, in public CI** (outside review 1, finding
       F9). The question is written from `Audit.lean` by `scripts/comparator/make_challenge.py`
-      (57 statements: the paper's 54 and three proved since); the workflow "Compare statements"
-      runs `lake comparator --paranoid` on GitHub's Linux machine and fails when the question is
-      out of date. First run accepted, 12.5 minutes. `connectionUnique` cannot be asked: the
-      statement files import its proof. Section 9, item 3.
+      (58 statements: the paper's 54, `connectionUnique` under the second name
+      `connectionUniqueForComparator`, and three proved since); the workflow "Compare
+      statements" runs `lake comparator --paranoid` on GitHub's Linux machine and fails when the
+      question is out of date. Accepted on GitHub and in the local container. Section 9, item 3.
 - [ ] **`nanoda` on the whole export.** Tell nanoda's authors about the stack overflow (it
       needs only the public repository and `scripts/sandbox-check/run.sh` to repeat), and run it
       again with a version that gets through.
