@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slow Clocks, Bent Light · Gravity in Lean</title>
+<meta name="description" content="Fly around a heavy mass and watch clocks slow down and light bend. The interactive pages of the Gravity in Lean project.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Slow Clocks, Bent Light">
+<meta property="og:description" content="Fly around a heavy mass and watch clocks slow down and light bend. Every one of them keeps its own time.">
+<meta property="og:image" content="https://flujo-app.github.io/gravity-in-lean/preview.jpg">
+<meta property="og:url" content="https://flujo-app.github.io/gravity-in-lean/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap">
+<style>
+/* The same deep space as the pages themselves. */
+:root {
+  color-scheme: dark;
+  --bg: #03050a;
+  --card: rgba(12, 18, 32, 0.72);
+  --line: rgba(160, 190, 230, 0.22);
+  --ink: #e9eff8;
+  --soft: #a3b4cb;
+  --hot: #ffd27a;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.55; }
+a { color: var(--hot); }
+:focus-visible { outline: 2px solid var(--hot); outline-offset: 3px; }
+.wrap { width: min(1080px, 100%); margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); }
+
+.hero { position: relative; min-height: min(78vh, 720px); display: flex; align-items: flex-end; overflow: hidden; border-bottom: 1px solid var(--line); }
+.hero img { position: absolute; top: 0; left: 0; width: 125%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3,5,10,0.15) 0%, rgba(3,5,10,0.35) 45%, rgba(3,5,10,0.96) 100%), linear-gradient(90deg, rgba(3,5,10,0.85) 0%, rgba(3,5,10,0) 65%); }
+.hero .wrap { position: relative; z-index: 1; padding-top: 120px; padding-bottom: 56px; }
+.label { margin: 0 0 14px; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+h1 { margin: 0; max-width: 12ch; font-family: var(--font-display); font-stretch: 122%; font-weight: 800; font-size: clamp(40px, 8vw, 84px); line-height: 0.98; letter-spacing: -0.01em; }
+.lead { margin: 20px 0 0; max-width: 34em; font-size: clamp(18px, 2.3vw, 21px); color: #d3ddec; }
+.go { display: inline-block; margin-top: 26px; padding: 13px 30px; border-radius: 999px; background: var(--hot); color: #1b1404; font-weight: 800; font-size: 18px; text-decoration: none; }
+.go:hover { background: #ffe0a0; }
+.how { margin: 14px 0 0; font-size: 14.5px; color: var(--soft); }
+
+section { padding: 56px 0 8px; }
+h2 { margin: 0 0 6px; font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hot); }
+section > .wrap > p { margin: 0 0 18px; max-width: 42em; color: #d3ddec; }
+.sure { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 18px; }
+.sure div { padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font-size: 15.5px; color: #d3ddec; }
+.sure b { display: block; margin-bottom: 4px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin-top: 18px; }
+.grid a { display: block; padding: 18px 20px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: inherit; text-decoration: none; transition: border-color 0.2s ease, transform 0.2s ease; }
+.grid a:hover { border-color: var(--hot); transform: translateY(-2px); }
+.grid h3 { margin: 0 0 6px; font-family: var(--font-display); font-stretch: 110%; font-weight: 700; font-size: 21px; line-height: 1.15; }
+.grid p { margin: 0; font-size: 15.5px; color: var(--soft); }
+
+footer { margin-top: 56px; padding: 26px 0 40px; border-top: 1px solid var(--line); font-size: 15px; color: var(--soft); }
+footer p { margin: 0 0 6px; }
+@media (prefers-reduced-motion: reduce) { .grid a { transition: none; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <img src="hero.jpg" alt="A glowing heavy mass in open space, with flashes of light bending around it and the paths light would take curving across the floor">
+  <div class="wrap">
+    <p class="label">Gravity in Lean · the pages</p>
+    <h1>Slow Clocks, Bent Light</h1>
+    <p class="lead">A heavy mass, a light mass, a far observer, a distant light that flashes once a second, and you. Every one of them keeps its own time. Fly around, follow any of the clocks, and watch light bend.</p>
+    <a class="go" href="slow-clocks-bent-light.html">Enter</a>
+    <p class="how">W A S D to fly, drag to look, wheel to zoom. On a phone: left thumb flies, right thumb looks.</p>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <h2>How sure is this</h2>
+      <p>The page was tested with numbers against the textbook formulas. Then the project went further: several of its formulas, and the theory behind them, are now proved by machine.</p>
+      <div class="sure">
+        <div><b>Tested</b>Clock rates, free fall, round orbits and bent light agree with the textbook sums, light bending to about one part in a hundred and the rest to five digits.</div>
+        <div><b>Proved</b>Lean, a proof checker, confirms every step: Schwarzschild's space-time is empty, it is the only round empty one, and the clock rates and orbits follow from it.</div>
+        <div><b>Not claimed</b>An exact formula for two masses circling each other. There almost certainly is none.</div>
+      </div>
+      <p style="margin-top:18px"><a href="https://github.com/flujo-app/gravity-in-lean#what-is-proved-today">What is proved, and what is still taken on trust</a></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>The earlier tries</h2>
+      <p>The pages that led to it. Each shows the same idea from a different side. They are pictures: good for the idea, not tested the same way.</p>
+      <div class="grid">
+        <a href="everything-rises.html"><h3>Everything Rises</h3><p>Sideways is space, up is the time each thing has lived. Everything climbs. Moving tilts your climb, and a heavy thing makes a funnel.</p></a>
+        <a href="slow-light-town.html"><h3>Slow Light Town</h3><p>A town where light moves at walking pace, so far streets are in the past and running bends what you see.</p></a>
+        <a href="slices-of-time.html"><h3>Slices of Time</h3><p>A block of space-time cut in four ways: at rest, moving, falling, and falling along.</p></a>
+        <a href="dome-and-horn.html"><h3>The Dome and the Horn</h3><p>Two curved pictures of the motion budget: a dome without gravity, a horn with it.</p></a>
+        <a href="light-clock-falling-wave.html"><h3>Light Clock &amp; Falling Wave</h3><p>A light clock that shows why moving clocks run slow, and a matter wave that falls.</p></a>
+        <a href="spacetime-speedometer.html"><h3>Spacetime Speedometer</h3><p>The motion budget as a dial: what you spend on moving through space is missing from your moving through time.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>On the side: a maths lesson</h2>
+      <p>Not part of the gravity work, except where they meet in the last chapter: the clock it uses is the same slow-clock rule.</p>
+      <div class="grid">
+        <a href="arrows-to-amplitudes.html"><h3>Arrows to Amplitudes</h3><p>Six short chapters on the maths behind quantum physics, from adding arrows to the double-slit stripes. Each chapter asks questions you answer before you check.</p></a>
+        <a href="turns-explainer.svg"><h3>Turns and a Mirror</h3><p>One picture of a quarter turn, a half turn and a mirror, with a letter F so you can see which way things face.</p></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Source, proofs and these pages: <a href="https://github.com/flujo-app/gravity-in-lean">github.com/flujo-app/gravity-in-lean</a></p>
+    <p>The pages need the internet: they load their 3D library and fonts from the web.</p>
+  </div>
+</footer>
+
+</body>
+</html>
