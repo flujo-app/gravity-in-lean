@@ -250,6 +250,16 @@ example : GravityInLean.Curved.Tests.IsEmptyOnNegIff.{0, 0, 0} :=
 example : GravityInLean.Curved.OneMassStatement := GravityInLean.oneMass
 example : GravityInLean.Curved.ConnectionExistsStatement := GravityInLean.connectionExists
 
+-- `connectionUnique` (`Curved/Unique.lean`) has its fixed statement as its own type. Every
+-- statement file loads that proof (`Curved/Goal.lean` imports `Curved/KnownAnswers.lean`, which
+-- leads to `Curved/Unique.lean`), so the question for `lake comparator` cannot declare that
+-- name. It is asked under this second name, which only this file declares.
+theorem GravityInLean.Curved.connectionUniqueForComparator :
+    GravityInLean.Curved.ConnectionUniqueStatement :=
+  GravityInLean.Curved.connectionUnique
+
+#audit GravityInLean.Curved.connectionUniqueForComparator
+
 #audit GravityInLean.oneMass GravityInLean.connectionExists
   GravityInLean.Curved.Tests.efNotUsableOnRim GravityInLean.Curved.Tests.zeroNotRound
   GravityInLean.Curved.Tests.deSitterNotSchwarzschild GravityInLean.Curved.Tests.minkowskiIsRoundOn

@@ -38,6 +38,7 @@
     "GravityInLean.Curved.Tests.isEmptyOnNegIff",
     "GravityInLean.oneMass",
     "GravityInLean.connectionExists",
+    "GravityInLean.Curved.connectionUniqueForComparator",
     "GravityInLean.Curved.kruskalRadiusSpec",
     "GravityInLean.Curved.kruskalRadiusSmooth",
     "GravityInLean.Curved.kruskalIsSpaceTime",

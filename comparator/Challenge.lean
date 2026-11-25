@@ -16,14 +16,15 @@ import GravityInLean.Goals.Turns
 /-!
 # The question for `lake comparator`
 
-Every statement that `Audit.lean` checks against its proof: 57 in all. Each appears
+Every statement that `Audit.lean` checks against its proof: 58 in all. Each appears
 under the same full name as its proof in the project and with the statement fixed in `Goals/`
 or `Curved/Goal.lean`, but with `sorry` (a hole) in place of a proof. This file imports only
 the statement files (which bring the definitions and a few checks with them). It is written
 from the `example : Statement := proof` lines of `Audit.lean` by
 `scripts/comparator/make_challenge.py`, which also writes `comparator.json`; the workflow
-"Compare statements" fails when the two are out of date. `connectionUnique` cannot be asked
-here: the statement files already import its proof, so its name is taken.
+"Compare statements" fails when the two are out of date. `connectionUnique` is asked under
+the second name `connectionUniqueForComparator`, which only `Audit.lean` declares: the
+statement files already load its proof, so this file could not declare its own name.
 
 `lake comparator` (configured in `comparator.json` at the top of the repository) builds this
 file and `Audit.lean` inside its sandbox, and accepts only if each named result in `Audit.lean`
@@ -166,6 +167,10 @@ theorem GravityInLean.oneMass : GravityInLean.Curved.OneMassStatement :=
 /-! ## The connection of a length measure exists and is unique (`Goals/Connection.lean`) -/
 
 theorem GravityInLean.connectionExists : GravityInLean.Curved.ConnectionExistsStatement :=
+  sorry
+
+theorem GravityInLean.Curved.connectionUniqueForComparator :
+    GravityInLean.Curved.ConnectionUniqueStatement :=
   sorry
 
 /-! ## Every point, the horizon included, and Kruskal's table (`Goals/EveryPoint.lean`) -/

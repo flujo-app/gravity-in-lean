@@ -1,8 +1,9 @@
 """Write comparator/Challenge.lean and comparator.json from Audit.lean.
 
 Every `example : Statement := proof` line of Audit.lean becomes `theorem proof : Statement := sorry`
-in the challenge. (`connectionUnique`, whose own type is its fixed statement, cannot be asked: the
-statement files the challenge imports already import its proof, so the name is taken.)
+in the challenge. So does every `theorem name : Statement := proof` that Audit.lean declares
+itself: such a second name is used where the statement files already load the proof, so that
+the challenge could not declare the proof's own name (`connectionUniqueForComparator`).
 
 Usage:  python scripts/comparator/make_challenge.py           write both files
         python scripts/comparator/make_challenge.py --check   fail if either is out of date
@@ -17,6 +18,9 @@ root = pathlib.Path(__file__).resolve().parents[2]
 audit = root.joinpath("Audit.lean").read_text(encoding="utf-8")
 flat = re.sub(r"\s+", " ", audit)
 pairs = re.findall(r"example : ([A-Za-z0-9_.]+(?:\.\{[0-9, ]+\})?) := ([A-Za-z0-9_.]+)", flat)
+pairs += [(stmt, name) for name, stmt in
+          re.findall(r"^theorem ([A-Za-z0-9_.]+) : ([A-Za-z0-9_.]+) :=",
+                     re.sub(r":\s+", ": ", audit), re.M)]
 
 # Where each statement is fixed, read from the statement files themselves.
 files = sorted(root.joinpath("GravityInLean", "Goals").glob("*.lean")) + [
@@ -67,8 +71,9 @@ out += ["", "/-!", "# The question for `lake comparator`", "",
         "the statement files (which bring the definitions and a few checks with them). It is written",
         "from the `example : Statement := proof` lines of `Audit.lean` by",
         "`scripts/comparator/make_challenge.py`, which also writes `comparator.json`; the workflow",
-        "\"Compare statements\" fails when the two are out of date. `connectionUnique` cannot be asked",
-        "here: the statement files already import its proof, so its name is taken.", "",
+        "\"Compare statements\" fails when the two are out of date. `connectionUnique` is asked under",
+        "the second name `connectionUniqueForComparator`, which only `Audit.lean` declares: the",
+        "statement files already load its proof, so this file could not declare its own name.", "",
         "`lake comparator` (configured in `comparator.json` at the top of the repository) builds this",
         "file and `Audit.lean` inside its sandbox, and accepts only if each named result in `Audit.lean`",
         "has exactly the statement written here, rests on no assumption beyond `propext`,",
