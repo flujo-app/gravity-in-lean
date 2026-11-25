@@ -1,0 +1,39 @@
+name: Publish the pages
+
+# Puts the interactive pages in pages/ online: https://flujo-app.github.io/gravity-in-lean/
+# Only the pages and their pictures are published, exactly as they are in this folder.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pages/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Collect the pages
+        run: |
+          mkdir _site
+          cp pages/*.html pages/*.svg pages/*.jpg _site/
+          ls -l _site
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4

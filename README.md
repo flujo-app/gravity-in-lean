@@ -6,6 +6,10 @@ A proof checker called [Lean](https://lean-lang.org) reads every step of every p
 folder and refuses anything that does not follow. Mathematicians use the same tool for their
 largest proofs. So the results below are not "the numbers agree" or "we think so". They are proved.
 
+**Fly it in your browser:**
+[Slow Clocks, Bent Light](https://flujo-app.github.io/gravity-in-lean/slow-clocks-bent-light.html),
+the page this project grew out of, or [all eight pages](https://flujo-app.github.io/gravity-in-lean/).
+
 [What is proved](#what-is-proved-today) ·
 [What is taken on trust](#what-is-still-taken-on-trust) ·
 [Check it yourself](#check-it-yourself) ·
@@ -15,7 +19,7 @@ largest proofs. So the results below are not "the numbers agree" or "we think so
 ## Why this exists
 
 The formulas come from the interactive page
-[Slow Clocks, Bent Light](https://claude.ai/artifact/2wKidE7zA8Z1FXimbFPkjL), where you fly around
+[Slow Clocks, Bent Light](https://flujo-app.github.io/gravity-in-lean/slow-clocks-bent-light.html), where you fly around
 a heavy mass and watch clocks slow down and light bend. That page was tested with numbers. This
 project asks the stricter question: can a machine confirm the formulas exactly? And how far up
 could that go, perhaps as far as two masses circling each other?
@@ -42,8 +46,12 @@ Solid arrows are steps worth taking. Dotted arrows are not for now.
 
 ## The pages
 
-The interactive pages this project grew out of are kept in [pages/](pages/): eight pages, each of
-which opens in a browser by itself, and one picture. Start with *Slow Clocks, Bent Light*.
+The interactive pages this project grew out of are online at
+[flujo-app.github.io/gravity-in-lean](https://flujo-app.github.io/gravity-in-lean/), and kept as
+files in [pages/](pages/): eight pages, each of which opens in a browser by itself, and one
+picture. Start with *Slow Clocks, Bent Light*.
+
+[![Slow Clocks, Bent Light: a glowing heavy mass in open space, flashes of light bending around it, and one row per clock along the top, where the heavy mass has fewer ticks](pages/preview.jpg)](https://flujo-app.github.io/gravity-in-lean/slow-clocks-bent-light.html)
 
 ## What is proved today
 
