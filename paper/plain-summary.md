@@ -58,9 +58,8 @@ Lean. A proof checker accepts no gaps and no "it is clear that".
 1. "Every final theorem has exactly the statement that was fixed before it was proved." *Why it
    holds:* each build checks this (`Audit.lean`), and the public build on GitHub shows it.
    *And:* Lean's own comparison tool (`lake comparator`) confirms it from outside the build, for
-   every fixed statement but one, on GitHub's machines, where anyone can read the log. *The one:*
-   `connectionUnique` cannot be put to the tool, because its proof is already loaded with the
-   statements; the build's own check covers it.
+   every fixed statement that has been proved, on GitHub's machines, where anyone can read the
+   log.
 2. "The proofs rest on nothing but Lean's three standard assumptions." *Why:* the same audit,
    for all 2,605 declarations. *And:* six separate checking programs that ship with Lean
    accept the main theorems, also inside Lake's protective sandbox on Linux (Section 9).
